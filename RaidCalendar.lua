@@ -71,6 +71,11 @@ function RaidCalendar.events:ADDON_LOADED()
 			return
 		end
 
+		if args == "vc" then
+			m.msg.version_check()
+			return
+		end
+
 		if args == "refresh" then
 			m.msg.request_events()
 			return

@@ -266,7 +266,19 @@ function M.new()
 	local function on_comm_received( prefix, data_str, _, sender )
 		if prefix ~= m.prefix or sender == m.player then return end
 
-		local command = string.match( data_str, "^#(.-)#" )
+		--m.debug(data_str)
+
+		local command = string.match( data_str, "^(%u-)::" )
+		if (command) then
+			data_str = string.gsub( data_str, "^.-::", "" )
+
+			local lua_data = loadstring( "return " .. data_str )()
+
+			on_command( command, lua_data, sender )
+			return
+		end
+
+		command = string.match( data_str, "^#(.-)#" )
 		data_str = string.gsub( data_str, "^#.-#", "" )
 
 		if command == "ct" then
