@@ -11,7 +11,7 @@ if m.GuiElements then return end
 local M = {}
 
 M.font_normal = CreateFont( "GIFontNormal" )
-M.font_normal:SetFont( "Interface\\AddOns\\RaidCalendar\assets\\Myriad-Pro.ttf", 12, "" )
+M.font_normal:SetFont( "Interface\\AddOns\\RaidCalendar\\assets\\Myriad-Pro.ttf", 12, "" )
 M.font_normal:SetTextColor( NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b )
 
 M.font_highlight = CreateFont( "GIFontHighlight" )
