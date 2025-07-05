@@ -11,18 +11,18 @@ if m.GuiElements then return end
 local M = {}
 
 M.font_normal = CreateFont( "GIFontNormal" )
-M.font_normal:SetFont( "Interface\\AddOns\\GuildInventory\\assets\\Myriad-Pro.ttf", 12, "" )
+M.font_normal:SetFont( "Interface\\AddOns\\RaidCalendar\assets\\Myriad-Pro.ttf", 12, "" )
 M.font_normal:SetTextColor( NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b )
 
 M.font_highlight = CreateFont( "GIFontHighlight" )
-M.font_highlight:SetFont( "Interface\\AddOns\\GuildInventory\\assets\\Myriad-Pro.ttf", 12, "" )
+M.font_highlight:SetFont( "Interface\\AddOns\\RaidCalendar\\assets\\Myriad-Pro.ttf", 12, "" )
 M.font_highlight:SetTextColor( HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b )
 
 M.font_normal_small = CreateFont( "GIFontNormalSmall" )
-M.font_normal_small:SetFont( "Interface\\AddOns\\GuildInventory\\assets\\Myriad-Pro.ttf", 11, "" )
+M.font_normal_small:SetFont( "Interface\\AddOns\\RaidCalendar\\assets\\Myriad-Pro.ttf", 11, "" )
 
 M.font_highlight_small = CreateFont( "GIFontHighlightSmall" )
-M.font_highlight_small:SetFont( "Interface\\AddOns\\GuildInventory\\assets\\Myriad-Pro.ttf", 11, "" )
+M.font_highlight_small:SetFont( "Interface\\AddOns\\RaidCalendar\\assets\\Myriad-Pro.ttf", 11, "" )
 M.font_highlight_small:SetTextColor( HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b )
 
 ---@param parent Frame
@@ -53,8 +53,8 @@ function M.tiny_button( parent, text, tooltip, color, font_size )
 		button:SetNormalTexture( "Interface\\Buttons\\UI-Panel-MinimizeButton-Up" )
 		button:SetPushedTexture( "Interface\\Buttons\\UI-Panel-MinimizeButton-Down" )
 	else
-		button:SetNormalTexture( "Interface\\AddOns\\GuildInventory\\assets\\tiny-button-up.tga" )
-		button:SetPushedTexture( "Interface\\AddOns\\GuildInventory\\assets\\tiny-button-down.tga" )
+		button:SetNormalTexture( "Interface\\AddOns\\RaidCalendar\\assets\\tiny-button-up.tga" )
+		button:SetPushedTexture( "Interface\\AddOns\\RaidCalendar\\assets\\tiny-button-down.tga" )
 	end
 	button:GetHighlightTexture():SetTexCoord( .1875, .78125, .21875, .78125 )
 	button:GetNormalTexture():SetTexCoord( .1875, .78125, .21875, .78125 )

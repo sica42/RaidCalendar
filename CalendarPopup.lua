@@ -76,7 +76,7 @@ function M.new()
 		local title = frame:CreateFontString( nil, "ARTWORK", "GIFontNormal" )
 		title:SetPoint( "TopLeft", frame, "TopLeft", 3, -14 )
 		title:SetTextColor( NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b )
-		title:SetFont( "Interface\\AddOns\\GuildInventory\\assets\\Myriad-Pro.ttf", 13, "OUTLINE" )
+		title:SetFont( "Interface\\AddOns\\RaidCalendar\\assets\\Myriad-Pro.ttf", 13, "OUTLINE" )
 		title:SetJustifyH( "Left" )
 
 		local date_label = gui.create_icon_label( frame, "Interface\\AddOns\\RaidCalendar\\assets\\icon_date.tga", 85, 14 )
