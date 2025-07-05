@@ -106,6 +106,12 @@ function M.count( t )
 	return count
 end
 
+function M.capitalize_words( str )
+	return string.gsub( str, "(%w)(%w*)", function( first, rest )
+		return string.upper( first ) .. string.lower( rest )
+	end )
+end
+
 ---@param message string
 ---@param short boolean?
 function M.info( message, short )

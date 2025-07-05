@@ -40,6 +40,7 @@ function RaidCalendar.events:ADDON_LOADED()
 	m.db.user_settings = m.db.user_settings or {}
 	m.db.popup_event = m.db.popup_event or {}
 	m.db.popup_calendar = m.db.popup_calendar or {}
+	m.db.minimap_icon = m.db.minimap_icon or {}
 
 	---@type MessageHandler
 	m.msg = m.MessageHandler.new()
@@ -50,8 +51,12 @@ function RaidCalendar.events:ADDON_LOADED()
 	---@type CalendarPopup
 	m.calendar_popup = m.CalendarPopup.new()
 
+	---@type MinimapIcon
+	m.minimap_icon = m.MinimapIcon.new()
+
 	-- Refresh events if last update is older then 12h
 	if not m.db.user_settings.last_updated or time() - m.db.user_settings.last_updated > 43200 then
+		m.debug("Fetching events...")
 		m.msg.request_events()
 	end
 
@@ -82,7 +87,6 @@ function RaidCalendar.events:ADDON_LOADED()
 		end
 
 		m.calendar_popup.show()
-
 	end
 
 	m.version = GetAddOnMetadata( m.name, "Version" )

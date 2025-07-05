@@ -1,7 +1,7 @@
 ## Interface: 11200
 ## Title: RaidCalendar
 ## Author: Sica
-## Version: 0.4
+## Version: 0.5
 ## Notes: Shows raids from raid-helper.dev
 ## SavedVariablesPerCharacter: RaidCalendarDB
 
@@ -12,6 +12,7 @@ RaidCalendar.lua
 CalendarPopup.lua
 EventPopup.lua
 MessageHandler.lua
+MinimapIcon.lua
 FrameBuilder.lua
 GuiElements.lua
 Utils.lua

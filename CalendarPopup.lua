@@ -307,6 +307,7 @@ function M.new()
 
 			if getn( events ) == 0 then
 				m.info( "Loading events, hang on..." )
+				m.msg.request_events()
 			end
 		end
 
