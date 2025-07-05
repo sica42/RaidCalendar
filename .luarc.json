@@ -1,0 +1,34 @@
+{
+  "$schema": "https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json",
+  "Lua.diagnostics.globals": [
+    "_",
+    "arg1",
+    "arg2",
+    "ChatFrame_AddMessageEventFilter",
+    "date",
+    "event",
+    "GameFontHighlightSmall",
+    "GetGuildRosterInfo",
+    "GetNumGuildMembers",
+    "getn",
+    "HIGHLIGHT_FONT_COLOR",
+    "LibStub",
+    "NORMAL_FONT_COLOR",
+    "NUM_CHAT_WINDOWS",
+    "RAID_CLASS_COLORS",
+    "strtrim",
+    "this",
+    "time",
+    "TOOLTIP_DEFAULT_COLOR"
+  ],
+  "Lua.runtime.version": "Lua 5.1",
+  "Lua.workspace.checkThirdParty": false,
+  "Lua.workspace.ignoreDir": [
+    "libs"
+  ],
+  "type.inferParamType": true,
+  "workspace.library": [ "../wow-api-type-definitions", "libs/LibScrollDrop-1.1" ],
+  "Lua.diagnostics.strict": true,
+  "diagnostics.disable": [],
+  "Lua.hint.enable": true
+}
