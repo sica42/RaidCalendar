@@ -309,22 +309,26 @@ function M.new()
 		command = string.match( data_str, "^#(.-)#" )
 		data_str = string.gsub( data_str, "^#.-#", "" )
 
-		if command == "ct" then
-			chunk_total = tonumber( data_str ) or 0
-		elseif string.find( command, "c%d+" ) then
-			local chunk_number = tonumber( string.match( command, "c(%d+)" ) )
-			chunk_data = chunk_number == 1 and data_str or chunk_data .. data_str
+		if command then
+			if command == "ct" then
+				chunk_total = tonumber( data_str ) or 0
+			elseif string.find( command, "c%d+" ) then
+				local chunk_number = tonumber( string.match( command, "c(%d+)" ) )
+				chunk_data = chunk_number == 1 and data_str or chunk_data .. data_str
 
-			if chunk_number == chunk_total then
-				local cmd = string.match( chunk_data, "^#(.-)#" )
-				chunk_data = string.gsub( chunk_data, "^#.-#", "" )
+				if chunk_number == chunk_total then
+					local cmd = string.match( chunk_data, "^#(.-)#" )
+					chunk_data = string.gsub( chunk_data, "^#.-#", "" )
 
-				local lua_data = loadstring( "return " .. chunk_data )()
-				on_command( cmd, lua_data, sender )
+					local lua_data = loadstring( "return " .. chunk_data )()
+					on_command( cmd, lua_data, sender )
+				end
+			elseif command then
+				local lua_data = loadstring( "return " .. data_str )()
+				on_command( command, lua_data, sender )
 			end
-		elseif command then
-			local lua_data = loadstring( "return " .. data_str )()
-			on_command( command, lua_data, sender )
+		else
+			m.debug("No command: " .. data_str)
 		end
 	end
 

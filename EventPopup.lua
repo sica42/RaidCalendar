@@ -105,6 +105,9 @@ function M.new()
 		end
 
 		if btn_name == "Signup" then
+			m.db.user_settings[ event.templateId .. "_className" ] = popup.dd_class.selected
+			m.db.user_settings[ event.templateId .. "_specName" ] = popup.dd_spec.selected
+
 			if not m.db.user_settings[ event.templateId .. "_className" ] then
 				m.error( "Class not selected" )
 				return
