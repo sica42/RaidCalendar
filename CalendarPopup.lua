@@ -77,10 +77,13 @@ function M.new()
 		selected_tex:Hide()
 
 		local title = frame:CreateFontString( nil, "ARTWORK", "GIFontNormal" )
-		title:SetPoint( "TopLeft", frame, "TopLeft", 3, -14 )
+		title:SetPoint( "TopLeft", frame, "TopLeft", 3, -2 )
+		title:SetWidth( 280 )
+		title:SetHeight( 35 )
 		title:SetTextColor( NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b )
 		title:SetFont( "Interface\\AddOns\\RaidCalendar\\assets\\Myriad-Pro.ttf", 13, "OUTLINE" )
 		title:SetJustifyH( "Left" )
+		title:SetJustifyV( "Middle" )
 
 		local date_label = gui.create_icon_label( frame, "Interface\\AddOns\\RaidCalendar\\assets\\icon_date.tga", 85, 14 )
 		date_label:SetPoint( "TopRight", frame, "TopRight", 0, -3 )
@@ -263,7 +266,7 @@ function M.new()
 		cb:SetWidth( 22 )
 		cb:SetHeight( 22 )
 		cb:SetPoint( "TopLeft", frame.settings, "TopLeft", 8, -33 )
-		getglobal(cb:GetName() .. 'Text'):SetText("Use character name instead of Discord name on signups")
+		getglobal( cb:GetName() .. 'Text' ):SetText( "Use character name instead of Discord name on signups" )
 		frame.settings.use_char_name = cb
 
 		local dd_timeformat = scroll_drop:New( frame.settings, {
@@ -274,10 +277,10 @@ function M.new()
 		} )
 
 		dd_timeformat:SetPoint( "TopLeft", frame.settings, "TopLeft", 73, -60 )
-		dd_timeformat:SetItems({
-			{ value="24", text="24-hour"},
-			{ value="12", text="12-hour"}
-		})
+		dd_timeformat:SetItems( {
+			{ value = "24", text = "24-hour" },
+			{ value = "12", text = "12-hour" }
+		} )
 		frame.settings.time_format = dd_timeformat
 
 		local label_timeformat = frame.settings:CreateFontString( nil, "ARTWORK", "GIFontNormal" )
@@ -288,7 +291,7 @@ function M.new()
 		local btn_save = gui.create_button( frame.settings, "Save", 80, function()
 			local discord_id = input_discord:GetText()
 
-			if string.find(discord_id, "^%d+$") ~= nil then
+			if string.find( discord_id, "^%d+$" ) ~= nil then
 				m.db.user_settings.discord_id = input_discord:GetText()
 				m.db.user_settings.use_character_name = cb:GetChecked()
 				m.db.user_settings.time_format = dd_timeformat.selected
@@ -299,7 +302,7 @@ function M.new()
 				frame:SetHeight( 250 )
 				refresh()
 			else
-				m.error("Invalid Discord ID")
+				m.error( "Invalid Discord ID" )
 			end
 		end )
 		btn_save:SetPoint( "BottomRight", frame.settings, "BottomRight", -10, 10 )

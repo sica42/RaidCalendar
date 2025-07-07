@@ -70,6 +70,20 @@ function M.new()
 		Assassination = "Interface\\AddOns\\RaidCalendar\\assets\\icon_assassination.tga"
 	}
 
+	local class_icons = {
+		WARRIOR = { 0, 0.246094, 0, 0.246094 },
+		MAGE    = { 0.246094, 0.492188, 0, 0.246094 },
+		ROGUE   = { 0.492188, 0.738281, 0, 0.246094 },
+		DRUID   = { 0.738281, 0.972656, 0, 0.246094 },
+
+		HUNTER  = { 0, 0.246094, 0.246094, 0.5 },
+		SHAMAN  = { 0.246094, 0.492188, 0.246094, 0.5 },
+		PRIEST  = { 0.492188, 0.738281, 0.246094, 0.5 },
+		WARLOCK = { 0.738281, 0.972656, 0.246094, 0.5 },
+
+		PALADIN = { 0, 0.246094, 0.5, 0.730469 },
+	}
+
 	local function save_position( self )
 		local point, _, relative_point, x, y = self:GetPoint()
 
@@ -188,7 +202,7 @@ function M.new()
 			frame:SetWidth( 100 )
 			frame:SetHeight( 100 )
 
-			frame.header = gui.create_icon_label( frame, "Interface\\AddOns\\RaidCalendar\\assets\\icon_" .. string.lower( class ) .. ".tga", 100 )
+			frame.header = gui.create_icon_label( frame, "", 100 )
 			frame.header:SetPoint( "TopLeft", frame, "TopLeft", 0, 0 )
 			frame.header:SetBackdrop( { bgFile = "Interface\\Buttons\\WHITE8X8" } )
 			frame.header:SetBackdropColor( 0.3, 0.3, 0.3, 1 )
@@ -201,7 +215,16 @@ function M.new()
 		end
 
 		frame.header.set( class .. " (" .. tostring( count ) .. ")" )
-		frame.header.set_icon( "Interface\\AddOns\\RaidCalendar\\assets\\icon_" .. string.lower( class ) .. ".tga" )
+
+
+		if class_icons[ string.upper( class ) ] then
+			frame.header.set_icon( "Interface\\Glues\\CharacterCreate\\UI-CharacterCreate-Classes" )
+			frame.header.icon:SetTexCoord( unpack( class_icons[ string.upper( class ) ] ) )
+		else
+			frame.header.set_icon( "Interface\\AddOns\\RaidCalendar\\assets\\icon_" .. string.lower( class ) .. ".tga" )
+			frame.header.icon:SetTexCoord( 0, 1, 0, 1 )
+		end
+
 		frame:Show()
 
 		return frame
@@ -316,15 +339,15 @@ function M.new()
 		frame.desc:SetJustifyV( "Top" )
 
 		frame.sr_link = CreateFrame( "EditBox", nil, frame, "InputBoxTemplate" )
-		frame.sr_link:SetPoint("TopLeft", frame, "TopLeft", 58, -133 )
+		frame.sr_link:SetPoint( "TopLeft", frame, "TopLeft", 58, -133 )
 		frame.sr_link:SetHeight( 22 )
 		frame.sr_link:SetWidth( 170 )
 		frame.sr_link:SetAutoFocus( false )
 		frame.sr_link:SetFontObject( m.GuiElements.font_highlight )
 
 		frame.sr_label = frame:CreateFontString( nil, "ARTWORK", "GIFontHighlight" )
-		frame.sr_label:SetPoint("Right", frame.sr_link, "Left", -10, 0 )
-		frame.sr_label:SetText("SR sheet")
+		frame.sr_label:SetPoint( "Right", frame.sr_link, "Left", -10, 0 )
+		frame.sr_label:SetText( "SR sheet" )
 
 		frame.leader = gui.create_icon_label( frame, "Interface\\AddOns\\RaidCalendar\\assets\\icon_leader.tga", 140 )
 		frame.leader:SetPoint( "TopLeft", frame, "TopLeft", 20, -160 )
@@ -438,7 +461,7 @@ function M.new()
 	local function set_description( desc )
 		popup.desc:SetText( desc )
 
-		local lineHeight = 12
+		local lineHeight = 14
 		local frameWidth = popup.desc_frame:GetWidth()
 		local textWidth = popup.desc:GetStringWidth()
 		local numLines = math.ceil( textWidth / frameWidth )
@@ -487,8 +510,8 @@ function M.new()
 		end
 		set_description( event.description )
 
-		local sr = string.match( event.description, "(https://raidres.fly.dev/res/%w+)%s?")
-		popup.sr_link:SetText(sr or "")
+		local sr = string.match( event.description, "(https://raidres.fly.dev/res/%w+)%s?" )
+		popup.sr_link:SetText( sr or "" )
 
 		popup.leader.set( event.leaderName )
 		popup.date.set( date( "%d. %B %Y", event.startTime ) )
@@ -569,7 +592,7 @@ function M.new()
 			class_frame:SetHeight( y )
 		end
 
-		popup.attending:SetHeight( math.max(20, data[ "attending" ].total_y + data[ "attending" ].max_y + 9 ))
+		popup.attending:SetHeight( math.max( 20, data[ "attending" ].total_y + data[ "attending" ].max_y + 9 ) )
 
 		if data[ "missing" ].count == 0 then
 			popup.missing:SetHeight( 0 )
