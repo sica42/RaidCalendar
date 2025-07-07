@@ -1,10 +1,10 @@
 -----------------------------------------------------------------------
--- LibScrollDrop-1.1
+-- LibScrollDrop-1.2
 --
 -- Dropdown with scrollbar and search
 --
 
-local MAJOR, MINOR = "LibScrollDrop-1.1", 1
+local MAJOR, MINOR = "LibScrollDrop-1.2", 1
 if not LibStub then error( MAJOR .. " requires LibStub." ) end
 local lib = LibStub:NewLibrary( MAJOR, MINOR )
 if not lib then return end
@@ -13,8 +13,9 @@ if not lib then return end
 ---@field New fun( self, parent: Frame, optionsTbl: DropdownOptions?): DropdownFrame
 
 ---@class DropdownFrame: Frame
----@field SetItems fun( self: DropdownFrame, items_or_callback: function|table, callback: function )
+---@field SetItems fun( self: DropdownFrame, items_or_callback: function|table, callback: function? )
 ---@field options DropdownOptions
+---@field selected any
 
 ---@class DropdownList: Frame
 ---@field scrollbar Slider
@@ -63,13 +64,19 @@ local function create_button( parent, i )
 	btn:GetHighlightTexture():SetBlendMode( "ADD" )
 	btn.id = i
 
+	btn.icon = btn:CreateTexture( nil, "ARTWORK" )
+	btn.icon:SetPoint( "Left", btn, "Left", 0, 0 )
+	btn.icon:SetWidth( 16 )
+	btn.icon:SetHeight( 16 )
+
 	btn:SetScript( "OnClick", function()
 		local dropdown = lib.active_dropdown
 		local index = parent.offset + btn.id
+		dropdown.selected = btn.value
 		local value = btn.value
 		local text = btn:GetText()
 		if text then
-			dropdown.label:SetText( lib.options.label_on_select == "text" and text or value or text )
+			dropdown.label:SetText( lib.options.label_on_select == "text" and text or value )
 			dropdown.edit_box:ClearFocus()
 
 			parent:Hide()
@@ -407,6 +414,17 @@ function lib:UpdateList()
 		if item then
 			btn.value = item.value
 			btn:SetText( item.text )
+
+			local text = btn:GetFontString()
+			text:ClearAllPoints()
+			if item.icon then
+				btn.icon:SetTexture( item.icon )
+				text:SetPoint( "Left", btn, "Left", 18, 0 )
+			else
+				btn.icon:SetTexture( nil )
+				text:SetPoint( "Left", btn, "Left", 0, 0 )
+			end
+
 			btn:UnlockHighlight()
 			btn:Show()
 		else
@@ -460,21 +478,20 @@ function lib:ShowListFor( dropdown )
 	end
 
 	if dropdown.on_open then
-		local items = dropdown.on_open( dropdown )
-		dropdown.items = items or {}
+		dropdown.items = dropdown.on_open( dropdown ) or {}
+	end
 
-		if self.options.dropdown_width == "auto" then
-			local btn = frame.buttons[ 1 ]
-			self.options.dp_width = 0
-			for _, item in items do
-				btn:SetText( item.text )
+	if self.options.dropdown_width == "auto" then
+		local btn = frame.buttons[ 1 ]
+		self.options.dp_width = 0
+		for _, item in dropdown.items do
+			btn:SetText( item.text )
 
-				if btn:GetFontString():GetStringWidth() > self.options.dp_width then
-					self.options.dp_width = btn:GetFontString():GetStringWidth()
-				end
+			if btn:GetFontString():GetStringWidth() > self.options.dp_width then
+				self.options.dp_width = btn:GetFontString():GetStringWidth()
 			end
-			frame:SetWidth( self.options.dp_width + 60 )
 		end
+		frame:SetWidth( self.options.dp_width + 60 )
 	end
 
 	config_dropdown_list()
@@ -523,6 +540,7 @@ function lib:New( parent, options )
 	---@class DropdownFrame
 	local dropdown = create_dropdown( self, parent )
 
+
 	function dropdown:SetItems( items_or_callback, on_select )
 		if type( items_or_callback ) == "function" then
 			self.items = {}
@@ -531,12 +549,24 @@ function lib:New( parent, options )
 			self.items = items_or_callback
 			self.on_open = nil
 		end
-		self.on_select = on_select
+		if on_select then
+			self.on_select = on_select
+		end
 	end
 
 	function dropdown:SetValue( value )
 		dropdown.label:SetText( value )
+		dropdown.selected = value
 	end
+
+	function dropdown:SetSelected( text, value )
+		dropdown.label:SetText( text )
+		dropdown.selected = value
+	end
+
+	--function dropdown:Get()
+	--return dropdown.selected
+	--end
 
 	return dropdown
 end

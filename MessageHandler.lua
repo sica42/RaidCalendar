@@ -147,8 +147,8 @@ function M.new()
 		for key, value in pairs( tbl ) do
 			if type( value ) == "table" then
 				value = decode( value, keymap, valuemap )
-			elseif type(value) == "string" then
-				value = valuemap[value] or value
+			elseif type( value ) == "string" then
+				value = valuemap[ value ] or value
 			end
 
 			ret[ keymap[ key ] ] = value
@@ -214,39 +214,69 @@ function M.new()
 	---@param sender string
 	local function on_command( command, data, sender )
 		if command == MessageCommand.Event then
+			--
+			-- EVENT
+			--
 			data = decode( data, key_map, value_map )
 
 			m.debug( "Got event id: " .. data.id )
 			m.db.events[ data.id ] = data
 			m.event_popup.update( data.id )
 		elseif command == MessageCommand.Events then
+			--
+			-- EVENTS
+			--
 			data = decode( data, key_map, value_map )
 			if data.error then
 				m.error( data.error )
 				return
 			end
 
-			m.debug( "Receiving events" )
-			for _, event in data do
+			m.debug( "Receiving events requested by " .. data.player )
+			for _, event in data.events do
 				if m.db.events[ event.id ] then
-					if event.lastUpdated > m.db.events[ event.id ].lastUpdated then
+					-- Only send event update request from player who requested it if needed
+					if event.lastUpdated > m.db.events[ event.id ].lastUpdated and data.player == m.player then
 						m.debug( "Update event: " .. event.title )
 						request_event( event.id )
 					end
 				else
+					m.debug( event.id )
 					m.debug( "New event: " .. event.title )
 					m.db.events[ event.id ] = event
 				end
 			end
+
+			-- Remove old and deleted raids
+			for id, event in m.db.events do
+				if not m.find( id, data.events, "id" ) then
+					m.debug( "Remove event: " .. event.title )
+					m.db.events[ id ] = nil
+				end
+			end
+
 			m.db.user_settings.last_updated = time()
 			m.calendar_popup.update()
 		elseif command == MessageCommand.SignupResult then
-			if data.player == m.player then
-				if data.success then
-					request_event( data.eventId )
+			--
+			-- SIGNUP_RESULT
+			--
+			data = decode( data, key_map, value_map )
+
+			if data.success then
+				local _, index = m.find( data.signUp.id, m.db.events[ data.eventId ].signUps, "id" )
+
+				m.db.events[ data.eventId ].lastUpdated = tonumber( data.lastUpdated )
+				if index then
+					m.db.events[ data.eventId ].signUps[ index ] = data.signUp
 				else
-					m.error( "Signup failed: " .. data.status )
+					table.insert( m.db.events[ data.eventId ].signUps, data.signUp )
 				end
+
+				m.calendar_popup.update()
+				m.event_popup.update( data.eventId )
+			else
+				m.error( "Signup failed: " .. data.status )
 			end
 		elseif command == MessageCommand.VersionCheck then
 			--
@@ -265,8 +295,6 @@ function M.new()
 
 	local function on_comm_received( prefix, data_str, _, sender )
 		if prefix ~= m.prefix or sender == m.player then return end
-
-		--m.debug(data_str)
 
 		local command = string.match( data_str, "^(%u-)::" )
 		if (command) then
@@ -295,7 +323,6 @@ function M.new()
 				on_command( cmd, lua_data, sender )
 			end
 		elseif command then
-			m.debug(data_str)
 			local lua_data = loadstring( "return " .. data_str )()
 			on_command( command, lua_data, sender )
 		end

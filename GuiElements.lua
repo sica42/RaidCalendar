@@ -142,17 +142,52 @@ function M.create_icon_label( parent, icon, width, icon_size )
 	frame:SetWidth( width and width or 100 )
 	frame:SetHeight( 16 )
 
-	frame.icon = frame:CreateTexture( nil, "ARTWORK" )
+	local icon_frame = CreateFrame( "Frame", nil, parent )
+	icon_frame:EnableMouse( true )
+	icon_frame:SetWidth( icon_size and icon_size or 16 )
+	icon_frame:SetHeight( icon_size and icon_size or 16 )
+	icon_frame:SetPoint( "Left", frame, "Left", 0, 0 )
+	icon_frame:SetScript( "OnEnter", function()
+		if frame.icon_tooltip then
+			GameTooltip:SetOwner( icon_frame, "ANCHOR_RIGHT" )
+			GameTooltip:SetText( frame.icon_tooltip )
+			GameTooltip:SetScale( 0.8 )
+			GameTooltip:Show()
+		end
+	end )
+
+	icon_frame:SetScript( "OnLeave", function()
+		if frame.icon_tooltip and GameTooltip:IsVisible() then
+			GameTooltip:SetScale( 1 )
+			GameTooltip:Hide()
+		end
+	end )
+
+	frame.icon = icon_frame:CreateTexture( nil, "ARTWORK" )
 	frame.icon:SetTexture( icon )
-	frame.icon:SetWidth( icon_size and icon_size or 16 )
-	frame.icon:SetHeight( icon_size and icon_size or 16 )
-	frame.icon:SetPoint( "Left", frame, "Left", 0, 0 )
+	frame.icon:SetAllPoints( icon_frame )
 
 	frame.count_frame = CreateFrame( "Frame", nil, frame )
+	frame.count_frame:EnableMouse( true )
 	frame.count_frame:SetPoint( "Left", frame, "Left", 20, 0 )
 	frame.count_frame:SetHeight( 10 )
 	frame.count_frame:SetBackdrop( { bgFile = "Interface\\Buttons\\WHITE8X8" } )
 	frame.count_frame:SetBackdropColor( 0, 0, 0, 1 )
+	frame.count_frame:SetScript( "OnEnter", function()
+		if frame.count_tooltip then
+			GameTooltip:SetOwner( icon_frame, "ANCHOR_RIGHT" )
+			GameTooltip:SetText( frame.count_tooltip )
+			GameTooltip:SetScale( 0.8 )
+			GameTooltip:Show()
+		end
+	end )
+
+	frame.count_frame:SetScript( "OnLeave", function()
+		if frame.count_tooltip and GameTooltip:IsVisible() then
+			GameTooltip:SetScale( 1 )
+			GameTooltip:Hide()
+		end
+	end )
 
 	frame.count = frame.count_frame:CreateFontString( nil, "ARTWORK", "GIFontNormal" )
 	frame.count:SetPoint( "Left", frame.count_frame, "Left", 0, 0 )
@@ -162,12 +197,12 @@ function M.create_icon_label( parent, icon, width, icon_size )
 	frame.label = frame:CreateFontString( nil, "ARTWORK", "GIFontNormal" )
 	frame.label:SetPoint( "Left", frame, "Left", 20, 0 )
 	frame.label:SetWidth( (width or 100) - 35 )
-	frame.label:SetHeight(16 )
-	frame.label:SetNonSpaceWrap(false)
+	frame.label:SetHeight( 16 )
+	frame.label:SetNonSpaceWrap( false )
 	frame.label:SetTextColor( 1, 1, 1 )
 	frame.label:SetJustifyH( "Left" )
 
-	frame.set = function( label, count )
+	frame.set = function( label, count, count_tooltip )
 		if count and count > 0 then
 			frame.count_frame:Show()
 			frame.count:SetText( string.format( "%02d", count ) )
@@ -175,6 +210,7 @@ function M.create_icon_label( parent, icon, width, icon_size )
 			frame.count_frame:SetWidth( w )
 			frame.label:SetPoint( "Left", frame, "Left", 20 + w, 0 )
 			frame.label:SetWidth( (width or 100) - 35 )
+			frame.count_tooltip = count_tooltip
 		else
 			frame.count_frame:Hide()
 			frame.label:SetPoint( "Left", frame, "Left", 20, 0 )
@@ -183,8 +219,11 @@ function M.create_icon_label( parent, icon, width, icon_size )
 		frame.label:SetText( label )
 	end
 
-	frame.set_icon = function( _icon )
+	---@param _icon string
+	---@param tooltip string?
+	frame.set_icon = function( _icon, tooltip )
 		frame.icon:SetTexture( _icon )
+		frame.icon_tooltip = tooltip
 	end
 
 	return frame

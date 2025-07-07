@@ -38,9 +38,12 @@ function RaidCalendar.events:ADDON_LOADED()
 	m.db = RaidCalendarDB
 	m.db.events = m.db.events or {}
 	m.db.user_settings = m.db.user_settings or {}
+	m.db.user_settings.time_format = m.db.user_settings.time_format or "24"
 	m.db.popup_event = m.db.popup_event or {}
 	m.db.popup_calendar = m.db.popup_calendar or {}
 	m.db.minimap_icon = m.db.minimap_icon or {}
+
+	m.time_format = m.db.user_settings.time_format == "24" and "%H:%M" or "%I:%M %p"
 
 	---@type MessageHandler
 	m.msg = m.MessageHandler.new()

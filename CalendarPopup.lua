@@ -15,6 +15,9 @@ if m.CalendarPopup then return end
 
 local M = {}
 
+---@type ScrollDropdown
+local scroll_drop = LibStub:GetLibrary( "LibScrollDrop-1.2" )
+
 function M.new()
 	local popup
 	local refresh
@@ -107,7 +110,7 @@ function M.new()
 
 			title:SetText( event.title )
 			date_label.set( date( "%d. %b %Y", event.startTime ) )
-			time_label.set( date( "%H:%M", event.startTime ) )
+			time_label.set( date( m.time_format, event.startTime ) )
 
 			local diff = event.startTime - time( date( "*t" ) )
 			time_offset.set( m.format_time_difference( diff ) )
@@ -181,7 +184,7 @@ function M.new()
 				frame:SetHeight( 250 )
 			else
 				frame.settings:Show()
-				frame:SetHeight( 350 )
+				frame:SetHeight( 360 )
 			end
 		end )
 
@@ -238,7 +241,7 @@ function M.new()
 				:parent( frame )
 				:point( "TopLeft", border_events, "BottomLeft", 0, -6 )
 				:point( "Right", frame, "Right", -10, 10 )
-				:height( 90 )
+				:height( 100 )
 				:frame_style( "TOOLTIP" )
 				:backdrop( { bgFile = "Interface/Buttons/WHITE8x8" } )
 				:backdrop_color( 0, 0, 0, 1 )
@@ -263,6 +266,24 @@ function M.new()
 		getglobal(cb:GetName() .. 'Text'):SetText("Use character name instead of Discord name on signups")
 		frame.settings.use_char_name = cb
 
+		local dd_timeformat = scroll_drop:New( frame.settings, {
+			default_text = "",
+			dropdown_style = "classic",
+			search = false,
+			width = 95
+		} )
+
+		dd_timeformat:SetPoint( "TopLeft", frame.settings, "TopLeft", 73, -60 )
+		dd_timeformat:SetItems({
+			{ value="24", text="24-hour"},
+			{ value="12", text="12-hour"}
+		})
+		frame.settings.time_format = dd_timeformat
+
+		local label_timeformat = frame.settings:CreateFontString( nil, "ARTWORK", "GIFontNormal" )
+		label_timeformat:SetPoint( "Right", dd_timeformat, "Left", -10, 0 )
+		label_timeformat:SetText( "Time format" )
+
 
 		local btn_save = gui.create_button( frame.settings, "Save", 80, function()
 			local discord_id = input_discord:GetText()
@@ -270,6 +291,10 @@ function M.new()
 			if string.find(discord_id, "^%d+$") ~= nil then
 				m.db.user_settings.discord_id = input_discord:GetText()
 				m.db.user_settings.use_character_name = cb:GetChecked()
+				m.db.user_settings.time_format = dd_timeformat.selected
+
+				m.time_format = m.db.user_settings.time_format == "24" and "%H:%M" or "%I:%M %p"
+
 				frame.settings:Hide()
 				frame:SetHeight( 250 )
 				refresh()
@@ -291,6 +316,7 @@ function M.new()
 
 		popup.settings.discord:SetText( m.db.user_settings.discord_id or "" )
 		popup.settings.use_char_name:SetChecked( m.db.user_settings.use_character_name )
+		popup.settings.time_format:SetValue( m.db.user_settings.time_format == "24" and "24-hour" or "12-hour" )
 
 		if not events or refresh_data then
 			events = {}

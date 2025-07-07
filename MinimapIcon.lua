@@ -74,13 +74,13 @@ function M.new()
 		local grouped = group_by_day(events )
 
 		self:AddLine( "Upcoming raids" )
-		self:AddLine( "" )
+		self:AddLine( " " )
 
 		for _, group in ipairs(grouped) do
 			self:AddLine( group.label )
 			for _, e in ipairs(group.entries) do
 				local event = m.db.events[ e.key ]
-				local start_time = date( "%H:%M", event.startTime )
+				local start_time = date( m.time_format, event.startTime )
 				self:AddLine(string.format("  - %s |cffffffff[%s]|r", m.capitalize_words(event.title), start_time))
 			end
 		end

@@ -13,10 +13,21 @@ if m.EventPopup then return end
 ---@field update fun( event_id: string? )
 ---@field online_status fun( online: boolean )
 
+---@class Signup
+---@field id number
+---@field userid string
+---@field position number
+---@field name string
+---@field entryTime number
+---@field status string
+---@field specName string
+---@field className string
+---@field roleName string
+
 local M = {}
 
 ---@type ScrollDropdown
-local scroll_drop = LibStub:GetLibrary( "LibScrollDrop-1.1" )
+local scroll_drop = LibStub:GetLibrary( "LibScrollDrop-1.2" )
 
 function M.new()
 	local popup
@@ -43,6 +54,7 @@ function M.new()
 		Subtlety = "Interface\\Icons\\ability_stealth",
 		Marksmanship = "Interface\\AddOns\\RaidCalendar\\assets\\icon_marksmanship.tga",
 		Holy = "Interface\\AddOns\\RaidCalendar\\assets\\icon_holy_guardianspirit.tga",
+		Holy1 = "Interface\\Icons\\spell_holy_holybolt",
 		Destruction = "Interface\\Icons\\spell_shadow_rainoffire",
 		Elemental = "Interface\\Icons\\spell_nature_lightning",
 		Smite = "Interface\\Icons\\spell_holy_holysmite",
@@ -50,7 +62,12 @@ function M.new()
 		Survival = "Interface\\AddOns\\RaidCalendar\\assets\\icon_survival.tga",
 		Guardian = "Interface\\Icons\\ability_racial_bearform",
 		Retribution = "Interface\\Icons\\spell_holy_auraoflight",
-		Beastmastery = "Interface\\AddOns\\RaidCalendar\\assets\\icon_beastmastery.tga"
+		Beastmastery = "Interface\\AddOns\\RaidCalendar\\assets\\icon_beastmastery.tga",
+		Discipline = "Interface\\Icons\\spell_holy_powerwordshield",
+		Balance = "Interface\\Icons\\spell_nature_starfall",
+		Enhancement = "Interface\\Icons\\spell_nature_lightningshield",
+		Feral = "Interface\\Icons\\ability_druid_catform",
+		Assassination = "Interface\\AddOns\\RaidCalendar\\assets\\icon_assassination.tga"
 	}
 
 	local function save_position( self )
@@ -143,7 +160,9 @@ function M.new()
 
 	local function change_spec()
 		popup.cs_change:Disable()
-		popup.cs_cancel:Disable()
+
+		m.db.user_settings[ event.templateId .. "_className" ] = popup.dd_class.selected
+		m.db.user_settings[ event.templateId .. "_specName" ] = popup.dd_spec.selected
 
 		m.msg.signup_edit(
 			event.id,
@@ -186,12 +205,10 @@ function M.new()
 	end
 
 	---@param parent Frame
-	---@param name string
-	---@param position number
-	---@param class string
-	---@param spec string
-	local function create_player_frame( parent, name, position, class, spec )
+	---@param signup Signup
+	local function create_player_frame( parent, signup )
 		local frame = get_from_cache( "player" )
+
 
 		if not frame then
 			---@class PlayerFrame: Frame
@@ -201,7 +218,7 @@ function M.new()
 			frame:SetBackdrop( { bgFile = "Interface\\Buttons\\WHITE8X8" } )
 			frame:SetBackdropColor( 0.2, 0.2, 0.2, 1 )
 
-			frame.player = gui.create_icon_label( frame, "icon_", 100 )
+			frame.player = gui.create_icon_label( frame, "", 100 )
 			frame.player:SetPoint( "TopLeft", frame, "TopLeft", 0, 0 )
 
 			frame.is_used = true
@@ -211,8 +228,9 @@ function M.new()
 			frame:SetParent( parent )
 		end
 
-		frame.player.set( name, position )
-		frame.player.set_icon( icons[ spec ] and icons[ spec ] or "" )
+		local entry_time = date( "%d. %b %Y " .. m.time_format, signup.entryTime )
+		frame.player.set( signup.name, signup.position, entry_time )
+		frame.player.set_icon( icons[ signup.specName ] and icons[ signup.specName ] or "", string.match( signup.specName, "(%a+)" ) )
 		frame:Show()
 
 		return frame
@@ -297,13 +315,13 @@ function M.new()
 		frame.leader = gui.create_icon_label( frame, "Interface\\AddOns\\RaidCalendar\\assets\\icon_leader.tga", 140 )
 		frame.leader:SetPoint( "TopLeft", frame, "TopLeft", 20, -140 )
 
-		frame.signups = gui.create_icon_label( frame, "Interface\\AddOns\\RaidCalendar\\assets\\icon_signups.tga" )
+		frame.signups = gui.create_icon_label( frame, "Interface\\AddOns\\RaidCalendar\\assets\\icon_signups.tga", 80 )
 		frame.signups:SetPoint( "TopLeft", frame.leader, "TopRight", 5, 0 )
 
-		frame.date = gui.create_icon_label( frame, "Interface\\AddOns\\RaidCalendar\\assets\\icon_date.tga" )
+		frame.date = gui.create_icon_label( frame, "Interface\\AddOns\\RaidCalendar\\assets\\icon_date.tga", 110 )
 		frame.date:SetPoint( "TopLeft", frame.signups, "TopRight", 5, 0 )
 
-		frame.time = gui.create_icon_label( frame, "Interface\\AddOns\\RaidCalendar\\assets\\icon_time.tga", 60 )
+		frame.time = gui.create_icon_label( frame, "Interface\\AddOns\\RaidCalendar\\assets\\icon_time.tga", 70 )
 		frame.time:SetPoint( "TopLeft", frame.date, "TopRight", 5, 0 )
 
 		frame.time_offset = gui.create_icon_label( frame, "Interface\\AddOns\\RaidCalendar\\assets\\icon_hourglass.tga" )
@@ -363,15 +381,13 @@ function M.new()
 				if v.type == "primary" then
 					table.insert( list, {
 						value = v.name,
-						text = v.name
+						text = v.name,
 					} )
 				end
 			end
 
 			return list
 		end, function( value )
-			m.db.user_settings[ event.templateId .. "_className" ] = value
-			m.db.user_settings[ event.templateId .. "_specName" ] = nil
 			frame.dd_spec:SetValue( "Select spec" )
 		end )
 
@@ -385,20 +401,19 @@ function M.new()
 		frame.dd_spec:SetPoint( "TopRight", frame.dd_class, "BottomRight", 0, -5 )
 		frame.dd_spec:SetItems( function()
 			local list = {}
-			local class = m.db.user_settings[ event.templateId .. "_className" ]
+			local class = frame.dd_class.selected
 
 			if class then
 				for _, v in m.find( class, event.classes, "name" ).specs do
 					table.insert( list, {
 						value = v.name,
-						text = v.name
+						text = string.match( v.name, "(%a+)" ),
+						icon = icons[ v.name ],
 					} )
 				end
 			end
 
 			return list
-		end, function( value )
-			m.db.user_settings[ event.templateId .. "_specName" ] = value
 		end )
 
 		return frame
@@ -459,7 +474,9 @@ function M.new()
 
 		popup.leader.set( event.leaderName )
 		popup.date.set( date( "%d. %B %Y", event.startTime ) )
-		popup.time.set( date( "%H:%M", event.startTime ) )
+
+		local time_format = m.db.user_settings.time_format == "24" and "%H:%M" or "%I:%M %p"
+		popup.time.set( date( time_format, event.startTime ) )
 		popup.time_offset.set( m.format_time_difference( event.startTime - now ) )
 
 		--
@@ -515,7 +532,7 @@ function M.new()
 			local y = 17
 			for _, v in pairs( event.signUps ) do
 				if v.className == class.name then
-					local player_frame = create_player_frame( class_frame, v.name, v.position, v.className, v.specName )
+					local player_frame = create_player_frame( class_frame, v )
 					player_frame:SetPoint( "TopLeft", class_frame, "TopLeft", 0, -y )
 
 					y = y + 17
@@ -551,11 +568,11 @@ function M.new()
 		-- Buttons
 		--
 		local class = m.db.user_settings[ event.templateId .. "_className" ]
-		popup.dd_class:SetValue( class and class or "Select class" )
+		popup.dd_class:SetSelected( class and class or "Select class", class or nil )
 		popup.dd_class:Hide()
 
 		local spec = m.db.user_settings[ event.templateId .. "_specName" ]
-		popup.dd_spec:SetValue( spec and spec or "Select spec" )
+		popup.dd_spec:SetSelected( spec and string.match( spec, "(%a+)" ) or "Select spec", spec or nil )
 		popup.dd_spec:Hide()
 		popup.cs_change:Hide()
 		popup.cs_cancel:Hide()
