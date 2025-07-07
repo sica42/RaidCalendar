@@ -194,10 +194,30 @@ function M.create_icon_label( parent, icon, width, icon_size )
 	frame.count:SetTextColor( 1, 1, 1 )
 	frame.count:SetJustifyH( "Left" )
 
-	frame.label = frame:CreateFontString( nil, "ARTWORK", "GIFontNormal" )
-	frame.label:SetPoint( "Left", frame, "Left", 20, 0 )
-	frame.label:SetWidth( (width or 100) - 35 )
-	frame.label:SetHeight( 16 )
+	frame.label_frame = CreateFrame( "Frame", nil, frame)
+	frame.label_frame:SetPoint( "Left", frame, "Left", 20, 0 )
+	frame.label_frame:EnableMouse( true )
+	frame.label_frame:SetWidth( (width or 100) - 35 )
+	frame.label_frame:SetHeight( 16 )
+
+	frame.label_frame:SetScript( "OnEnter", function()
+		if frame.label:GetStringWidth() > frame.label_frame:GetWidth() then
+			GameTooltip:SetOwner( icon_frame, "ANCHOR_RIGHT" )
+			GameTooltip:SetText( frame.label:GetText() or "" )
+			GameTooltip:SetScale( 0.8 )
+			GameTooltip:Show()
+		end
+	end )
+
+	frame.label_frame:SetScript( "OnLeave", function()
+		if GameTooltip:IsVisible() then
+			GameTooltip:SetScale( 1 )
+			GameTooltip:Hide()
+		end
+	end )
+
+	frame.label = frame.label_frame:CreateFontString( nil, "ARTWORK", "GIFontNormal" )
+	frame.label:SetAllPoints(frame.label_frame)
 	frame.label:SetNonSpaceWrap( false )
 	frame.label:SetTextColor( 1, 1, 1 )
 	frame.label:SetJustifyH( "Left" )
@@ -208,13 +228,13 @@ function M.create_icon_label( parent, icon, width, icon_size )
 			frame.count:SetText( string.format( "%02d", count ) )
 			local w = frame.count:GetStringWidth() + 1
 			frame.count_frame:SetWidth( w )
-			frame.label:SetPoint( "Left", frame, "Left", 20 + w, 0 )
-			frame.label:SetWidth( (width or 100) - 35 )
+			frame.label_frame:SetPoint( "Left", frame, "Left", 20 + w, 0 )
+			frame.label_frame:SetWidth( (width or 100) - 35 )
 			frame.count_tooltip = count_tooltip
 		else
 			frame.count_frame:Hide()
-			frame.label:SetPoint( "Left", frame, "Left", 20, 0 )
-			frame.label:SetWidth( (width or 100) - 20 )
+			frame.label_frame:SetPoint( "Left", frame, "Left", 20, 0 )
+			frame.label_frame:SetWidth( (width or 100) - 20 )
 		end
 		frame.label:SetText( label )
 	end

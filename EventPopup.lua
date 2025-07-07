@@ -144,7 +144,7 @@ function M.new()
 			popup.cs_cancel:Enable()
 			popup.cs_cancel:Show()
 
-			popup.dd_class:SetPoint( "Top", popup, "Top", 0, -170 )
+			popup.dd_class:SetPoint( "Top", popup.attending, "Top", 0, 0 )
 			popup.dd_class:Show()
 			popup.dd_spec:Show()
 		else
@@ -315,8 +315,19 @@ function M.new()
 		frame.desc:SetJustifyH( "Left" )
 		frame.desc:SetJustifyV( "Top" )
 
+		frame.sr_link = CreateFrame( "EditBox", nil, frame, "InputBoxTemplate" )
+		frame.sr_link:SetPoint("TopLeft", frame, "TopLeft", 58, -133 )
+		frame.sr_link:SetHeight( 22 )
+		frame.sr_link:SetWidth( 170 )
+		frame.sr_link:SetAutoFocus( false )
+		frame.sr_link:SetFontObject( m.GuiElements.font_highlight )
+
+		frame.sr_label = frame:CreateFontString( nil, "ARTWORK", "GIFontHighlight" )
+		frame.sr_label:SetPoint("Right", frame.sr_link, "Left", -10, 0 )
+		frame.sr_label:SetText("SR sheet")
+
 		frame.leader = gui.create_icon_label( frame, "Interface\\AddOns\\RaidCalendar\\assets\\icon_leader.tga", 140 )
-		frame.leader:SetPoint( "TopLeft", frame, "TopLeft", 20, -140 )
+		frame.leader:SetPoint( "TopLeft", frame, "TopLeft", 20, -160 )
 
 		frame.signups = gui.create_icon_label( frame, "Interface\\AddOns\\RaidCalendar\\assets\\icon_signups.tga", 80 )
 		frame.signups:SetPoint( "TopLeft", frame.leader, "TopRight", 5, 0 )
@@ -332,7 +343,8 @@ function M.new()
 
 		frame.attending = m.FrameBuilder.new()
 				:parent( frame )
-				:point( "TopLeft", frame, "TopLeft", 10, -170 )
+				:point( "Top", frame.leader, "Bottom", 0, -7 )
+				:point( "Left", frame, "Left", 10, 0 )
 				:frame_style( "TOOLTIP" )
 				:backdrop( { bgFile = "Interface/Buttons/WHITE8x8" } )
 				:backdrop_color( 0.08, 0.08, 0.08, 1 )
@@ -355,7 +367,8 @@ function M.new()
 			if prev then
 				frame[ btn ]:SetPoint( "TopRight", prev, "BottomRight", 0, -5 )
 			else
-				frame[ btn ]:SetPoint( "TopRight", frame, "TopRight", -10, -170 )
+				frame[ btn ]:SetPoint( "Top", frame.attending, "TopRight", 0, 0 )
+				frame[ btn ]:SetPoint( "Right", frame, "Right", -10, -0 )
 			end
 			prev = frame[ btn ]
 		end
@@ -469,11 +482,13 @@ function M.new()
 
 		if not event.description then
 			set_description( 'Hang on while event data is loaded...' )
-			--m.view_event = true
 			m.msg.request_event( event_id )
 			return
 		end
 		set_description( event.description )
+
+		local sr = string.match( event.description, "(https://raidres.fly.dev/res/%w+)%s?")
+		popup.sr_link:SetText(sr or "")
 
 		popup.leader.set( event.leaderName )
 		popup.date.set( date( "%d. %B %Y", event.startTime ) )
@@ -554,7 +569,7 @@ function M.new()
 			class_frame:SetHeight( y )
 		end
 
-		popup.attending:SetHeight( data[ "attending" ].total_y + data[ "attending" ].max_y + 9 )
+		popup.attending:SetHeight( math.max(20, data[ "attending" ].total_y + data[ "attending" ].max_y + 9 ))
 
 		if data[ "missing" ].count == 0 then
 			popup.missing:SetHeight( 0 )
@@ -564,8 +579,7 @@ function M.new()
 			popup.missing:Show()
 		end
 
-		popup:SetHeight( math.max( 350, 202 + data[ "attending" ].total_y + data[ "attending" ].max_y + data[ "missing" ].max_y ) )
-
+		popup:SetHeight( math.max( 365, 216 + data[ "attending" ].total_y + data[ "attending" ].max_y + data[ "missing" ].max_y ) )
 
 		--
 		-- Buttons
@@ -596,14 +610,12 @@ function M.new()
 		else
 			popup.btn_signup:Show()
 			popup.btn_signup:Enable()
-			--popup.btn_bench:SetPoint("Top", popup.btn_login, "Top", 0, -5 )
-			popup.dd_class:SetPoint( "Top", popup, "Top", 0, -200 )
+			popup.dd_class:SetPoint( "Top", popup, "Top", 0, -220 )
 			popup.dd_class:Show()
 			popup.dd_spec:Show()
 			for _, v in buttons do
 				if v ~= "Signup" then
 					local btn = "btn_" .. string.gsub( string.lower( v ), "%s", "_" )
-					--					popup[ btn ]:Enable()
 					popup[ btn ]:Hide()
 				end
 			end

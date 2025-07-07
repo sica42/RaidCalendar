@@ -232,7 +232,7 @@ function M.new()
 				return
 			end
 
-			m.debug( "Receiving events requested by " .. data.player )
+			m.debug( "Receiving events requested by " .. (data.player or "UNKNOWN") )
 			for _, event in data.events do
 				if m.db.events[ event.id ] then
 					-- Only send event update request from player who requested it if needed
@@ -262,6 +262,7 @@ function M.new()
 			-- SIGNUP_RESULT
 			--
 			data = decode( data, key_map, value_map )
+			m.debug( m.dump( data ) )
 
 			if data.success then
 				local _, index = m.find( data.signUp.id, m.db.events[ data.eventId ].signUps, "id" )
@@ -296,7 +297,7 @@ function M.new()
 	local function on_comm_received( prefix, data_str, _, sender )
 		if prefix ~= m.prefix or sender == m.player then return end
 
-		local command = string.match( data_str, "^(%u-)::" )
+		local command = string.match( data_str, "^([_%u]-)::" )
 		if (command) then
 			data_str = string.gsub( data_str, "^.-::", "" )
 
@@ -328,7 +329,7 @@ function M.new()
 				on_command( command, lua_data, sender )
 			end
 		else
-			m.debug("No command: " .. data_str)
+			m.debug( "No command: " .. data_str )
 		end
 	end
 
