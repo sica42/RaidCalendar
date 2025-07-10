@@ -504,10 +504,9 @@ function M.new()
 		for i = 1, rows do
 			local item = create_entry( border_srlist )
 			item:SetPoint( "Top", border_srlist, "Top", 4, ((i - 1) * -20) - 4 )
+			item:Hide()
 			table.insert( frame_items, item )
 		end
-
-
 
 		return frame
 	end
@@ -550,7 +549,10 @@ function M.new()
 		popup.sr2:Hide()
 		popup.btn_refresh:Enable()
 
-		if not m.db.events[ event_id ].sr then
+		---@diagnostic disable-next-line: undefined-global
+		local atlas = AtlasLoot_Data and AtlasLoot_Data[ "AtlasLootItems" ]
+
+		if not m.db.events[ event_id ].sr or not atlas then
 			popup.yoursr:SetText( "Please wait while SR data is loading..." )
 			popup.dd_spec:Hide()
 			popup.label_sr1:Hide()
@@ -559,9 +561,16 @@ function M.new()
 			popup.dd_sr2:Hide()
 			popup.btn_reserve:Hide()
 
-			m.msg.request_sr( m.db.events[ event_id ].srId )
+			if atlas then
+				m.msg.request_sr( m.db.events[ event_id ].srId )
+			else
+				popup.yoursr:SetText("AtlasLoot is required")
+				popup.btn_refresh:Disable()
+			end
 			return
 		end
+
+		m.debug("lala")
 		sr_list = m.db.events[ event_id ].sr.reservations
 		raid_id = m.db.events[ event_id ].sr.raidId
 		sr_items = nil
