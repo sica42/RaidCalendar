@@ -76,6 +76,8 @@ local function create_button( parent, i )
 		local value = btn.value
 		local text = btn:GetText()
 		if text then
+			--print("lib option: " .. lib.options.label_on_select)
+			--print("self option" .. dropdown.options.label_on_select)
 			dropdown.label:SetText( lib.options.label_on_select == "text" and text or value )
 			dropdown.edit_box:ClearFocus()
 

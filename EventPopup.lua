@@ -38,51 +38,6 @@ function M.new()
 	local gui = m.GuiElements
 
 	local buttons = { "Signup", "Bench", "Late", "Tentative", "Absence", "Change Spec" }
-	local icons = {
-		Restoration = "Interface\\Icons\\spell_nature_healingtouch",
-		Restoration1 = "Interface\\Icons\\spell_nature_magicimmunity",
-		Protection = "Interface\\Icons\\ability_warrior_defensivestance",
-		Protection1 = "Interface\\AddOns\\RaidCalendar\\assets\\icon_shieldofthetemplar.tga",
-		Combat = "Interface\\Icons\\ability_backstab",
-		Arms = "Interface\\Icons\\ability_warrior_savageblow",
-		Fury = "Interface\\Icons\\ability_warrior_innerrage",
-		Fire = "Interface\\Icons\\spell_fire_firebolt02",
-		Frost = "Interface\\Icons\\spell_frost_frostbolt02",
-		Arcane = "Interface\\Icons\\inv_misc_rune_03",
-		Affliction = "Interface\\Icons\\spell_shadow_deathcoil",
-		Shadow = "Interface\\Icons\\spell_shadow_shadowwordpain",
-		Subtlety = "Interface\\Icons\\ability_stealth",
-		Marksmanship = "Interface\\AddOns\\RaidCalendar\\assets\\icon_marksmanship.tga",
-		Holy = "Interface\\AddOns\\RaidCalendar\\assets\\icon_holy_guardianspirit.tga",
-		Holy1 = "Interface\\Icons\\spell_holy_holybolt",
-		Destruction = "Interface\\Icons\\spell_shadow_rainoffire",
-		Elemental = "Interface\\Icons\\spell_nature_lightning",
-		Smite = "Interface\\Icons\\spell_holy_holysmite",
-		Demonology = "Interface\\Icons\\spell_shadow_metamorphosis",
-		Survival = "Interface\\AddOns\\RaidCalendar\\assets\\icon_survival.tga",
-		Guardian = "Interface\\Icons\\ability_racial_bearform",
-		Retribution = "Interface\\Icons\\spell_holy_auraoflight",
-		Beastmastery = "Interface\\AddOns\\RaidCalendar\\assets\\icon_beastmastery.tga",
-		Discipline = "Interface\\Icons\\spell_holy_powerwordshield",
-		Balance = "Interface\\Icons\\spell_nature_starfall",
-		Enhancement = "Interface\\Icons\\spell_nature_lightningshield",
-		Feral = "Interface\\Icons\\ability_druid_catform",
-		Assassination = "Interface\\AddOns\\RaidCalendar\\assets\\icon_assassination.tga"
-	}
-
-	local class_icons = {
-		WARRIOR = { 0, 0.246094, 0, 0.246094 },
-		MAGE    = { 0.246094, 0.492188, 0, 0.246094 },
-		ROGUE   = { 0.492188, 0.738281, 0, 0.246094 },
-		DRUID   = { 0.738281, 0.972656, 0, 0.246094 },
-
-		HUNTER  = { 0, 0.246094, 0.246094, 0.5 },
-		SHAMAN  = { 0.246094, 0.492188, 0.246094, 0.5 },
-		PRIEST  = { 0.492188, 0.738281, 0.246094, 0.5 },
-		WARLOCK = { 0.738281, 0.972656, 0.246094, 0.5 },
-
-		PALADIN = { 0, 0.246094, 0.5, 0.730469 },
-	}
 
 	local function save_position( self )
 		local point, _, relative_point, x, y = self:GetPoint()
@@ -217,9 +172,9 @@ function M.new()
 		frame.header.set( class .. " (" .. tostring( count ) .. ")" )
 
 
-		if class_icons[ string.upper( class ) ] then
+		if gui.class_icons[ string.upper( class ) ] then
 			frame.header.set_icon( "Interface\\Glues\\CharacterCreate\\UI-CharacterCreate-Classes" )
-			frame.header.icon:SetTexCoord( unpack( class_icons[ string.upper( class ) ] ) )
+			frame.header.icon:SetTexCoord( unpack( gui.class_icons[ string.upper( class ) ] ) )
 		else
 			frame.header.set_icon( "Interface\\AddOns\\RaidCalendar\\assets\\icon_" .. string.lower( class ) .. ".tga" )
 			frame.header.icon:SetTexCoord( 0, 1, 0, 1 )
@@ -256,7 +211,7 @@ function M.new()
 
 		local entry_time = date( "%d. %b %Y " .. m.time_format, signup.entryTime )
 		frame.player.set( signup.name, signup.position, entry_time )
-		frame.player.set_icon( icons[ signup.specName ] and icons[ signup.specName ] or "", string.match( signup.specName, "(%a+)" ) )
+		frame.player.set_icon( gui.spec_icons[ signup.specName ] and gui.spec_icons[ signup.specName ] or "", string.match( signup.specName, "(%a+)" ) )
 		frame:Show()
 
 		return frame
@@ -338,19 +293,8 @@ function M.new()
 		frame.desc:SetJustifyH( "Left" )
 		frame.desc:SetJustifyV( "Top" )
 
-		frame.sr_link = CreateFrame( "EditBox", nil, frame, "InputBoxTemplate" )
-		frame.sr_link:SetPoint( "TopLeft", frame, "TopLeft", 58, -133 )
-		frame.sr_link:SetHeight( 22 )
-		frame.sr_link:SetWidth( 170 )
-		frame.sr_link:SetAutoFocus( false )
-		frame.sr_link:SetFontObject( m.GuiElements.font_highlight )
-
-		frame.sr_label = frame:CreateFontString( nil, "ARTWORK", "GIFontHighlight" )
-		frame.sr_label:SetPoint( "Right", frame.sr_link, "Left", -10, 0 )
-		frame.sr_label:SetText( "SR sheet" )
-
 		frame.leader = gui.create_icon_label( frame, "Interface\\AddOns\\RaidCalendar\\assets\\icon_leader.tga", 140 )
-		frame.leader:SetPoint( "TopLeft", frame, "TopLeft", 20, -160 )
+		frame.leader:SetPoint( "TopLeft", frame, "TopLeft", 20, -140 )
 
 		frame.signups = gui.create_icon_label( frame, "Interface\\AddOns\\RaidCalendar\\assets\\icon_signups.tga", 80 )
 		frame.signups:SetPoint( "TopLeft", frame.leader, "TopRight", 5, 0 )
@@ -447,7 +391,7 @@ function M.new()
 					table.insert( list, {
 						value = v.name,
 						text = string.match( v.name, "(%a+)" ),
-						icon = icons[ v.name ],
+						icon = gui.spec_icons[ v.name ],
 					} )
 				end
 			end
@@ -510,9 +454,6 @@ function M.new()
 		end
 		set_description( event.description )
 
-		local sr = string.match( event.description, "(https://raidres.fly.dev/res/%w+)%s?" )
-		popup.sr_link:SetText( sr or "" )
-
 		popup.leader.set( event.leaderName )
 		popup.date.set( date( "%d. %B %Y", event.startTime ) )
 
@@ -536,11 +477,15 @@ function M.new()
 		end )
 
 		local signups_count = { Total = 0 }
+		local classes_count = 0
 		for _, v in pairs( event.signUps ) do
-			signups_count[ v.className ] = signups_count[ v.className ] and signups_count[ v.className ] + 1 or 1
 			if v.className ~= "Tentative" and v.className ~= "Absence" and v.className ~= "Late" then
 				signups_count[ "Total" ] = signups_count[ "Total" ] + 1
+				if not signups_count[ v.className ] then
+					classes_count = classes_count + 1
+				end
 			end
+			signups_count[ v.className ] = signups_count[ v.className ] and signups_count[ v.className ] + 1 or 1
 		end
 
 		local extra = (signups_count[ "Tentative" ] and signups_count[ "Tentative" ] or 0) + (signups_count[ "Late" ] and signups_count[ "Late" ] or 0)
@@ -552,23 +497,18 @@ function M.new()
 		local current
 		local data = {
 			attending = { x = 5, y = -5, max_y = 0, count = 0, total_y = 0 },
-			missing = { x = 5, y = -5, max_y = 0, count = 0 }
+			missing = { x = 5, y = -5, max_y = 0, count = 0, total_y = 0 }
 		}
 
 		signup_id = nil
 		for _, class in ipairs( event.classes ) do
 			current = class.type == "primary" and "attending" or "missing"
-			data[ current ].count = data[ current ].count + 1
-
-			if data[ current ].count == 5 then
-				data[ current ].x = 5
-				data[ current ].total_y = data[ current ].total_y + data[ current ].max_y
-				data[ current ].y = -22 - data[ current ].max_y
-			end
 
 			local class_frame = create_class_frame( popup[ current ], class.name, signups_count[ class.name ] or 0 )
 			class_frame:SetPoint( "TopLeft", popup[ current ], "TopLeft", data[ current ].x, data[ current ].y )
+
 			data[ current ].x = data[ current ].x + 102
+			data[ current ].count = data[ current ].count + 1
 
 			local y = 17
 			for _, v in pairs( event.signUps ) do
@@ -584,11 +524,20 @@ function M.new()
 					end
 				end
 			end
+
 			if y == 17 then
 				class_frame:Hide()
 				data[ current ].x = data[ current ].x - 102
 				data[ current ].count = data[ current ].count - 1
 			end
+
+			if data[ current ].count ~= 0 and data[ current ].count ~= classes_count and mod( data[ current ].count, 4 ) == 0 then
+				data[ current ].x = 5
+				data[ current ].total_y = data[ current ].total_y + data[ current ].max_y + 15
+				data[ current ].y = -5 - data[ current ].total_y
+				data[ current ].max_y = 0
+			end
+
 			class_frame:SetHeight( y )
 		end
 
@@ -602,13 +551,13 @@ function M.new()
 			popup.missing:Show()
 		end
 
-		popup:SetHeight( math.max( 365, 216 + data[ "attending" ].total_y + data[ "attending" ].max_y + data[ "missing" ].max_y ) )
+		popup:SetHeight( math.max( 365, 196 + data[ "attending" ].total_y + data[ "attending" ].max_y + data[ "missing" ].max_y ) )
 
 		--
 		-- Buttons
 		--
 		local class = m.db.user_settings[ event.templateId .. "_className" ]
-		popup.dd_class:SetSelected( class and class or "Select class", class or nil )
+		popup.dd_class:SetSelected( class and class or m.player_class, class or m.player_class )
 		popup.dd_class:Hide()
 
 		local spec = m.db.user_settings[ event.templateId .. "_specName" ]
@@ -682,9 +631,9 @@ function M.new()
 		return popup and popup:IsVisible() or false
 	end
 
-	local function update( eventid )
+	local function update( event_id )
 		if popup and popup:IsVisible() then
-			if eventid and event.id ~= eventid then
+			if event_id and event.id ~= event_id then
 				return
 			end
 			refresh( event.id )

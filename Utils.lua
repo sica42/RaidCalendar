@@ -106,10 +106,48 @@ function M.count( t )
 	return count
 end
 
+---@param item_name string
+---@param item_quality string
+---@return string
+function M.get_item_name_colorized( item_name, item_quality )
+	local color = ITEM_QUALITY_COLORS[ item_quality ]
+	local link = color.hex .. item_name .. "|r"
+
+	return link
+end
+
 function M.capitalize_words( str )
 	return string.gsub( str, "(%w)(%w*)", function( first, rest )
 		return string.upper( first ) .. string.lower( rest )
 	end )
+end
+
+function M.is_new_version( mine, theirs )
+  local function parse_version( v )
+    local parts = {}
+
+    for part in string.gmatch( v, "%d+" ) do
+      table.insert( parts, tonumber( part ) )
+    end
+
+    return parts
+  end
+
+  local my_version = parse_version( mine )
+  local their_version = parse_version( theirs )
+
+  for i = 1, math.max( getn( my_version ), getn( their_version ) ) do
+    local my_part = my_version[ i ] or 0
+    local their_part = their_version[ i ] or 0
+
+    if their_part > my_part then
+      return true
+    elseif their_part < my_part then
+      return false
+    end
+  end
+
+  return false
 end
 
 ---@param message string
@@ -158,7 +196,7 @@ end
 
 ---@param o any
 ---@return string
-function M.flatten( o )
+function M.____flatten( o )
 	if not o then return "nil" end
 	if type( o ) ~= 'table' then return tostring( o ) end
 
@@ -166,18 +204,65 @@ function M.flatten( o )
 	local s = "{"
 
 	for k, v in pairs( o ) do
-		if (entries == 0) then s = s .. " " end
+		--if (entries == 0) then s = s .. "" end
 
 		local key = type( k ) ~= "number" and '"' .. k .. '"' or k
 
-		if (entries > 0) then s = s .. ", " end
+		if (entries > 0) then s = s .. "," end
 
-		s = s .. "[" .. key .. ']="' .. M.dump( v ) .. '"'
+		local f = M.flatten( v )
+		if string.sub( f, 1, 1 ) == "{" then
+			s = s .. "[" .. key .. ']=' .. f
+		else
+			s = s .. "[" .. key .. ']="' .. f .. '"'
+		end
 		entries = entries + 1
 	end
 
 	--if (entries > 0) then s = s .. " " end
 	return s .. "}"
+end
+
+function M.is_array( t )
+	local count = 0
+	for k, _ in pairs( t ) do
+		if type( k ) ~= "number" then return false end
+		count = count + 1
+	end
+	for i = 1, count do
+		if t[ i ] == nil then return false end
+	end
+	return true
+end
+
+function M.flatten( value )
+	local value_type = type( value )
+
+	if value_type == "table" then
+		if M.is_array( value ) then
+			-- JSON array
+			local items = {}
+			for i = 1, getn(value) do
+				table.insert( items, M.flatten( value[ i ] ) )
+			end
+			return "{" .. table.concat( items, ",	" ) .. "}"
+		else
+			-- JSON object
+			local items = {}
+			for k, v in pairs( value ) do
+				table.insert( items, '["' .. tostring( k ) .. '"]=' .. M.flatten( v ) )
+			end
+			return "{" .. table.concat( items, "," ) .. "}"
+		end
+	elseif value_type == "string" then
+		return '"' .. string.gsub(value, '"', '\\"' ) .. '"'
+	elseif value_type == "number" or value_type == "boolean" then
+		return tostring( value )
+	elseif value_type == "nil" then
+		return "null"
+	end
+
+	error( "Unsupported type: " .. value_type )
 end
 
 ---@diagnostic disable-next-line: undefined-field

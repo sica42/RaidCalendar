@@ -63,8 +63,7 @@ function M.new()
 				m.event_popup.hide()
 			else
 				selected = frame.index
-				local event = m.db.events[ events[ selected ].key ]
-				m.event_popup.show( event.id )
+				m.event_popup.show( events[ selected ].key )
 			end
 
 			refresh()
@@ -78,7 +77,7 @@ function M.new()
 
 		local title = frame:CreateFontString( nil, "ARTWORK", "GIFontNormal" )
 		title:SetPoint( "TopLeft", frame, "TopLeft", 3, -2 )
-		title:SetWidth( 280 )
+		title:SetWidth( 260 )
 		title:SetHeight( 35 )
 		title:SetTextColor( NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b )
 		title:SetFont( "Interface\\AddOns\\RaidCalendar\\assets\\Myriad-Pro.ttf", 13, "OUTLINE" )
@@ -97,6 +96,23 @@ function M.new()
 		local signups_label = gui.create_icon_label( frame, "Interface\\AddOns\\RaidCalendar\\assets\\icon_signups.tga", 100, 14 )
 		signups_label:SetPoint( "TopRight", time_label, "TopLeft", -5, 0 )
 
+		local sr_frame = CreateFrame( "Button", nil, frame )
+		sr_frame:SetPoint( "TopRight", time_offset, "TopLeft", -5, -6 )
+		sr_frame:SetWidth( 20 )
+		sr_frame:SetHeight( 20 )
+		sr_frame:SetNormalTexture( "Interface\\AddOns\\RaidCalendar\\assets\\raidres.tga" )
+		sr_frame:SetScript( "OnEnter", function()
+			sr_frame:GetNormalTexture():SetBlendMode("ADD")
+			frame:LockHighlight()
+		end )
+		sr_frame:SetScript( "OnLeave", function()
+			sr_frame:GetNormalTexture():SetBlendMode("BLEND")
+			frame:UnlockHighlight()
+		end )
+
+		sr_frame:SetScript( "OnClick", function()
+			m.sr_popup.toggle( events[ frame.index ].key )
+		end )
 
 		---@param select boolean
 		frame.set_selected = function( select )
@@ -123,6 +139,25 @@ function M.new()
 				time_offset.icon:SetVertexColor( 1, 1, 1, 1 )
 			end
 
+			if event.srId then
+				sr_frame:Show()
+				if event.sr and event.sr.reservations then
+					local cnt = 0
+					for _, res in ipairs(event.sr.reservations) do
+						if res.character.name == m.player then
+							cnt = cnt + 1
+						end
+					end
+					if cnt == event.sr.reservationLimit then
+						sr_frame:GetNormalTexture():SetVertexColor(0,1,0,1)
+					else
+						sr_frame:GetNormalTexture():SetVertexColor(1,1,1,1)
+					end
+				end
+			else
+				sr_frame:Hide()
+			end
+
 			local signed_up = false
 			if event.signUps then
 				local signups = 0
@@ -144,8 +179,6 @@ function M.new()
 			else
 				signups_label.icon:SetVertexColor( 1, 1, 1, 1 )
 			end
-
-
 
 			frame:Show()
 		end

@@ -25,6 +25,51 @@ M.font_highlight_small = CreateFont( "GIFontHighlightSmall" )
 M.font_highlight_small:SetFont( "Interface\\AddOns\\RaidCalendar\\assets\\Myriad-Pro.ttf", 11, "" )
 M.font_highlight_small:SetTextColor( HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b )
 
+M.class_icons = {
+	WARRIOR = { 0, 0.246094, 0, 0.246094 },
+	MAGE    = { 0.246094, 0.492188, 0, 0.246094 },
+	ROGUE   = { 0.492188, 0.738281, 0, 0.246094 },
+	DRUID   = { 0.738281, 0.972656, 0, 0.246094 },
+	HUNTER  = { 0, 0.246094, 0.246094, 0.5 },
+	SHAMAN  = { 0.246094, 0.492188, 0.246094, 0.5 },
+	PRIEST  = { 0.492188, 0.738281, 0.246094, 0.5 },
+	WARLOCK = { 0.738281, 0.972656, 0.246094, 0.5 },
+	PALADIN = { 0, 0.246094, 0.5, 0.730469 },
+}
+
+M.spec_icons = {
+	Restoration = "Interface\\Icons\\spell_nature_healingtouch",
+	Restoration1 = "Interface\\Icons\\spell_nature_magicimmunity",
+	Protection = "Interface\\Icons\\ability_warrior_defensivestance",
+	Protection1 = "Interface\\AddOns\\RaidCalendar\\assets\\icon_shieldofthetemplar.tga",
+	Combat = "Interface\\Icons\\ability_backstab",
+	Arms = "Interface\\Icons\\ability_warrior_savageblow",
+	Fury = "Interface\\Icons\\ability_warrior_innerrage",
+	Fire = "Interface\\Icons\\spell_fire_firebolt02",
+	Frost = "Interface\\Icons\\spell_frost_frostbolt02",
+	Arcane = "Interface\\Icons\\inv_misc_rune_03",
+	Affliction = "Interface\\Icons\\spell_shadow_deathcoil",
+	Shadow = "Interface\\Icons\\spell_shadow_shadowwordpain",
+	Subtlety = "Interface\\Icons\\ability_stealth",
+	Marksmanship = "Interface\\AddOns\\RaidCalendar\\assets\\icon_marksmanship.tga",
+	Holy = "Interface\\AddOns\\RaidCalendar\\assets\\icon_holy_guardianspirit.tga",
+	Holy1 = "Interface\\Icons\\spell_holy_holybolt",
+	Destruction = "Interface\\Icons\\spell_shadow_rainoffire",
+	Elemental = "Interface\\Icons\\spell_nature_lightning",
+	Smite = "Interface\\Icons\\spell_holy_holysmite",
+	Demonology = "Interface\\Icons\\spell_shadow_metamorphosis",
+	Survival = "Interface\\AddOns\\RaidCalendar\\assets\\icon_survival.tga",
+	Guardian = "Interface\\Icons\\ability_racial_bearform",
+	Retribution = "Interface\\Icons\\spell_holy_auraoflight",
+	Beastmastery = "Interface\\AddOns\\RaidCalendar\\assets\\icon_beastmastery.tga",
+	Discipline = "Interface\\Icons\\spell_holy_powerwordshield",
+	Balance = "Interface\\Icons\\spell_nature_starfall",
+	Enhancement = "Interface\\Icons\\spell_nature_lightningshield",
+	Feral = "Interface\\Icons\\ability_druid_catform",
+	Assassination = "Interface\\AddOns\\RaidCalendar\\assets\\icon_assassination.tga",
+	Swords = "Interface\\Icons\\classicon_rogue"
+}
+
 ---@param parent Frame
 ---@param text string?
 ---@param tooltip string?
@@ -143,7 +188,7 @@ function M.create_icon_label( parent, icon, width, icon_size )
 	frame:SetHeight( 16 )
 
 	local icon_frame = CreateFrame( "Frame", nil, parent )
-	icon_frame:EnableMouse( true )
+	--icon_frame:EnableMouse( false )
 	icon_frame:SetWidth( icon_size and icon_size or 16 )
 	icon_frame:SetHeight( icon_size and icon_size or 16 )
 	icon_frame:SetPoint( "Left", frame, "Left", 0, 0 )
@@ -168,7 +213,7 @@ function M.create_icon_label( parent, icon, width, icon_size )
 	frame.icon:SetAllPoints( icon_frame )
 
 	frame.count_frame = CreateFrame( "Frame", nil, frame )
-	frame.count_frame:EnableMouse( true )
+	--frame.count_frame:EnableMouse( false )
 	frame.count_frame:SetPoint( "Left", frame, "Left", 20, 0 )
 	frame.count_frame:SetHeight( 10 )
 	frame.count_frame:SetBackdrop( { bgFile = "Interface\\Buttons\\WHITE8X8" } )
@@ -196,7 +241,7 @@ function M.create_icon_label( parent, icon, width, icon_size )
 
 	frame.label_frame = CreateFrame( "Frame", nil, frame)
 	frame.label_frame:SetPoint( "Left", frame, "Left", 20, 0 )
-	frame.label_frame:EnableMouse( true )
+	--frame.label_frame:EnableMouse( true )
 	frame.label_frame:SetWidth( (width or 100) - 35 )
 	frame.label_frame:SetHeight( 16 )
 
@@ -230,20 +275,39 @@ function M.create_icon_label( parent, icon, width, icon_size )
 			frame.count_frame:SetWidth( w )
 			frame.label_frame:SetPoint( "Left", frame, "Left", 20 + w, 0 )
 			frame.label_frame:SetWidth( (width or 100) - 35 )
-			frame.count_tooltip = count_tooltip
+
+			if count_tooltip then
+				frame.count_frame:EnableMouse( true )
+				frame.count_tooltip = count_tooltip
+			else
+				frame.count_frame:EnableMouse( false )
+				frame.count_tooltip = nil
+			end
 		else
 			frame.count_frame:Hide()
 			frame.label_frame:SetPoint( "Left", frame, "Left", 20, 0 )
 			frame.label_frame:SetWidth( (width or 100) - 20 )
 		end
+
 		frame.label:SetText( label )
+		if frame.label:GetStringWidth() > frame.label_frame:GetWidth() then
+			frame.label_frame:EnableMouse( true )
+		else
+			frame.label_frame:EnableMouse( false )
+		end
 	end
 
 	---@param _icon string
 	---@param tooltip string?
 	frame.set_icon = function( _icon, tooltip )
 		frame.icon:SetTexture( _icon )
-		frame.icon_tooltip = tooltip
+		if tooltip then
+			icon_frame:EnableMouse( true )
+			frame.icon_tooltip = tooltip
+		else
+			icon_frame:EnableMouse( false )
+			frame.icon_tooltip = nil
+		end
 	end
 
 	return frame

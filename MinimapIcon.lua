@@ -87,11 +87,7 @@ function M.new()
 	end
 
 	function obj:OnClick( button )
-		if m.calendar_popup.is_visible() then
-			m.calendar_popup.hide()
-		else
-			m.calendar_popup.show()
-		end
+		m.calendar_popup.toggle()
 	end
 
 	icon:Register( m.name, obj, m.db.minimap_icon )

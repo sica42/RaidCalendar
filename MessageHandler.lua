@@ -7,8 +7,14 @@ if m.MessageHandler then return end
 
 ---@type MessageCommand
 local MessageCommand = {
+	SR = "SR",
+	AddSR = "SRADD",
+	AddSRResult = "SRADD_RESULT",
+	DeleteSR = "SRDELETE",
+	DeleteSRResult = "SRDELETE_RESULT",
 	Event = "EVENT",
 	Events = "EVENTS",
+	RequestSR = "RSR",
 	RequestEvent = "REVENT",
 	RequestEvents = "REVENTS",
 	Signup = "SIGNUP",
@@ -19,6 +25,12 @@ local MessageCommand = {
 }
 
 ---@alias MessageCommand
+---| "SR"
+---| "RSR"
+---| "SRADD",
+---| "SRADD_RESULT",
+---| "SRDELETE",
+---| "SRDELETE_RESULT"
 ---| "REVENT"
 ---| "REVENTS"
 ---| "EVENT"
@@ -36,11 +48,14 @@ local MessageCommand = {
 ---@field SendCommMessage fun( self: any, prefix: string, text: string, distribution: string, target: string?, prio: "BULK"|"NORMAL"|"ALERT"?, callbackFn: function?, callbackArg: any? )
 
 ---@class MessageHandler
+---@field add_sr fun( raid_id: number, sr_id: string, sr1: number, sr2: number )
+---@field delete_sr fun( id: number )
+---@field request_sr fun( sr_id: string )
 ---@field request_event fun( event_id: string )
 ---@field request_events fun()
 ---@field signup fun( event_id: string, user_id: string, class_name: string, spec_name: string )
 ---@field signup_edit fun( event_id: string, signup_id: string, class_name: string, spec_name: string )
----@field version_check fun()
+---@field version_check fun( show_all: boolean?)
 
 local M = {}
 
@@ -88,7 +103,20 @@ function M.new()
 		sc = "specs",
 		di = "displayTitle",
 		su = "signUpCount",
-		co = "closeTime"
+		co = "closeTime",
+		re = "reference",
+		ad = "allowDuplicateReservation",
+		ac = "allowComments",
+		rl = "reservationLimit",
+		cm = "comment",
+		ca = "character",
+		b = "raidItemId",
+		f = "itemId",
+		z = "specialization",
+		ah = "advancedHrItems",
+		h = "isHardReserved",
+		cz = "characterSpecializations",
+		cb = "characterNames"
 	}
 
 	local value_map = {
@@ -165,6 +193,29 @@ function M.new()
 		ace_comm:SendCommMessage( m.prefix, command .. "::" .. _data, "GUILD", nil, "NORMAL" )
 	end
 
+	local function add_sr( raid_id, sr_id, sr1, sr2 )
+		broadcast( MessageCommand.AddSR, {
+			raidId = raid_id,
+			reference = sr_id,
+			characterName = m.player,
+			characterClass = m.player_class,
+			specialization = m.player_class .. m.db.user_settings.sr_specName,
+			raidItemIds = { sr1, sr2 }
+		} )
+	end
+
+	local function delete_sr( id )
+		broadcast( MessageCommand.DeleteSR, {
+			id = id
+		} )
+	end
+
+	local function request_sr( sr_id )
+		broadcast( MessageCommand.RequestSR, {
+			id = sr_id
+		} )
+	end
+
 	local function request_events()
 		broadcast( MessageCommand.RequestEvents )
 	end
@@ -205,7 +256,8 @@ function M.new()
 		} );
 	end
 
-	local function version_check()
+	local function version_check( show_all )
+		m.version_show_all = show_all or false
 		broadcast( MessageCommand.VersionCheck )
 	end
 
@@ -213,15 +265,78 @@ function M.new()
 	---@param data table
 	---@param sender string
 	local function on_command( command, data, sender )
-		if command == MessageCommand.Event then
+		if command == MessageCommand.SR then
+			--
+			-- SR
+			--
+			data = decode( data, key_map, value_map )
+
+			if data.success and data.success == false then
+				m.error( data.status )
+				return
+			end
+
+			m.debug( "GOT SR" )
+			local _, event_id = m.find( data.reference, m.db.events, "srId" )
+			if event_id then
+				m.db.events[ event_id ].sr = data
+				m.db.events[ event_id ].sr.lastUpdated = time()
+				m.sr_popup.update( event_id )
+				m.calendar_popup.update()
+			end
+		elseif command == MessageCommand.AddSRResult then
+			--
+			-- SR Added
+			--
+			data = decode( data, key_map, value_map )
+
+			if data.player == m.player then
+				if data.success == true then
+					m.debug( "SR Added" )
+				else
+					m.error( "Adding SR failed: " .. (data.status or "Unknown error") )
+				end
+				request_sr( data.srId )
+			end
+		elseif command == MessageCommand.DeleteSRResult then
+			--
+			-- SR Deleted
+			--
+			data = decode( data, key_map, value_map )
+
+			if data.success == true then
+				for event_id, event in pairs( m.db.events ) do
+					if event.sr then
+						local _, k = m.find( data.id, event.sr.reservations, "id" )
+						if k then
+							m.debug( "Delete entry: " .. tostring( k ) .. " in " .. event_id )
+							table.remove( event.sr.reservations, k )
+							m.sr_popup.update()
+							m.calendar_popup.update()
+							return
+						end
+					end
+				end
+				--m.find( data.id, m.db.events)
+			elseif data.player == m.player then
+				m.error( "Delete SR failed: " .. (data.status or "Unknown error") )
+			end
+		elseif command == MessageCommand.Event then
 			--
 			-- EVENT
 			--
 			data = decode( data, key_map, value_map )
-
 			m.debug( "Got event id: " .. data.id )
+
+			local sr = m.db.events[ data.id ].sr
 			m.db.events[ data.id ] = data
+			m.db.events[ data.id ].sr = sr
+
+			local sr_ref = string.match( m.db.events[ data.id ].description, "https://raidres.fly.dev/res/(%w+)%s?" )
+			m.db.events[ data.id ].srId = sr_ref
+
 			m.event_popup.update( data.id )
+			m.calendar_popup.update()
 		elseif command == MessageCommand.Events then
 			--
 			-- EVENTS
@@ -262,7 +377,6 @@ function M.new()
 			-- SIGNUP_RESULT
 			--
 			data = decode( data, key_map, value_map )
-			m.debug( m.dump( data ) )
 
 			if data.success then
 				local _, index = m.find( data.signUp.id, m.db.events[ data.eventId ].signUps, "id" )
@@ -288,8 +402,17 @@ function M.new()
 			--
 			-- Receive version
 			--
-			if data.requester == m.player then
+			if data.requester == m.player and m.version_show_all then
 				m.info( string.format( "%s [v%s]", m.colorize_player_by_class( sender, data.class ), data.version ), true )
+				return
+			end
+
+			if not m.db.user_settings.last_versioncheck or time() - m.db.user_settings.last_versioncheck > 3600 * 24 then
+				m.db.user_settings.last_versioncheck = time()
+				if m.is_new_version(m.version, data.version) then
+					m.info( string.format( "New version (%s) is available!", data.version ) )
+					m.info( "https://github.com/sica42/RaidCalendar" )
+				end
 			end
 		end
 	end
@@ -325,6 +448,7 @@ function M.new()
 					on_command( cmd, lua_data, sender )
 				end
 			elseif command then
+				m.debug( data_str )
 				local lua_data = loadstring( "return " .. data_str )()
 				on_command( command, lua_data, sender )
 			end
@@ -337,6 +461,9 @@ function M.new()
 
 	---@type MessageHandler
 	return {
+		add_sr = add_sr,
+		delete_sr = delete_sr,
+		request_sr = request_sr,
 		request_event = request_event,
 		request_events = request_events,
 		signup = signup,

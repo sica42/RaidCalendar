@@ -39,6 +39,7 @@ function RaidCalendar.events:ADDON_LOADED()
 	m.db.events = m.db.events or {}
 	m.db.user_settings = m.db.user_settings or {}
 	m.db.user_settings.time_format = m.db.user_settings.time_format or "24"
+	m.db.popup_sr = m.db.popup_sr or {}
 	m.db.popup_event = m.db.popup_event or {}
 	m.db.popup_calendar = m.db.popup_calendar or {}
 	m.db.minimap_icon = m.db.minimap_icon or {}
@@ -54,12 +55,15 @@ function RaidCalendar.events:ADDON_LOADED()
 	---@type CalendarPopup
 	m.calendar_popup = m.CalendarPopup.new()
 
+	---@type SRPopup
+	m.sr_popup = m.SRPopup.new()
+
 	---@type MinimapIcon
 	m.minimap_icon = m.MinimapIcon.new()
 
 	-- Refresh events if last update is older then 12h
 	if not m.db.user_settings.last_updated or time() - m.db.user_settings.last_updated > 43200 then
-		m.debug("Fetching events...")
+		m.debug( "Fetching events..." )
 		m.msg.request_events()
 	end
 
@@ -80,7 +84,7 @@ function RaidCalendar.events:ADDON_LOADED()
 		end
 
 		if args == "vc" then
-			m.msg.version_check()
+			m.msg.version_check( true )
 			return
 		end
 
@@ -94,6 +98,13 @@ function RaidCalendar.events:ADDON_LOADED()
 
 	m.version = GetAddOnMetadata( m.name, "Version" )
 	self.info( string.format( "(v%s) Loaded", m.version ) )
+	self.check_new_version()
+end
+
+function RaidCalendar.check_new_version()
+	if not m.db.user_settings.last_versioncheck or time() - m.db.user_settings.last_versioncheck > 3600 * 24 then
+		m.msg.version_check()
+	end
 end
 
 RaidCalendar:init()
