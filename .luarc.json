@@ -8,6 +8,7 @@
     "date",
     "event",
     "GameFontHighlightSmall",
+    "GameFontNormal",
     "GetGuildRosterInfo",
     "GetItemInfo",
     "GetNumGuildMembers",

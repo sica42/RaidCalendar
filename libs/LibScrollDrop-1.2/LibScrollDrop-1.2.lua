@@ -24,6 +24,8 @@ if not lib then return end
 ---@class DropdownItem: Button
 ---@field id integer
 ---@field value any
+---@field tooltip function|string
+---@field type "normal"|"header"
 
 ---@class DropdownOptions
 ---@field max_visible? integer
@@ -70,14 +72,15 @@ local function create_button( parent, i )
 	btn.icon:SetHeight( 16 )
 
 	btn:SetScript( "OnClick", function()
+		if btn.type == "header" then
+			return
+		end
 		local dropdown = lib.active_dropdown
 		local index = parent.offset + btn.id
 		dropdown.selected = btn.value
 		local value = btn.value
 		local text = btn:GetText()
 		if text then
-			--print("lib option: " .. lib.options.label_on_select)
-			--print("self option" .. dropdown.options.label_on_select)
 			dropdown.label:SetText( lib.options.label_on_select == "text" and text or value )
 			dropdown.edit_box:ClearFocus()
 
@@ -86,6 +89,19 @@ local function create_button( parent, i )
 			if dropdown.on_select then
 				dropdown.on_select( value, index )
 			end
+		end
+	end )
+
+	btn:SetScript( "OnEnter", function()
+		if btn.tooltip then
+			if type( btn.tooltip ) == "function" then
+				btn.tooltip()
+			end
+		end
+	end )
+	btn:SetScript( "OnLeave", function()
+		if btn.tooltip and GameTooltip:IsVisible() then
+			GameTooltip:Hide()
 		end
 	end )
 
@@ -108,7 +124,7 @@ local function create_dropdown_list( max_items )
     frame:SetBackdropColor( 1, 0, 0, 1 )]]
 		frame:SetWidth( 160 )
 		frame:SetHeight( lib.default_options.max_visible * 16 + 8 )
-		frame:SetFrameStrata( "TOOLTIP" )
+		frame:SetFrameStrata( "FULLSCREEN_DIALOG" )
 		frame:EnableMouseWheel( true )
 		frame:EnableMouse( true )
 		frame:Hide()
@@ -160,6 +176,7 @@ local function create_dropdown_list( max_items )
 			--      frame.offset = math.floor( arg1 + 0.5 )
 			frame.offset = arg1
 			lib:UpdateList()
+			GameTooltip:Hide()
 		end )
 	end
 end
@@ -415,6 +432,8 @@ function lib:UpdateList()
 
 		if item then
 			btn.value = item.value
+			btn.type = item.type
+			btn.tooltip = item.tooltip or nil
 			btn:SetText( item.text )
 
 			local text = btn:GetFontString()
@@ -426,6 +445,17 @@ function lib:UpdateList()
 				btn.icon:SetTexture( nil )
 				text:SetPoint( "Left", btn, "Left", 0, 0 )
 			end
+
+			if item.type == "header" then
+				--text:SetTextColor( NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, 1 )
+				--text:SetFontObject( "GameFontNormalLarge" )
+				btn:SetTextFontObject( GameFontNormal )
+			else
+				btn:SetTextFontObject( GameFontHighlightSmall )
+				--text:SetTextColor( 1, 1, 1, 1 )
+				--text:SetFontObject( "GameFontHighlight" )
+			end
+
 
 			btn:UnlockHighlight()
 			btn:Show()

@@ -38,7 +38,7 @@ function M.new()
 		[ 98 ] = { "AQ20", "Ruins of Ahn'Qiraj", { "AQ20Kurinnaxx", "AQ20Andorov", "AQ20Rajaxx", "AQ20CAPTAIN", "AQ20Moam", "AQ20Buru", "AQ20Ayamiss", "AQ20Ossirian", "AQ20Trash", "AQ20ClassBooks", "AQ20Enchants" } },
 		[ 99 ] = { "AQ40", "Temple of Ahn'Qiraj", { "AQ40Skeram", "AQ40Trio", "AQ40Sartura", "AQ40Fankriss", "AQ40Viscidus", "AQ40Huhuran", "AQ40Emperors", "AQ40Ouro", "AQ40CThun", "AQ40Trash1", "AQEnchants" } },
 		[ 100 ] = { "ZG", "Zul Gurub", { "ZGJeklik", "ZGVenoxis", "ZGEnchants", "ZGMarli", "ZGMandokir", "ZGGrilek", "ZGHazzarah", "ZGRenataki", "ZGWushoolay", "ZGGahzranka", "ZGThekal", "ZGArlokk", "ZGJindo", "ZGHakkar", "ZGMuddyChurningWaters", "ZGJinxedHoodooPile", "ZGTrash1", "ZGShared" } },
-		[ 101 ] = { "KC", "Karazhan", { "LKHRolfen", "LKHBroodQueenAraxxna", "LKHGrizikil", "LKHClawlordHowlfang", "LKHLordBlackwaldII", "LKHMoroes", "LKHTrash", "LKHEnchants" } },
+		[ 101 ] = { "LKH", "Karazhan", { "LKHRolfen", "LKHBroodQueenAraxxna", "LKHGrizikil", "LKHClawlordHowlfang", "LKHLordBlackwaldII", "LKHMoroes", "LKHTrash", "LKHEnchants" } },
 		[ 102 ] = { "ES", "Emerald Sanctum", { "ESErennius", "ESSolnius1", "ESHardMode", "ESTrash" } }
 	}
 
@@ -104,14 +104,12 @@ function M.new()
 				:backdrop( { bgFile = "Interface/Buttons/WHITE8x8" } )
 				:backdrop_color( 0.1, 0.1, 0.1, 1 )
 				:point( "Left", parent, "Left", 4, 0 )
-				--:point( "Right", parent, "Right", -21, 0 )
-				:width( 495 )
+				:width( 485 )
 				:height( 20 )
 				:build()
 
 		local player_label = frame:CreateFontString( nil, "ARTWORK", "GIFontHighlight" )
 		player_label:SetPoint( "TopLeft", frame, "TopLeft", 3, -2 )
-		--player_label:SetWidth( 100 )
 		player_label:SetHeight( 16 )
 		player_label:SetJustifyH( "Left" )
 
@@ -164,14 +162,13 @@ function M.new()
 				frame:SetBackdropColor( 0.08, 0.08, 0.08, 1 )
 			end
 
-			player_label:SetText( item.character.name )
-			--			player_label:SetWidth( player_label:GetStringWidth() )
-
 			if item.comment then
 				comment_icon:Show()
 			else
 				comment_icon:Hide()
 			end
+
+			player_label:SetText( item.character.name )
 
 			local class = string.sub( item.character.specialization, string.find( item.character.specialization, "%u", 2 ) or 0 )
 			class_label.set( class )
@@ -219,7 +216,6 @@ function M.new()
 				:width( 38 )
 				:height( 38 )
 				:build()
-
 
 		local icon = frame:CreateTexture( nil, "ARTWORK" )
 		icon:SetPoint( "TopLeft", frame, "TopLeft", 3, -3 )
@@ -288,6 +284,12 @@ function M.new()
 		return list
 	end
 
+	local function sr_dropdown_item_tooltip()
+		GameTooltip:SetOwner( this, "ANCHOR_RIGHT" )
+		GameTooltip:SetHyperlink( string.format( "item:%d:0:0:0", this.value ) )
+		GameTooltip:Show()
+	end
+
 	--
 	-- SR Items dropdown
 	--
@@ -303,43 +305,52 @@ function M.new()
 			local shared = {}
 
 			for _, v in raids[ raid_id ][ 3 ] do
-				local label = string.gsub( v, raids[ raid_id ][1], "" )
-				label = string.gsub( label, "%d", "" )
+				local label = raids[ raid_id ][ 1 ]
+				if raid_id ~= 97 then
+					label = string.gsub( v, label, "" )
+					label = string.gsub( label, "%d", "" )
+					label = string.gsub( label, "AQ", "" )
+					label = string.gsub( label, "(%l)(%u)", "%1 %2")
+				end
 
 				table.insert( sr_items, {
-					value = v,
+					type = "header",
 					text = label,
 				} )
+
 				---@diagnostic disable-next-line: undefined-global
 				for _, item in pairs( AtlasLoot_Data[ "AtlasLootItems" ][ v ] ) do
 					if item[ 1 ] and item[ 1 ] > 0 and not string.find( item[ 4 ], "=q1=" ) then
-						local name = string.gsub( item[ 3 ], "=q%d=", "" )
-						local _, i = m.find( item[ 1 ], sr_items, "value")
+						local _, i = m.find( item[ 1 ], sr_items, "value" )
 						if i then
 							table.remove( sr_items, i )
-							if not m.find( item [ 1 ], shared, "value") then
+							if not m.find( item[ 1 ], shared, "value" ) then
 								table.insert( shared, {
 									value = item[ 1 ],
-									text = name,
-									icon = "Interface\\Icons\\" .. item[ 2 ]
-								})
+									text = get_itemlink_atlas( item[ 1 ] ),
+									icon = "Interface\\Icons\\" .. item[ 2 ],
+									tooltip = sr_dropdown_item_tooltip
+								} )
 							end
 						else
 							table.insert( sr_items, {
 								value = item[ 1 ],
-								text = name,
-								icon = "Interface\\Icons\\" .. item[ 2 ]
+								text = get_itemlink_atlas( item[ 1 ] ),
+								icon = "Interface\\Icons\\" .. item[ 2 ],
+								tooltip = sr_dropdown_item_tooltip
 							} )
 						end
 					end
 				end
 			end
-			table.insert(sr_items, {
-				value = "Shared",
-				text = "Shared"
-			})
-			for _,v in ipairs(shared) do
-				table.insert(sr_items, v)
+			if getn(shared) > 0 then
+				table.insert( sr_items, {
+					type = "header",
+					text = "Shared"
+				} )
+				for _, v in ipairs( shared ) do
+					table.insert( sr_items, v )
+				end
 			end
 		end
 
@@ -564,13 +575,12 @@ function M.new()
 			if atlas then
 				m.msg.request_sr( m.db.events[ event_id ].srId )
 			else
-				popup.yoursr:SetText("AtlasLoot is required")
+				popup.yoursr:SetText( "AtlasLoot is required" )
 				popup.btn_refresh:Disable()
 			end
 			return
 		end
 
-		m.debug("lala")
 		sr_list = m.db.events[ event_id ].sr.reservations
 		raid_id = m.db.events[ event_id ].sr.raidId
 		sr_items = nil
@@ -602,12 +612,12 @@ function M.new()
 			popup.btn_reserve:Show()
 			popup.btn_reserve:Enable()
 
-			if sr_limit > 1 and sr_count == 1 then
+			if sr_limit > 1 and sr_count == 1 or sr_limit == 1 then
 				popup.dd_spec:Hide()
 				popup.label_sr2:Hide()
 				popup.dd_sr2:Hide()
 				popup.label_sr1:SetPoint( "TopLeft", popup.border_reserve, "TopLeft", 263, -36 )
-				popup.label_sr1:SetText( "SR 2" )
+				popup.label_sr1:SetText( "SR " .. sr_limit )
 			else
 				popup.dd_spec:Show()
 				popup.label_sr2:Show()
@@ -666,7 +676,6 @@ function M.new()
 			refresh()
 		end
 	end
-
 
 	---@type SRPopup
 	return {
