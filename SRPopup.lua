@@ -15,7 +15,7 @@ if m.SRPopup then return end
 local M = {}
 
 ---@type ScrollDropdown
-local scroll_drop = LibStub:GetLibrary( "LibScrollDrop-1.2" )
+local scroll_drop = LibStub:GetLibrary( "LibScrollDrop-1.3" )
 
 function M.new()
 	local popup
@@ -139,6 +139,10 @@ function M.new()
 		item_label:SetPoint( "Left", class_label, "Right", 5, 0 )
 		item_label:EnableMouse( true )
 
+		local sr_label = frame:CreateFontString( nil, "ARTWORK", "GIFontHighlight" )
+		sr_label:SetPoint( "Right", frame, "Right", -5, 0 )
+		sr_label:SetJustifyH( "Left" )
+
 		item_label:SetScript( "OnEnter", function()
 			GameTooltip:SetOwner( item_label, "ANCHOR_RIGHT" )
 			GameTooltip:SetHyperlink( string.format( "item:%d:0:0:0", frame.item_id ) )
@@ -169,6 +173,7 @@ function M.new()
 			end
 
 			player_label:SetText( item.character.name )
+			sr_label:SetText( (item.srPlus and item.srPlus > 0) and ("+" .. tostring( item.srPlus )) or "" )
 
 			local class = string.sub( item.character.specialization, string.find( item.character.specialization, "%u", 2 ) or 0 )
 			class_label.set( class )
@@ -191,6 +196,7 @@ function M.new()
 				item_label.set_icon( item_tex )
 			else
 				item_label.set( "Unkown item" )
+				item_label.set_icon( nil )
 			end
 
 			local w = item_label.label:GetStringWidth()

@@ -112,6 +112,7 @@ function M.new()
 		ca = "character",
 		b = "raidItemId",
 		f = "itemId",
+		sr = "srPlus",
 		z = "specialization",
 		ah = "advancedHrItems",
 		h = "isHardReserved",

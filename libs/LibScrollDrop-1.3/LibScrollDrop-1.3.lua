@@ -1,10 +1,10 @@
 -----------------------------------------------------------------------
--- LibScrollDrop-1.2
+-- LibScrollDrop-1.3
 --
 -- Dropdown with scrollbar and search
 --
 
-local MAJOR, MINOR = "LibScrollDrop-1.2", 1
+local MAJOR, MINOR = "LibScrollDrop-1.3", 1
 if not LibStub then error( MAJOR .. " requires LibStub." ) end
 local lib = LibStub:NewLibrary( MAJOR, MINOR )
 if not lib then return end

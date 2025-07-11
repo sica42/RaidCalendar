@@ -297,7 +297,7 @@ function M.create_icon_label( parent, icon, width, icon_size )
 		end
 	end
 
-	---@param _icon string
+	---@param _icon string|nil
 	---@param tooltip string?
 	frame.set_icon = function( _icon, tooltip )
 		frame.icon:SetTexture( _icon )

@@ -16,7 +16,7 @@ if m.CalendarPopup then return end
 local M = {}
 
 ---@type ScrollDropdown
-local scroll_drop = LibStub:GetLibrary( "LibScrollDrop-1.2" )
+local scroll_drop = LibStub:GetLibrary( "LibScrollDrop-1.3" )
 
 function M.new()
 	local popup
