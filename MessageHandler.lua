@@ -160,7 +160,46 @@ function M.new()
 		[ "#38" ] = "Healers",
 		[ "#39" ] = "Melee",
 		[ "#40" ] = "Tank",
-		[ "#41" ] = "primary"
+		[ "#41" ] = "primary",
+
+		[ "#42" ] = "Druid",
+		[ "#43" ] = "DruidBalance",
+		[ "#44" ] = "DruidFeral",
+		[ "#45" ] = "DruidRestoration",
+		[ "#46" ] = "DruidBear",
+		[ "#47" ] = "Hunter",
+		[ "#48" ] = "HunterBeastMastery",
+		[ "#49" ] = "HunterMarksmanship",
+		[ "#50" ] = "HunterSurvival",
+		[ "#51" ] = "Mage",
+		[ "#52" ] = "MageArcane",
+		[ "#53" ] = "MageFire",
+		[ "#54" ] = "MageFrost",
+		[ "#55" ] = "Paladin",
+		[ "#56" ] = "PaladinHoly",
+		[ "#57" ] = "PaladinProtection",
+		[ "#58" ] = "PaladinRetribution",
+		[ "#59" ] = "Priest",
+		[ "#60" ] = "PriestDiscipline",
+		[ "#61" ] = "PriestHoly",
+		[ "#62" ] = "PriestShadow",
+		[ "#63" ] = "Rogue",
+		[ "#64" ] = "RogueSwords",
+		[ "#65" ] = "RogueDaggers",
+		[ "#66" ] = "RogueMaces",
+		[ "#67" ] = "Shaman",
+		[ "#68" ] = "ShamanElemental",
+		[ "#69" ] = "ShamanEnchancement",
+		[ "#70" ] = "ShamanRestoration",
+		[ "#71" ] = "ShamanTank",
+		[ "#72" ] = "Warlock",
+		[ "#73" ] = "WarlockAffliction",
+		[ "#74" ] = "Demonology",
+		[ "#75" ] = "Destruction",
+		[ "#76" ] = "Warrior",
+		[ "#77" ] = "WarriorArms",
+		[ "#78" ] = "WarriorFury",
+		[ "#79" ] = "WarriorProtection"
 	}
 
 	setmetatable( key_map, { __index = function( _, key ) return key end } );
@@ -334,6 +373,7 @@ function M.new()
 
 			local sr_ref = string.match( m.db.events[ data.id ].description, "https://raidres.fly.dev/res/(%w+)%s?" )
 			m.db.events[ data.id ].srId = sr_ref
+			m.db.events[ data.id ].title = string.gsub( m.db.events[ data.id ].title, "<:.*>", "" )
 
 			m.event_popup.update( data.id )
 			m.calendar_popup.update()
@@ -358,6 +398,7 @@ function M.new()
 				else
 					m.debug( event.id )
 					m.debug( "New event: " .. event.title )
+					event.title = string.gsub( event.title, "<:.*>", "" )
 					m.db.events[ event.id ] = event
 				end
 			end
@@ -409,7 +450,7 @@ function M.new()
 
 			if not m.db.user_settings.last_versioncheck or time() - m.db.user_settings.last_versioncheck > 3600 * 24 then
 				m.db.user_settings.last_versioncheck = time()
-				if m.is_new_version(m.version, data.version) then
+				if m.is_new_version( m.version, data.version ) then
 					m.info( string.format( "New version (%s) is available!", data.version ) )
 					m.info( "https://github.com/sica42/RaidCalendar" )
 				end

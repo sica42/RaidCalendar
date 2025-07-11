@@ -290,6 +290,52 @@ function M.new()
 		GameTooltip:Show()
 	end
 
+	local function sort_sections_by_text( t )
+		local sorted = {}
+		local group = nil
+
+		local function strip_color( text )
+			return string.gsub( text, "|cff%x%x%x%x%x%x(.-)|r", "%1" )
+		end
+
+		for _, entry in ipairs( t ) do
+			if entry.type == "header" then
+				-- Finish and sort the previous group (if any)
+				if group then
+					table.sort( group, function( a, b )
+						return string.lower( strip_color( a.text ) ) < string.lower( strip_color( b.text ) )
+					end )
+					for _, item in ipairs( group ) do
+						table.insert( sorted, item )
+					end
+				end
+
+				-- Add the new header and start a new group
+				table.insert( sorted, entry )
+				group = {}
+			else
+				if group then
+					table.insert( group, entry )
+				else
+					-- Safety fallback: item before any header
+					table.insert( sorted, entry )
+				end
+			end
+		end
+
+		-- Handle the final group
+		if group then
+			table.sort( group, function( a, b )
+				return string.lower( strip_color( a.text ) ) < string.lower( strip_color( b.text ) )
+			end )
+			for _, item in ipairs( group ) do
+				table.insert( sorted, item )
+			end
+		end
+
+		return sorted
+	end
+
 	--
 	-- SR Items dropdown
 	--
@@ -310,7 +356,7 @@ function M.new()
 					label = string.gsub( v, label, "" )
 					label = string.gsub( label, "%d", "" )
 					label = string.gsub( label, "AQ", "" )
-					label = string.gsub( label, "(%l)(%u)", "%1 %2")
+					label = string.gsub( label, "(%l)(%u)", "%1 %2" )
 				end
 
 				table.insert( sr_items, {
@@ -343,7 +389,7 @@ function M.new()
 					end
 				end
 			end
-			if getn(shared) > 0 then
+			if getn( shared ) > 0 then
 				table.insert( sr_items, {
 					type = "header",
 					text = "Shared"
@@ -352,7 +398,18 @@ function M.new()
 					table.insert( sr_items, v )
 				end
 			end
+
+			for _, item in pairs( m.db.events[ event_id ].sr.advancedHrItems ) do
+				local _, index = m.find( item.itemId, sr_items, "value" )
+				if index then
+					table.remove( sr_items, index )
+				end
+			end
+
+			sr_items = sort_sections_by_text( sr_items )
 		end
+
+
 
 		return sr_items
 	end
