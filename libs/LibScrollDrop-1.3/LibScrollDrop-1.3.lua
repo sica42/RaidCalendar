@@ -26,6 +26,7 @@ if not lib then return end
 ---@field value any
 ---@field tooltip function|string
 ---@field type "normal"|"header"
+---@field disabled boolean
 
 ---@class DropdownOptions
 ---@field max_visible? integer
@@ -72,7 +73,7 @@ local function create_button( parent, i )
 	btn.icon:SetHeight( 16 )
 
 	btn:SetScript( "OnClick", function()
-		if btn.type == "header" then
+		if btn.type == "header" or btn.disabled then
 			return
 		end
 		local dropdown = lib.active_dropdown
@@ -434,6 +435,7 @@ function lib:UpdateList()
 			btn.value = item.value
 			btn.type = item.type
 			btn.tooltip = item.tooltip or nil
+			btn.disabled = item.disabled or false
 			btn:SetText( item.text )
 
 			local text = btn:GetFontString()
@@ -455,7 +457,6 @@ function lib:UpdateList()
 				--text:SetTextColor( 1, 1, 1, 1 )
 				--text:SetFontObject( "GameFontHighlight" )
 			end
-
 
 			btn:UnlockHighlight()
 			btn:Show()

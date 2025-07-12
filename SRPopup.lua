@@ -42,6 +42,18 @@ function M.new()
 		[ 102 ] = { "ES", "Emerald Sanctum", { "ESErennius", "ESSolnius1", "ESHardMode", "ESTrash" } }
 	}
 
+	local atlas_classes = {
+		[ 1 ] = "Druid",
+		[ 2 ] = "Hunter",
+		[ 3 ] = "Mage",
+		[ 4 ] = "Paladin",
+		[ 5 ] = "Priest",
+		[ 6 ] = "Rogue",
+		[ 7 ] = "Shaman",
+		[ 8 ] = "Warlock",
+		[ 9 ] = "Warrior"
+	}
+
 	local specs = {
 		Druid = { "Balance", "Feral", "Restoration", "Bear" },
 		Hunter = { "BeastMastery", "Marksmanship", "Survival" },
@@ -223,7 +235,7 @@ function M.new()
 			if m.api.IsShiftKeyDown() then
 				if m.api.ChatFrameEditBox:IsVisible() then
 					local item_link = get_itemlink_atlas( frame.item_id )
-					m.api.ChatFrameEditBox:Insert( item_link)
+					m.api.ChatFrameEditBox:Insert( item_link )
 				end
 			end
 		end )
@@ -338,7 +350,7 @@ function M.new()
 			if m.api.IsShiftKeyDown() then
 				if m.api.ChatFrameEditBox:IsVisible() then
 					local item_link = get_itemlink_atlas( frame.item_id )
-					m.api.ChatFrameEditBox:Insert( item_link)
+					m.api.ChatFrameEditBox:Insert( item_link )
 				end
 			end
 		end )
@@ -457,13 +469,8 @@ function M.new()
 			local shared = {}
 
 			for _, v in raids[ raid_id ][ 3 ] do
-				local label = raids[ raid_id ][ 1 ]
-				if raid_id ~= 97 then
-					label = string.gsub( v, label, "" )
-					label = string.gsub( label, "%d", "" )
-					label = string.gsub( label, "AQ", "" )
-					label = string.gsub( label, "(%l)(%u)", "%1 %2" )
-				end
+				---@diagnostic disable-next-line: undefined-global
+				local label = string.match( AtlasLoot_TableNames[ v ][ 1 ], "- (.*)" )
 
 				table.insert( sr_items, {
 					type = "header",
@@ -472,25 +479,28 @@ function M.new()
 
 				---@diagnostic disable-next-line: undefined-global
 				for _, item in pairs( AtlasLoot_Data[ "AtlasLootItems" ][ v ] ) do
-					if item[ 1 ] and item[ 1 ] > 0 and not string.find( item[ 4 ], "=q1=" ) then
-						local _, i = m.find( item[ 1 ], sr_items, "value" )
-						if i then
-							table.remove( sr_items, i )
-							if not m.find( item[ 1 ], shared, "value" ) then
-								table.insert( shared, {
+					if item[ 1 ] and item[ 1 ] > 0 and not string.find( item[ 4 ], "#m4#" ) and item[ 5 ] then
+						local class = string.match( item[ 4 ], "#c(%d)#" )
+						if not class or atlas_classes[ tonumber( class ) ] == m.player_class then
+							local _, i = m.find( item[ 1 ], sr_items, "value" )
+							if i then
+								table.remove( sr_items, i )
+								if not m.find( item[ 1 ], shared, "value" ) then
+									table.insert( shared, {
+										value = item[ 1 ],
+										text = get_iteminfo_atlas( item[ 1 ] ),
+										icon = "Interface\\Icons\\" .. item[ 2 ],
+										tooltip = sr_dropdown_item_tooltip
+									} )
+								end
+							else
+								table.insert( sr_items, {
 									value = item[ 1 ],
 									text = get_iteminfo_atlas( item[ 1 ] ),
 									icon = "Interface\\Icons\\" .. item[ 2 ],
 									tooltip = sr_dropdown_item_tooltip
 								} )
 							end
-						else
-							table.insert( sr_items, {
-								value = item[ 1 ],
-								text = get_iteminfo_atlas( item[ 1 ] ),
-								icon = "Interface\\Icons\\" .. item[ 2 ],
-								tooltip = sr_dropdown_item_tooltip
-							} )
 						end
 					end
 				end
@@ -506,9 +516,11 @@ function M.new()
 			end
 
 			for _, item in pairs( m.db.events[ event_id ].sr.advancedHrItems ) do
-				local _, index = m.find( item.itemId, sr_items, "value" )
-				if index then
-					table.remove( sr_items, index )
+				local sr_item, index = m.find( item.itemId, sr_items, "value" )
+				if sr_item then
+					sr_item.disabled = true
+					sr_item.text = string.gsub( sr_item.text, "(|cff%x%x%x%x%x%x)", "|cffaaaaaa" )
+					--table.remove( sr_items, index )
 				end
 			end
 
