@@ -234,14 +234,18 @@ function M.new()
 	end
 
 	local function add_sr( raid_id, sr_id, sr1, sr2 )
-		broadcast( MessageCommand.AddSR, {
+		local data = {
 			raidId = raid_id,
 			reference = sr_id,
 			characterName = m.player,
 			characterClass = m.player_class,
 			specialization = m.player_class .. m.db.user_settings.sr_specName,
-			raidItemIds = { sr1, sr2 }
-		} )
+			raidItemIds = {}
+		}
+		if sr1 then table.insert( data.raidItemIds, sr1 ) end
+		if sr2 then table.insert( data.raidItemIds, sr2 ) end
+
+		broadcast( MessageCommand.AddSR, data )
 	end
 
 	local function delete_sr( id )
