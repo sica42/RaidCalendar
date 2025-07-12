@@ -7,6 +7,8 @@
     "ChatFrame_AddMessageEventFilter",
     "date",
     "event",
+    "RollFor",
+    "_RollFor",
     "GameFontHighlightSmall",
     "GameFontNormal",
     "GetGuildRosterInfo",

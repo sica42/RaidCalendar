@@ -68,11 +68,12 @@ function M.new()
 	---@param item_id number
 	---@return string? name
 	---@return string? texture
+	---@return number? quality
 	local function get_itemlink_atlas( item_id )
 		item_id = tonumber( item_id ) or 0
 		if item_id == 0 then
 			m.error( "Invalid itemID" )
-			return nil, nil
+			return nil, nil, nil
 		end
 
 		for _, v in ipairs( raids[ raid_id ][ 3 ] ) do
@@ -81,17 +82,81 @@ function M.new()
 				if item[ 1 ] == tonumber( item_id ) then
 					local tex = "Interface\\Icons\\" .. item[ 2 ]
 					local quality, name = string.match( item[ 3 ], "=q(%d)=(.*)" )
+					quality = tonumber( quality )
 					if name and quality then
-						name = (ITEM_QUALITY_COLORS[ tonumber( quality ) ].hex) .. name .. "|r"
+						name = (ITEM_QUALITY_COLORS[ quality ].hex) .. name .. "|r"
 					end
-					return name, tex
+					return name, tex, quality
 				end
 			end
 		end
 
-		return nil, nil
+		return nil, nil, nil
 	end
 
+	local function rollfor_update_minimap_icon()
+		local result = _RollFor.softres_check.check_softres( true )
+
+		if result == _RollFor.softres_check.ResultType.NoItemsFound then
+			_RollFor.minimap_button.set_icon( _RollFor.minimap_button.ColorType.White )
+		elseif result == _RollFor.softres_check.ResultType.SomeoneIsNotSoftRessing then
+			_RollFor.minimap_button.set_icon( _RollFor.minimap_button.ColorType.Orange )
+		elseif result == _RollFor.softres_check.ResultType.FoundOutdatedData then
+			_RollFor.minimap_button.set_icon( _RollFor.minimap_button.ColorType.Red )
+		else
+			_RollFor.minimap_button.set_icon( _RollFor.minimap_button.ColorType.Green )
+		end
+	end
+
+	local function export_to_rollfor()
+		local sr = m.db.events[ event_id ].sr
+
+		local rollfor = {
+			metadata = {
+				origin = "RaidCalendar",
+				id = sr.reference,
+				instance = raid_id,
+				instances = { raids[ raid_id ][ 2 ] },
+			},
+			softreserves = {},
+			hardreserves = {}
+		}
+
+		for _, res in ipairs( sr.reservations ) do
+			local v = m.find( res.character.name, rollfor.softreserves, "name" )
+			local _, _, quality = get_itemlink_atlas( res.itemId )
+			if v then
+				table.insert( v.items, {
+					id = res.itemId,
+					sr_plus = res.srPlus,
+					quality = quality or 1
+				} )
+			else
+				table.insert( rollfor.softreserves, {
+					name = res.character.name,
+					items = {
+						[ 1 ] = {
+							id = res.itemId,
+							sr_plus = res.srPlus,
+							quality = quality or 1
+						}
+					}
+				} )
+			end
+		end
+
+		--m.debug( m.dump( rollfor ) )
+		if RollFor and _RollFor then
+			_RollFor.import_softres_data( rollfor )
+			RollFor.pretty_print( "Soft-res data loaded successfully!" )
+			rollfor_update_minimap_icon()
+
+			local result = _RollFor.softres_check.check_softres()
+			if result ~= _RollFor.softres_check.ResultType.NoItemsFound then
+				_RollFor.dropped_loot_announce.reset()
+			end
+		end
+	end
 	--
 	-- Create SR list entry
 	--
@@ -190,13 +255,19 @@ function M.new()
 			end
 
 			local item_name, item_tex = get_itemlink_atlas( item.itemId )
-
 			if item_name and item_tex then
 				item_label.set( item_name )
 				item_label.set_icon( item_tex )
 			else
-				item_label.set( "Unkown item" )
-				item_label.set_icon( nil )
+				local name, link, quality, _, _, _, _, _, tex = GetItemInfo( item.itemId )
+				if name then
+					name = (ITEM_QUALITY_COLORS[ quality ].hex) .. name .. "|r"
+					item_label.set( name )
+					item_label.set_icon( tex )
+				else
+					item_label.set( "Unkown item" )
+					item_label.set_icon( nil )
+				end
 			end
 
 			local w = item_label.label:GetStringWidth()
@@ -492,6 +563,14 @@ function M.new()
 			m.msg.request_sr( m.db.events[ event_id ].srId )
 		end )
 
+
+		---@diagnostic disable-next-line: undefined-global
+		if RollFor then
+			frame.btn_export = m.GuiElements.tiny_button( frame, "E", "Export to RollFor" )
+			frame.btn_export:SetPoint( "Right", frame.btn_refresh, "Left", 2, 0 )
+			frame.btn_export:SetScript( "OnClick", export_to_rollfor )
+		end
+
 		--
 		-- Main content
 		--
@@ -676,7 +755,11 @@ function M.new()
 			popup.btn_reserve:Enable()
 
 			if sr_limit > 1 and sr_count == 1 or sr_limit == 1 then
-				popup.dd_spec:Hide()
+				if sr_limit == 1 then
+					popup.dd_spec:Show()
+				else
+					popup.dd_spec:Hide()
+				end
 				popup.label_sr2:Hide()
 				popup.dd_sr2:Hide()
 				popup.label_sr1:SetPoint( "TopLeft", popup.border_reserve, "TopLeft", 263, -36 )
