@@ -479,9 +479,18 @@ function M.new()
 
 				---@diagnostic disable-next-line: undefined-global
 				for _, item in pairs( AtlasLoot_Data[ "AtlasLootItems" ][ v ] ) do
-					if item[ 1 ] and item[ 1 ] > 0 and not string.find( item[ 4 ], "#m4#" ) and item[ 5 ] then
-						local class = string.match( item[ 4 ], "#c(%d)#" )
-						if not class or atlas_classes[ tonumber( class ) ] == m.player_class then
+					if item[ 1 ] and item[ 1 ] > 0
+							and not string.find( item[ 4 ], "#m4#" ) -- Don't show quest rewards
+							and item[ 5 ] then -- Don't show items without drop chance
+
+						local class_found = not string.find(item[ 4 ], "#c(%d)#")
+						for class in string.gmatch( item[ 4 ], "#c(%d)#" ) do
+							if atlas_classes[ tonumber( class ) ] == m.player_class then
+								class_found = true
+							end
+						end
+
+						if class_found then
 							local _, i = m.find( item[ 1 ], sr_items, "value" )
 							if i then
 								table.remove( sr_items, i )
