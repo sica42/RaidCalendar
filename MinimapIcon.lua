@@ -38,6 +38,8 @@ function M.new()
 				label = "Today"
 			elseif dt.year == tomorrow.year and dt.yday == tomorrow.yday then
 				label = "Tomorrow"
+			elseif eventTime - now > 604800 then
+				label = "In the distant future"
 			else
 				label = date("%A", eventTime)
 			end
