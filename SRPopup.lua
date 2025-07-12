@@ -69,7 +69,7 @@ function M.new()
 	---@return string? name
 	---@return string? texture
 	---@return number? quality
-	local function get_itemlink_atlas( item_id )
+	local function get_iteminfo_atlas( item_id )
 		item_id = tonumber( item_id ) or 0
 		if item_id == 0 then
 			m.error( "Invalid itemID" )
@@ -92,6 +92,18 @@ function M.new()
 		end
 
 		return nil, nil, nil
+	end
+
+	---@param item_id number
+	---@return string?
+	local function get_itemlink_atlas( item_id )
+		local name = get_iteminfo_atlas( item_id )
+		if name then
+			local color, item = string.match( name, "(|cff%x%x%x%x%x%x)(.-)|r" ) --, "%1[%2]|r")
+			return string.format( "%s|Hitem:%d:0:0:0|h[%s]|h|r", color, item_id, item )
+		end
+
+		return nil
 	end
 
 	local function rollfor_update_minimap_icon()
@@ -124,7 +136,7 @@ function M.new()
 
 		for _, res in ipairs( sr.reservations ) do
 			local v = m.find( res.character.name, rollfor.softreserves, "name" )
-			local _, _, quality = get_itemlink_atlas( res.itemId )
+			local _, _, quality = get_iteminfo_atlas( res.itemId )
 			if v then
 				table.insert( v.items, {
 					id = res.itemId,
@@ -145,7 +157,6 @@ function M.new()
 			end
 		end
 
-		--m.debug( m.dump( rollfor ) )
 		if RollFor and _RollFor then
 			_RollFor.import_softres_data( rollfor )
 			RollFor.pretty_print( "Soft-res data loaded successfully!" )
@@ -208,6 +219,15 @@ function M.new()
 		sr_label:SetPoint( "Right", frame, "Right", -5, 0 )
 		sr_label:SetJustifyH( "Left" )
 
+		item_label:SetScript( "OnMouseDown", function()
+			if m.api.IsShiftKeyDown() then
+				if m.api.ChatFrameEditBox:IsVisible() then
+					local item_link = get_itemlink_atlas( frame.item_id )
+					m.api.ChatFrameEditBox:Insert( item_link)
+				end
+			end
+		end )
+
 		item_label:SetScript( "OnEnter", function()
 			GameTooltip:SetOwner( item_label, "ANCHOR_RIGHT" )
 			GameTooltip:SetHyperlink( string.format( "item:%d:0:0:0", frame.item_id ) )
@@ -254,12 +274,12 @@ function M.new()
 				class_label.icon:SetTexCoord( 0, 1, 0, 1 )
 			end
 
-			local item_name, item_tex = get_itemlink_atlas( item.itemId )
+			local item_name, item_tex = get_iteminfo_atlas( item.itemId )
 			if item_name and item_tex then
 				item_label.set( item_name )
 				item_label.set_icon( item_tex )
 			else
-				local name, link, quality, _, _, _, _, _, tex = GetItemInfo( item.itemId )
+				local name, _, quality, _, _, _, _, _, tex = GetItemInfo( item.itemId )
 				if name then
 					name = (ITEM_QUALITY_COLORS[ quality ].hex) .. name .. "|r"
 					item_label.set( name )
@@ -314,6 +334,15 @@ function M.new()
 			m.msg.delete_sr( frame.id )
 		end )
 
+		frame:SetScript( "OnMouseDown", function()
+			if m.api.IsShiftKeyDown() then
+				if m.api.ChatFrameEditBox:IsVisible() then
+					local item_link = get_itemlink_atlas( frame.item_id )
+					m.api.ChatFrameEditBox:Insert( item_link)
+				end
+			end
+		end )
+
 		frame:SetScript( "OnEnter", function()
 			GameTooltip:SetOwner( frame, "ANCHOR_RIGHT" )
 			GameTooltip:SetHyperlink( string.format( "item:%d:0:0:0", frame.item_id ) )
@@ -330,7 +359,7 @@ function M.new()
 			frame.item_id = item.itemId
 			frame.id = item.id
 
-			local item_name, item_tex = get_itemlink_atlas( item.itemId )
+			local item_name, item_tex = get_iteminfo_atlas( item.itemId )
 
 			if item_name and item_tex then
 				icon:SetTexture( item_tex )
@@ -450,7 +479,7 @@ function M.new()
 							if not m.find( item[ 1 ], shared, "value" ) then
 								table.insert( shared, {
 									value = item[ 1 ],
-									text = get_itemlink_atlas( item[ 1 ] ),
+									text = get_iteminfo_atlas( item[ 1 ] ),
 									icon = "Interface\\Icons\\" .. item[ 2 ],
 									tooltip = sr_dropdown_item_tooltip
 								} )
@@ -458,7 +487,7 @@ function M.new()
 						else
 							table.insert( sr_items, {
 								value = item[ 1 ],
-								text = get_itemlink_atlas( item[ 1 ] ),
+								text = get_iteminfo_atlas( item[ 1 ] ),
 								icon = "Interface\\Icons\\" .. item[ 2 ],
 								tooltip = sr_dropdown_item_tooltip
 							} )
