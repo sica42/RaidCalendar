@@ -33,7 +33,7 @@
     "libs"
   ],
   "type.inferParamType": true,
-  "workspace.library": [ "../wow-api-type-definitions", "libs/LibScrollDrop-1.1" ],
+  "workspace.library": [ "../wow-api-type-definitions", "libs/LibScrollDrop-1.3" ],
   "Lua.diagnostics.strict": true,
   "diagnostics.disable": [],
   "Lua.hint.enable": true

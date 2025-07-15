@@ -377,7 +377,15 @@ function M.new()
 				icon:SetTexture( item_tex )
 				label_item:SetText( item_name )
 			else
-				label_item:SetText( "Unkown item" )
+				local name, _, quality, _, _, _, _, _, tex = GetItemInfo( item.itemId )
+				if name then
+					name = (ITEM_QUALITY_COLORS[ quality ].hex) .. name .. "|r"
+					icon:SetTexture( tex )
+					label_item:SetText( name )
+				else
+					icon:SetTexture( nil )
+					label_item:SetText( "Unkown item" )
+				end
 			end
 
 			btn_remove:Enable()
@@ -480,8 +488,8 @@ function M.new()
 				---@diagnostic disable-next-line: undefined-global
 				for _, item in pairs( AtlasLoot_Data[ "AtlasLootItems" ][ v ] ) do
 					if item[ 1 ] and item[ 1 ] > 0
-							and not string.find( item[ 4 ], "#m4#" ) -- Don't show quest rewards
-							and item[ 5 ] then -- Don't show items without drop chance
+							and not string.find( item[ 4 ], "#m4#" ) then -- Don't show quest rewards
+						--	and item[ 5 ] then -- Don't show items without drop chance
 
 						local class_found = not string.find(item[ 4 ], "#c(%d)#")
 						for class in string.gmatch( item[ 4 ], "#c(%d)#" ) do
