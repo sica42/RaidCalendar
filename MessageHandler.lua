@@ -513,6 +513,7 @@ function M.new()
 			--
 			if data.player == m.player then
 				m.db.user_settings.bot_name = data.botName
+				m.db.user_settings.discord_bot = data.discordBot
 				m.welcome_popup.bot_response( data.botName )
 			end
 		elseif command == MessageCommand.VersionCheck then

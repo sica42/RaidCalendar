@@ -56,7 +56,7 @@ function M.new()
 
 		if string.find( discord_id, "^%d+$" ) then
 			popup.status2:SetText( "User ID found (" .. discord_id .. ").")
-			popup.status3:SetText( "Authorization request sent, awaiting response.\nCheck your Discord DM." )
+			popup.status3:SetText( "Authorization request sent, awaiting response.\nCheck your Discord DM from " .. m.db.user_settings.discord_bot .. "." )
 			m.msg.authorize_user( discord_id )
 			return
 		end
@@ -162,7 +162,7 @@ function M.new()
 		if popup and popup:IsVisible() then
 			if success then
 				popup.status2:SetText( "User ID found (" .. user_id .. ").")
-				popup.status3:SetText( "Authorization request sent, awaiting response.\nCheck your Discord DM." )
+				popup.status3:SetText( "Authorization request sent, awaiting response.\nCheck your Discord DM from " .. m.db.user_settings.discord_bot .. "." )
 				m.msg.authorize_user( user_id )
 			else
 				popup.status2:SetText( "No User ID found for \"" .. popup.input_discord:GetText() .. "\"." )
