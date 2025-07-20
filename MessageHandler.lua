@@ -7,29 +7,47 @@ if m.MessageHandler then return end
 
 ---@type MessageCommand
 local MessageCommand = {
-	SR = "SR",
-	AddSR = "SRADD",
-	AddSRResult = "SRADD_RESULT",
-	DeleteSR = "SRDELETE",
-	DeleteSRResult = "SRDELETE_RESULT",
-	Event = "EVENT",
-	Events = "EVENTS",
-	RequestSR = "RSR",
+	-- Outgoing
+	RequestBotStatus = "RBSTATUS",
+	RequestDiscordId = "RDID",
+	RequestDiscordAuth = "RDAUTH",
+	RequestChannelCheck = "CHCHECK",
 	RequestEvent = "REVENT",
 	RequestEvents = "REVENTS",
 	Signup = "SIGNUP",
 	SignupEdit = "SIGNUP_EDIT",
-	SignupResult = "SIGNUP_RESULT",
+	RequestSR = "RSR",
+	AddSR = "SRADD",
+	DeleteSR = "SRDELETE",
 	VersionCheck = "VERC",
+	-- Incoming
+	BotStauts = "BSTATUS",
+	DiscordId = "DID",
+	DiscordAuth = "DAUTH",
+	ChannelCheckResult = "CHCHECK_RESULT",
+	Event = "EVENT",
+	Events = "EVENTS",
+	SignupResult = "SIGNUP_RESULT",
+	SR = "SR",
+	AddSRResult = "SRADD_RESULT",
+	DeleteSRResult = "SRDELETE_RESULT",
 	Version = "VER"
 }
 
 ---@alias MessageCommand
+---| "RDAUTH"
+---| "DAUTH"
+---| "CHCHECK"
+---| "CHCHECK_RESULT"
+---| "RBSTATUS"
+---| "BSTATUS"
+---| "DID"
+---| "RDID"
 ---| "SR"
 ---| "RSR"
----| "SRADD",
----| "SRADD_RESULT",
----| "SRDELETE",
+---| "SRADD"
+---| "SRADD_RESULT"
+---| "SRDELETE"
 ---| "SRDELETE_RESULT"
 ---| "REVENT"
 ---| "REVENTS"
@@ -41,20 +59,22 @@ local MessageCommand = {
 ---| "VERC"
 ---| "VER"
 
-
-
 ---@class AceComm
 ---@field RegisterComm fun( self: any, prefix: string, method: function? )
 ---@field SendCommMessage fun( self: any, prefix: string, text: string, distribution: string, target: string?, prio: "BULK"|"NORMAL"|"ALERT"?, callbackFn: function?, callbackArg: any? )
 
 ---@class MessageHandler
+---@field find_discord_id fun( name: string )
+---@field check_channel_access fun( channel_id: string )
+---@field authorize_user fun( user_id: string )
 ---@field add_sr fun( raid_id: number, sr_id: string, sr1: number, sr2: number )
 ---@field delete_sr fun( id: number )
 ---@field request_sr fun( sr_id: string )
 ---@field request_event fun( event_id: string )
 ---@field request_events fun()
----@field signup fun( event_id: string, user_id: string, class_name: string, spec_name: string )
----@field signup_edit fun( event_id: string, signup_id: string, class_name: string, spec_name: string )
+---@field signup fun( event_id: string, user_id: string )
+---@field signup_edit fun( event_id: string, signup_id: string, role: string? )
+---@field bot_status fun()
 ---@field version_check fun( show_all: boolean?)
 
 local M = {}
@@ -117,7 +137,8 @@ function M.new()
 		ah = "advancedHrItems",
 		h = "isHardReserved",
 		cz = "characterSpecializations",
-		cb = "characterNames"
+		cb = "characterNames",
+		rv = "reservations"
 	}
 
 	local value_map = {
@@ -233,6 +254,23 @@ function M.new()
 		ace_comm:SendCommMessage( m.prefix, command .. "::" .. _data, "GUILD", nil, "NORMAL" )
 	end
 
+	local function find_discord_id( name )
+		broadcast( MessageCommand.RequestDiscordId, { name = name } )
+	end
+
+	local function check_channel_access( channel_id )
+		broadcast( MessageCommand.RequestChannelCheck, {
+			userId = m.db.user_settings.discord_id,
+			channelId = channel_id
+		} )
+	end
+
+	local function authorize_user( user_id )
+		broadcast(MessageCommand.RequestDiscordAuth, {
+			userId = user_id
+		})
+	end
+
 	local function add_sr( raid_id, sr_id, sr1, sr2 )
 		local data = {
 			raidId = raid_id,
@@ -270,34 +308,41 @@ function M.new()
 		} )
 	end
 
-	local function signup( event_id, user_id, class_name, spec_name )
-		local name
-		if m.db.user_settings.use_character_name then
-			name = m.player
-		end
+	local function signup( event_id, user_id )
+		local name = m.db.user_settings.use_character_name and m.player
+		local class_name = m.db.user_settings[ m.db.events[ event_id ].templateId .. "_className" ]
+		local spec_name = m.db.user_settings[ m.db.events[ event_id ].templateId .. "_specName" ]
+		local channel_id = m.db.events[ event_id ].channelId
 
 		broadcast( MessageCommand.Signup, {
 			eventId = event_id,
 			userId = user_id,
 			className = class_name,
 			specName = spec_name,
+			channelId = channel_id,
 			name = name
 		} );
 	end
 
-	local function signup_edit( event_id, signup_id, class_name, spec_name )
-		local name
-		if m.db.user_settings.use_character_name then
-			name = m.player
-		end
+	local function signup_edit( event_id, signup_id, role )
+		local name = m.db.user_settings.use_character_name and m.player
+		local class_name = role and role or m.db.user_settings[ m.db.events[ event_id ].templateId .. "_className" ]
+		local spec_name = m.db.user_settings[ m.db.events[ event_id ].templateId .. "_specName" ]
+		local channel_id = m.db.events[ event_id ].channelId
 
 		broadcast( MessageCommand.SignupEdit, {
 			eventId = event_id,
 			signupId = signup_id,
 			className = class_name,
 			specName = spec_name,
+			channelId = channel_id,
 			name = name
-		} );
+		} )
+	end
+
+	local function bot_status()
+		-- Send directly to avoid ChatThrottle's startup delay
+		SendAddonMessage( m.prefix, MessageCommand.RequestBotStatus .. "::", "GUILD" )
 	end
 
 	local function version_check( show_all )
@@ -309,7 +354,33 @@ function M.new()
 	---@param data table
 	---@param sender string
 	local function on_command( command, data, sender )
-		if command == MessageCommand.SR then
+		if command == MessageCommand.DiscordId then
+			--
+			-- Discord ID response
+			--
+			if data.player == m.player then
+				if data.success then
+					m.db.user_settings.discord_id = data.userId
+				end
+				m.calendar_popup.discord_response( data.success, data.userId )
+				m.welcome_popup.discord_response( data.success, data.userId )
+			end
+		elseif command == MessageCommand.ChannelCheckResult then
+			--
+			-- Channel access result
+			--
+			if data.player == m.player then
+				m.db.user_settings.channel_access[ data.channelId ] = data.success
+				m.event_popup.update()
+			end
+		elseif command == MessageCommand.DiscordAuth then
+			--
+			-- Discord authentication response
+			--
+			if data.player == m.player then
+				m.welcome_popup.auth_response( data.userId, data.success )
+			end
+		elseif command == MessageCommand.SR then
 			--
 			-- SR
 			--
@@ -320,7 +391,6 @@ function M.new()
 				return
 			end
 
-			m.debug( "GOT SR" )
 			local _, event_id = m.find( data.reference, m.db.events, "srId" )
 			if event_id then
 				m.db.events[ event_id ].sr = data
@@ -401,7 +471,6 @@ function M.new()
 						request_event( event.id )
 					end
 				else
-					m.debug( event.id )
 					m.debug( "New event: " .. event.title )
 					event.title = string.gsub( event.title, "<:.*>", "" )
 					m.db.events[ event.id ] = event
@@ -423,7 +492,6 @@ function M.new()
 			-- SIGNUP_RESULT
 			--
 			data = decode( data, key_map, value_map )
-
 			if data.success then
 				local _, index = m.find( data.signUp.id, m.db.events[ data.eventId ].signUps, "id" )
 
@@ -436,8 +504,16 @@ function M.new()
 
 				m.calendar_popup.update()
 				m.event_popup.update( data.eventId )
-			else
+			elseif data.player == m.player then
 				m.error( "Signup failed: " .. data.status )
+			end
+		elseif command == MessageCommand.BotStauts then
+			--
+			-- Receive bot status
+			--
+			if data.player == m.player then
+				m.db.user_settings.bot_name = data.botName
+				m.welcome_popup.bot_response( data.botName )
 			end
 		elseif command == MessageCommand.VersionCheck then
 			--
@@ -465,41 +541,40 @@ function M.new()
 
 	local function on_comm_received( prefix, data_str, _, sender )
 		if prefix ~= m.prefix or sender == m.player then return end
+		local cmd_pat = "^([_%u%d]-)::"
 
-		local command = string.match( data_str, "^([_%u]-)::" )
-		if (command) then
-			data_str = string.gsub( data_str, "^.-::", "" )
-
-			local lua_data = loadstring( "return " .. data_str )()
-
-			on_command( command, lua_data, sender )
-			return
-		end
-
-		command = string.match( data_str, "^#(.-)#" )
-		data_str = string.gsub( data_str, "^#.-#", "" )
+		local command = string.match( data_str, cmd_pat )
+		data_str = string.gsub( data_str, cmd_pat, "" )
 
 		if command then
-			if command == "ct" then
+			if command == "CT" then
 				chunk_total = tonumber( data_str ) or 0
-			elseif string.find( command, "c%d+" ) then
-				local chunk_number = tonumber( string.match( command, "c(%d+)" ) )
+			elseif string.find( command, "C%d+" ) then
+				local chunk_number = tonumber( string.match( command, "C(%d+)" ) )
 				chunk_data = chunk_number == 1 and data_str or chunk_data .. data_str
 
 				if chunk_number == chunk_total then
-					local cmd = string.match( chunk_data, "^#(.-)#" )
-					chunk_data = string.gsub( chunk_data, "^#.-#", "" )
+					local cmd = string.match( chunk_data, cmd_pat )
+					chunk_data = string.gsub( chunk_data, cmd_pat, "" )
 
 					local lua_data = loadstring( "return " .. chunk_data )()
 					on_command( cmd, lua_data, sender )
 				end
-			elseif command then
-				m.debug( data_str )
-				local lua_data = loadstring( "return " .. data_str )()
-				on_command( command, lua_data, sender )
+			else
+				data_str = string.gsub( data_str, cmd_pat, "" )
+
+				local success, lua_data = pcall( function()
+					return loadstring( "return " .. data_str )()
+				end )
+				if success then
+					on_command( command, lua_data, sender )
+				else
+					m.error( "Invalid data received. This is not suppose to happen!" )
+					m.debug( data_str )
+				end
 			end
 		else
-			m.debug( "No command: " .. data_str )
+			m.debug( "No command, wtf?")
 		end
 	end
 
@@ -507,6 +582,9 @@ function M.new()
 
 	---@type MessageHandler
 	return {
+		find_discord_id = find_discord_id,
+		check_channel_access = check_channel_access,
+		authorize_user = authorize_user,
 		add_sr = add_sr,
 		delete_sr = delete_sr,
 		request_sr = request_sr,
@@ -514,6 +592,7 @@ function M.new()
 		request_events = request_events,
 		signup = signup,
 		signup_edit = signup_edit,
+		bot_status = bot_status,
 		version_check = version_check
 	}
 end

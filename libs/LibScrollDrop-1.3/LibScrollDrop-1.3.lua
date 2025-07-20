@@ -15,6 +15,7 @@ if not lib then return end
 ---@class DropdownFrame: Frame
 ---@field SetItems fun( self: DropdownFrame, items_or_callback: function|table, callback: function? )
 ---@field options DropdownOptions
+---@field selected_index number
 ---@field selected any
 
 ---@class DropdownList: Frame
@@ -25,7 +26,7 @@ if not lib then return end
 ---@field id integer
 ---@field value any
 ---@field tooltip function|string
----@field type "normal"|"header"
+---@field type? "normal"|"header"
 ---@field disabled boolean
 
 ---@class DropdownOptions
@@ -37,6 +38,7 @@ if not lib then return end
 ---@field dropdown_text_justify? "Left"|"Right"|"Center"
 ---@field label_on_select? "text"|"value"
 ---@field default_text? string
+---@field dp_width integer?
 
 lib.dropdown_list = lib.dropdownlist or {}
 lib.active_dropdown = nil
@@ -51,6 +53,22 @@ lib.default_options = {
 	dropdown_text_justify = "Left",
 	label_on_select = "text"
 }
+
+local function merge_options( defaults, options )
+	local result = {}
+
+	for key, value in pairs( defaults ) do
+		result[ key ] = value
+	end
+
+	if type( options ) == "table" then
+		for key, value in pairs( options ) do
+			result[ key ] = value
+		end
+	end
+
+	return result
+end
 
 ---@param parent DropdownList
 ---@param i integer
@@ -77,27 +95,27 @@ local function create_button( parent, i )
 			return
 		end
 		local dropdown = lib.active_dropdown
-		local index = parent.offset + btn.id
-		dropdown.selected = btn.value
 		local value = btn.value
 		local text = btn:GetText()
+
+		dropdown.selected_index = parent.offset + btn.id
+		dropdown.selected = btn.value
+
 		if text then
-			dropdown.label:SetText( lib.options.label_on_select == "text" and text or value )
+			dropdown.label:SetText( dropdown.options.label_on_select == "text" and text or value )
 			dropdown.edit_box:ClearFocus()
 
 			parent:Hide()
 			lib.active_dropdown = nil
 			if dropdown.on_select then
-				dropdown.on_select( value, index )
+				dropdown.on_select( value, dropdown.selected_index )
 			end
 		end
 	end )
 
 	btn:SetScript( "OnEnter", function()
-		if btn.tooltip then
-			if type( btn.tooltip ) == "function" then
-				btn.tooltip()
-			end
+		if btn.tooltip and type( btn.tooltip ) == "function" then
+			btn:tooltip()
 		end
 	end )
 	btn:SetScript( "OnLeave", function()
@@ -131,7 +149,7 @@ local function create_dropdown_list( max_items )
 		frame:Hide()
 		lib.dropdown_list.frame = frame
 
-		local scrollbar = CreateFrame( "Slider", "lala", frame, "UIPanelScrollBarTemplate" )
+		local scrollbar = CreateFrame( "Slider", "LibScrollDropScrollBar", frame, "UIPanelScrollBarTemplate" )
 		scrollbar:SetPoint( "TopRight", frame, "TopRight", -4, -20 )
 		scrollbar:SetPoint( "BottomRight", frame, "BottomRight", -4, 20 )
 		scrollbar:SetWidth( 16 )
@@ -174,18 +192,27 @@ local function create_dropdown_list( max_items )
 		end )
 
 		scrollbar:SetScript( "OnValueChanged", function()
-			--      frame.offset = math.floor( arg1 + 0.5 )
 			frame.offset = arg1
 			lib:UpdateList()
-			GameTooltip:Hide()
+
+			---@class DropdownItem
+			local btn = GetMouseFocus()
+
+			if btn.tooltip and type( btn.tooltip ) == "function" then
+				btn:tooltip()
+			else
+				GameTooltip:Hide()
+			end
 		end )
 	end
 end
 
 local function config_dropdown_list()
 	local frame = lib.dropdown_list.frame
+	---@class DropdownOptions
+	local options = lib.active_dropdown.options
 
-	if lib.options.dropdown_style == "classic" then
+	if options.dropdown_style == "classic" then
 		frame:SetBackdrop( {
 			bgFile = "Interface\\Buttons\\WHITE8x8",
 			edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
@@ -197,22 +224,24 @@ local function config_dropdown_list()
 
 		frame:SetBackdropBorderColor( TOOLTIP_DEFAULT_COLOR.r, TOOLTIP_DEFAULT_COLOR.g, TOOLTIP_DEFAULT_COLOR.b )
 		frame:SetBackdropColor( 0, 0, 0, 0.9 )
-		frame:SetHeight( lib.options.max_visible * 16 + 35 )
+		frame:SetHeight( options.max_visible * 16 + 35 )
 
-		if type( lib.options.dropdown_width ) == "number" then
-			frame:SetWidth( lib.options.dropdown_width )
+		if type( options.dropdown_width ) == "number" then
+			local width = options.dropdown_width
+			---@cast width integer
+			frame:SetWidth( width )
 		end
 
 		for i, btn in frame.buttons do
 			btn:SetPoint( "TopLeft", frame, "TopLeft", 15, -((i - 1) * 16) - 12 )
-			btn:SetWidth( lib.options.dp_width + 20 )
-			btn:GetTextFontObject():SetJustifyH( lib.options.dropdown_text_justify )
+			btn:SetWidth( options.dp_width + 20 )
+			btn:GetTextFontObject():SetJustifyH( options.dropdown_text_justify )
 		end
 
 		frame.scrollbar:ClearAllPoints()
 		frame.scrollbar:SetPoint( "TopRight", frame, "TopRight", -10, -26 )
 		frame.scrollbar:SetPoint( "BottomRight", frame, "BottomRight", -10, 26 )
-	elseif lib.options.dropdown_style == "modern" then
+	elseif options.dropdown_style == "modern" then
 
 	end
 end
@@ -255,14 +284,16 @@ local function update_highlight()
 	end
 end
 
----@param self DropdownFrame
+
 ---@param parent Frame
+---@param options DropdownOptions
 ---@return Frame
-local function create_dropdown( self, parent )
+local function create_dropdown( parent, options )
 	---@class DropdownFrame
 	local frame = CreateFrame( "Frame", nil, parent )
-	frame:SetWidth( self.options.width )
+	frame:SetWidth( options.width )
 	frame:SetHeight( 24 )
+	frame.options = options
 
 	local left = frame:CreateTexture( nil, "ARTWORK" )
 	left:SetTexture( "Interface\\Glues\\CharacterCreate\\CharacterCreate-LabelFrame" )
@@ -275,7 +306,7 @@ local function create_dropdown( self, parent )
 	middle:SetTexture( "Interface\\Glues\\CharacterCreate\\CharacterCreate-LabelFrame" )
 	middle:SetTexCoord( 0.1953125, 0.8046875, 0, 1 )
 	middle:SetPoint( "Left", left, "Right", 0, 0 )
-	middle:SetWidth( self.options.width - 15 )
+	middle:SetWidth( options.width - 15 )
 	middle:SetHeight( 64 )
 
 	local right = frame:CreateTexture( nil, "ARTWORK" )
@@ -302,7 +333,7 @@ local function create_dropdown( self, parent )
 
 	local edit_box = CreateFrame( "EditBox", nil, frame )
 	edit_box:SetPoint( "Left", frame, "Left", 7, 0 )
-	edit_box:SetWidth( self.options.width - 30 )
+	edit_box:SetWidth( options.width - 30 )
 	edit_box:SetHeight( 14 )
 	edit_box:SetFontObject( GameFontHighlightSmall )
 	edit_box:SetAutoFocus( false )
@@ -310,7 +341,7 @@ local function create_dropdown( self, parent )
 
 	local label = frame:CreateFontString( nil, "ARTWORK", "GameFontHighlightSmall" )
 	label:SetPoint( "Left", frame, "Left", 7, 0 )
-	label:SetWidth( self.options.width - 30 )
+	label:SetWidth( options.width - 30 )
 	label:SetHeight( 14 )
 	label:SetJustifyH( "Right" )
 	frame.label = label
@@ -343,6 +374,10 @@ local function create_dropdown( self, parent )
 	end )
 
 	edit_box:SetScript( "OnTabPressed", function()
+		if not lib.active_dropdown then
+			lib:ShowListFor( frame )
+			return
+		end
 		if IsShiftKeyDown() then
 			lib.selected_index = lib.selected_index and lib.selected_index - 1 or 1
 		else
@@ -360,7 +395,7 @@ local function create_dropdown( self, parent )
 	end )
 
 
-	if self.options.search then
+	if options.search then
 		edit_box:SetScript( "OnEditFocusGained", function()
 			label:Hide()
 		end )
@@ -376,27 +411,11 @@ local function create_dropdown( self, parent )
 		edit_box:ClearFocus()
 	end
 
-	if self.options.default_text then
-		label:SetText( self.options.default_text )
+	if options.default_text then
+		label:SetText( options.default_text )
 	end
 
 	return frame
-end
-
-local function merge_options( defaults, options )
-	local result = {}
-
-	for key, value in pairs( defaults ) do
-		result[ key ] = value
-	end
-
-	if type( options ) == "table" then
-		for key, value in pairs( options ) do
-			result[ key ] = value
-		end
-	end
-
-	return result
 end
 
 ---------------------------------------------------
@@ -409,8 +428,8 @@ function lib:UpdateList()
 	local buttons = dropdown_frame.buttons
 	local items = nil
 
-	if self.options.max_visible < lib.max_visible then
-		for i = self.options.max_visible + 1, lib.max_visible do
+	if dropdown.options.max_visible < lib.max_visible then
+		for i = dropdown.options.max_visible + 1, lib.max_visible do
 			buttons[ i ]:Hide()
 		end
 	end
@@ -426,7 +445,7 @@ function lib:UpdateList()
 
 	items = items or dropdown.items
 
-	for i = 1, self.options.max_visible do
+	for i = 1, dropdown.options.max_visible do
 		local index = offset + i
 		local item = items and items[ index ]
 		local btn = buttons[ i ]
@@ -449,13 +468,9 @@ function lib:UpdateList()
 			end
 
 			if item.type == "header" then
-				--text:SetTextColor( NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, 1 )
-				--text:SetFontObject( "GameFontNormalLarge" )
 				btn:SetTextFontObject( GameFontNormal )
 			else
 				btn:SetTextFontObject( GameFontHighlightSmall )
-				--text:SetTextColor( 1, 1, 1, 1 )
-				--text:SetFontObject( "GameFontHighlight" )
 			end
 
 			btn:UnlockHighlight()
@@ -466,16 +481,16 @@ function lib:UpdateList()
 	end
 
 	local total = getn( items )
-	local padding = self.options.dropdown_style == "classic" and 24 or 8
-	if total < self.options.max_visible then
+	local padding = dropdown.options.dropdown_style == "classic" and 24 or 8
+	if total <= dropdown.options.max_visible then
 		dropdown_frame.scrollbar:Hide()
-		dropdown_frame:SetHeight( total * 16 + padding )
+		dropdown_frame:SetHeight( math.max(40, total * 16 + padding ))
 	else
 		dropdown_frame.scrollbar:Show()
-		dropdown_frame:SetHeight( self.options.max_visible * 16 + padding )
+		dropdown_frame:SetHeight( dropdown.options.max_visible * 16 + padding )
 	end
 
-	dropdown_frame.scrollbar:SetMinMaxValues( 0, math.max( 0, total - self.options.max_visible ) )
+	dropdown_frame.scrollbar:SetMinMaxValues( 0, math.max( 0, total - dropdown.options.max_visible ) )
 	dropdown_frame.scrollbar:SetValue( offset )
 end
 
@@ -483,8 +498,6 @@ end
 -- Show shared list for a dropdown
 ---------------------------------------------------
 function lib:ShowListFor( dropdown )
-	lib.options = self.options
-
 	if not lib.dropdown_list.frame then
 		create_dropdown_list( lib.default_options.max_visible )
 	end
@@ -499,32 +512,32 @@ function lib:ShowListFor( dropdown )
 
 	lib.active_dropdown = dropdown
 
-	if self.options.max_visible > lib.max_visible then
+	if dropdown.options.max_visible > lib.max_visible then
 		local buttons = frame.buttons
-		for i = lib.max_visible + 1, self.options.max_visible do
+		for i = lib.max_visible + 1, dropdown.options.max_visible do
 			local btn = create_button( frame, i )
 
 			btn.id = i
 			buttons[ i ] = btn
 		end
-		lib.max_visible = self.options.max_visible
+		lib.max_visible = dropdown.options.max_visible
 	end
 
 	if dropdown.on_open then
 		dropdown.items = dropdown.on_open( dropdown ) or {}
 	end
 
-	if self.options.dropdown_width == "auto" then
+	if dropdown.options.dropdown_width == "auto" then
 		local btn = frame.buttons[ 1 ]
-		self.options.dp_width = 0
+		dropdown.options.dp_width = 0
 		for _, item in dropdown.items do
 			btn:SetText( item.text )
 
-			if btn:GetFontString():GetStringWidth() > self.options.dp_width then
-				self.options.dp_width = btn:GetFontString():GetStringWidth()
+			if btn:GetFontString():GetStringWidth() > dropdown.options.dp_width then
+				dropdown.options.dp_width = btn:GetFontString():GetStringWidth()
 			end
 		end
-		frame:SetWidth( self.options.dp_width + 60 )
+		frame:SetWidth( dropdown.options.dp_width + 60 )
 	end
 
 	config_dropdown_list()
@@ -567,11 +580,10 @@ end
 ---@param options DropdownOptions?
 ---@return Frame DropdownFrame
 function lib:New( parent, options )
-	-----@type DropdownOptions
-	self.options = merge_options( lib.default_options, options )
+	options = merge_options( lib.default_options, options )
 
 	---@class DropdownFrame
-	local dropdown = create_dropdown( self, parent )
+	local dropdown = create_dropdown( parent, options )
 
 
 	function dropdown:SetItems( items_or_callback, on_select )
@@ -592,9 +604,15 @@ function lib:New( parent, options )
 		dropdown.selected = value
 	end
 
+	---@param text string
+	---@param value string
 	function dropdown:SetSelected( text, value )
 		dropdown.label:SetText( text )
 		dropdown.selected = value
+	end
+
+	function dropdown:GetSelected()
+		return dropdown.items[ dropdown.selected_index ]
 	end
 
 	--function dropdown:Get()

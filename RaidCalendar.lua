@@ -39,6 +39,7 @@ function RaidCalendar.events:ADDON_LOADED()
 	m.db.events = m.db.events or {}
 	m.db.user_settings = m.db.user_settings or {}
 	m.db.user_settings.time_format = m.db.user_settings.time_format or "24"
+	m.db.user_settings.channel_access = m.db.user_settings.channel_access or {}
 	m.db.popup_sr = m.db.popup_sr or {}
 	m.db.popup_event = m.db.popup_event or {}
 	m.db.popup_calendar = m.db.popup_calendar or {}
@@ -58,14 +59,11 @@ function RaidCalendar.events:ADDON_LOADED()
 	---@type SRPopup
 	m.sr_popup = m.SRPopup.new()
 
+	---@type WelcomePopup
+	m.welcome_popup = m.WelcomePopup.new()
+
 	---@type MinimapIcon
 	m.minimap_icon = m.MinimapIcon.new()
-
-	-- Refresh events if last update is older then 12h
-	if not m.db.user_settings.last_updated or time() - m.db.user_settings.last_updated > 43200 then
-		m.debug( "Fetching events..." )
-		m.msg.request_events()
-	end
 
 	m.api[ "SLASH_RaidCalendar1" ] = "/rc"
 	m.api[ "SLASH_RaidCalendar2" ] = "/RaidCalendar"
@@ -80,6 +78,11 @@ function RaidCalendar.events:ADDON_LOADED()
 		if args == "clear" then
 			m.info( "All events have been removed" )
 			m.db.events = {}
+			return
+		end
+
+		if args == "welcome" then
+			m.welcome_popup.show()
 			return
 		end
 
@@ -98,6 +101,17 @@ function RaidCalendar.events:ADDON_LOADED()
 
 	m.version = GetAddOnMetadata( m.name, "Version" )
 	self.info( string.format( "(v%s) Loaded", m.version ) )
+
+	if m.db.user_settings.bot_name and m.db.user_settings.discord_id then
+		-- Refresh events if last update is older then 6h
+		if not m.db.user_settings.last_updated or time() - m.db.user_settings.last_updated > 3600 * 6 then
+			m.debug( "Fetching events..." )
+			m.msg.request_events()
+		end
+	else
+		m.welcome_popup.show()
+	end
+
 	self.check_new_version()
 end
 

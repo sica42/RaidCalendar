@@ -11,6 +11,7 @@ if m.CalendarPopup then return end
 ---@field toggle fun()
 ---@field is_visible fun(): boolean
 ---@field unselect fun()
+---@field discord_response fun( success: boolean, user_id: string )
 ---@field update fun()
 
 local M = {}
@@ -39,6 +40,31 @@ function M.new()
 		}
 	end
 
+	local function on_save_settings()
+		local discord_id = popup.settings.discord:GetText()
+		local bot_name = popup.settings.botname:GetText()
+
+		if not string.find( discord_id, "^%d+$" ) then
+			m.error( "Invalid Discord ID" )
+			return
+		end
+
+		if not bot_name or bot_name == "" then
+			m.error( "Bot name is required" )
+			return
+		end
+
+		m.db.user_settings.channel_access = {}
+		m.db.user_settings.discord_id = discord_id
+		m.db.user_settings.bot_name = bot_name
+		m.db.user_settings.use_character_name = popup.settings.use_char_name:GetChecked()
+		m.db.user_settings.time_format = popup.settings.time_format.selected
+		m.time_format = m.db.user_settings.time_format == "24" and "%H:%M" or "%I:%M %p"
+
+		popup.settings:Hide()
+		popup:SetHeight( 250 )
+		refresh()
+	end
 
 	---@param parent Frame
 	---@return Frame
@@ -49,11 +75,10 @@ function M.new()
 				:parent( parent )
 				:frame_style( "NONE" )
 				:backdrop( { bgFile = "Interface/Buttons/WHITE8x8" } )
-				:backdrop_color( 0.1, 0.1, 0.1, 1 )
+				:backdrop_color( 0.1, 0.1, 0.1, 0.9 )
 				:point( "Left", parent, "Left", 4, 0 )
-				--:point( "Right", parent, "Right", -21, 0 )
 				:width( 485 )
-				:height( 39 )
+				:height( 40 )
 				:build()
 
 		frame:SetHighlightTexture( "Interface\\QuestFrame\\UI-QuestTitleHighlight" )
@@ -72,7 +97,7 @@ function M.new()
 		local selected_tex = frame:CreateTexture( nil, "ARTWORK" )
 		selected_tex:SetTexture( "Interface\\QuestFrame\\UI-QuestLogTitleHighlight" )
 		selected_tex:SetAllPoints( frame )
-		selected_tex:SetVertexColor( 0.3, 0.3, 1, 1 )
+		selected_tex:SetVertexColor( 0.3, 0.3, 1, 0.6 )
 		selected_tex:Hide()
 
 		local title = frame:CreateFontString( nil, "ARTWORK", "GIFontNormal" )
@@ -102,11 +127,11 @@ function M.new()
 		sr_frame:SetHeight( 20 )
 		sr_frame:SetNormalTexture( "Interface\\AddOns\\RaidCalendar\\assets\\raidres.tga" )
 		sr_frame:SetScript( "OnEnter", function()
-			sr_frame:GetNormalTexture():SetBlendMode("ADD")
+			sr_frame:GetNormalTexture():SetBlendMode( "ADD" )
 			frame:LockHighlight()
 		end )
 		sr_frame:SetScript( "OnLeave", function()
-			sr_frame:GetNormalTexture():SetBlendMode("BLEND")
+			sr_frame:GetNormalTexture():SetBlendMode( "BLEND" )
 			frame:UnlockHighlight()
 		end )
 
@@ -143,16 +168,18 @@ function M.new()
 				sr_frame:Show()
 				if event.sr and event.sr.reservations then
 					local cnt = 0
-					for _, res in ipairs(event.sr.reservations) do
+					for _, res in ipairs( event.sr.reservations ) do
 						if res.character.name == m.player then
 							cnt = cnt + 1
 						end
 					end
 					if cnt == event.sr.reservationLimit then
-						sr_frame:GetNormalTexture():SetVertexColor(0,1,0,1)
+						sr_frame:GetNormalTexture():SetVertexColor( 0, 1, 0, 1 )
 					else
-						sr_frame:GetNormalTexture():SetVertexColor(1,1,1,1)
+						sr_frame:GetNormalTexture():SetVertexColor( 1, 1, 1, 1 )
 					end
+				else
+					sr_frame:GetNormalTexture():SetVertexColor( 1, 1, 1, 1 )
 				end
 			else
 				sr_frame:Hide()
@@ -219,6 +246,7 @@ function M.new()
 				frame.settings:Hide()
 				frame:SetHeight( 250 )
 			else
+				frame.settings.discord_response:SetText( "" )
 				frame.settings:Show()
 				frame:SetHeight( 360 )
 			end
@@ -253,6 +281,12 @@ function M.new()
 			frame.scroll_bar:SetValue( value )
 		end )
 
+		local bg = border_events:CreateTexture( nil, "ARTWORK" )
+		bg:SetTexture( "Interface\\AddOns\\RaidCalendar\\assets\\background.tga" )
+		bg:SetWidth( 190 )
+		bg:SetHeight( 190 )
+		bg:SetPoint( "Center", border_events, "Center", 0, 0)
+
 		local scroll_bar = CreateFrame( "Slider", "RaidCalendarScrollBar", border_events, "UIPanelScrollBarTemplate" )
 		frame.scroll_bar = scroll_bar
 		scroll_bar:SetPoint( "TopRight", border_events, "TopRight", -5, -20 )
@@ -284,16 +318,26 @@ function M.new()
 				:hidden()
 				:build()
 
-		local input_discord = CreateFrame( "EditBox", nil, frame.settings, "InputBoxTemplate" )
-		input_discord:SetPoint( "TopLeft", frame.settings, "TopLeft", 70, -8 )
-		input_discord:SetHeight( 22 )
+		local input_discord = CreateFrame( "EditBox", "RaidCalendarDiscordId", frame.settings, "InputBoxTemplate" )
+		input_discord:SetPoint( "TopLeft", frame.settings, "TopLeft", 96, -8 )
 		input_discord:SetWidth( 150 )
+		input_discord:SetHeight( 22 )
 		input_discord:SetAutoFocus( false )
 		frame.settings.discord = input_discord
 
 		local label_discord = frame.settings:CreateFontString( nil, "ARTWORK", "GIFontNormal" )
 		label_discord:SetPoint( "Right", input_discord, "Left", -15, 0 )
-		label_discord:SetText( "Discord ID" )
+		label_discord:SetText( "Discord name/ID" )
+
+		frame.settings.btn_loopup = gui.create_button( frame.settings, "Find Discord ID", 100, function()
+			this:Disable()
+			m.msg.find_discord_id( input_discord:GetText() )
+		end )
+		frame.settings.btn_loopup:SetPoint( "Left", frame.settings.discord, "Right", 5, 0 )
+
+		local label_response = frame.settings:CreateFontString( nil, "ARTWORK", "GIFontNormal" )
+		label_response:SetPoint( "Left", frame.settings.btn_loopup, "Right", 5, 0 )
+		frame.settings.discord_response = label_response
 
 		local cb = CreateFrame( "CheckButton", "RaidCalendarPopupCheckbox", frame.settings, "UICheckButtonTemplate" )
 		cb:SetWidth( 22 )
@@ -320,39 +364,31 @@ function M.new()
 		label_timeformat:SetPoint( "Right", dd_timeformat, "Left", -10, 0 )
 		label_timeformat:SetText( "Time format" )
 
+		local label_botname = frame.settings:CreateFontString( nil, "ARTWORK", "GIFontNormal" )
+		label_botname:SetPoint( "Left", dd_timeformat, "Right", 40, 0 )
+		label_botname:SetText( "Bot name" )
 
-		local btn_save = gui.create_button( frame.settings, "Save", 80, function()
-			local discord_id = input_discord:GetText()
+		local input_botname = CreateFrame( "EditBox", "RaidCalendarBotName", frame.settings, "InputBoxTemplate" )
+		input_botname:SetPoint( "Left", label_botname, "Right", 10, 0 )
+		input_botname:SetWidth( 90 )
+		input_botname:SetHeight( 22 )
+		input_botname:SetAutoFocus( false )
+		frame.settings.botname = input_botname
 
-			if string.find( discord_id, "^%d+$" ) ~= nil then
-				m.db.user_settings.discord_id = input_discord:GetText()
-				m.db.user_settings.use_character_name = cb:GetChecked()
-				m.db.user_settings.time_format = dd_timeformat.selected
-
-				m.time_format = m.db.user_settings.time_format == "24" and "%H:%M" or "%I:%M %p"
-
-				frame.settings:Hide()
-				frame:SetHeight( 250 )
-				refresh()
-			else
-				m.error( "Invalid Discord ID" )
-			end
-		end )
+		local btn_save = gui.create_button( frame.settings, "Save", 80, on_save_settings )
 		btn_save:SetPoint( "BottomRight", frame.settings, "BottomRight", -10, 10 )
 
 		return frame
 	end
 
+	---@param refresh_data boolean?
 	function refresh( refresh_data )
-		if m.bot_online_status() then
-			popup.indicator_tex:SetVertexColor( 0, 1, 0, .9 )
-		else
-			popup.indicator_tex:SetVertexColor( 1, 0, 0, .9 )
-		end
+		popup.indicator_tex:SetVertexColor( m.bot_online_status() )
 
 		popup.settings.discord:SetText( m.db.user_settings.discord_id or "" )
+		popup.settings.botname:SetText( m.db.user_settings.bot_name or "" )
 		popup.settings.use_char_name:SetChecked( m.db.user_settings.use_character_name )
-		popup.settings.time_format:SetValue( m.db.user_settings.time_format == "24" and "24-hour" or "12-hour" )
+		popup.settings.time_format:SetSelected( m.db.user_settings.time_format == "24" and "24-hour" or "12-hour", m.db.user_settings.time_format )
 
 		if not events or refresh_data then
 			events = {}
@@ -374,7 +410,7 @@ function M.new()
 		end
 
 		for i = 1, rows do
-			if events[ i ] then
+			if events[ i + offset ] then
 				frame_items[ i ].set_item( i + offset )
 				frame_items[ i ].set_selected( selected == i + offset )
 			else
@@ -434,6 +470,19 @@ function M.new()
 		end
 	end
 
+	local function discord_response( success, user_id )
+		if popup and popup:IsVisible() then
+			popup.settings.btn_loopup:Enable()
+			if success then
+				local name = popup.settings.discord:GetText()
+				popup.settings.discord_response:SetText( "UserID for \"" .. name .. "\" found" )
+				popup.settings.discord:SetText( user_id )
+			else
+				popup.settings.discord_response:SetText( "Name not found." )
+			end
+		end
+	end
+
 	local function update()
 		if popup and popup:IsVisible() then
 			refresh( true )
@@ -447,6 +496,7 @@ function M.new()
 		toggle = toggle,
 		is_visible = is_visible,
 		unselect = unselect,
+		discord_response = discord_response,
 		update = update
 	}
 end

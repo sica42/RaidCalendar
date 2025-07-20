@@ -89,19 +89,9 @@ function M.new()
 				popup[ btn ]:Disable()
 			end
 			if signup_id then
-				m.msg.signup_edit(
-					event.id,
-					signup_id,
-					m.db.user_settings[ event.templateId .. "_className" ],
-					m.db.user_settings[ event.templateId .. "_specName" ]
-				)
+				m.msg.signup_edit( event.id, signup_id )
 			else
-				m.msg.signup(
-					event.id,
-					m.db.user_settings.discord_id,
-					m.db.user_settings[ event.templateId .. "_className" ],
-					m.db.user_settings[ event.templateId .. "_specName" ]
-				)
+				m.msg.signup( event.id, m.db.user_settings.discord_id )
 			end
 		elseif btn_name == "Change Spec" then
 			for _, v in buttons do
@@ -121,27 +111,27 @@ function M.new()
 				local btn = "btn_" .. string.gsub( string.lower( v ), "%s", "_" )
 				popup[ btn ]:Disable()
 			end
-			m.msg.signup_edit(
-				event.id,
-				signup_id,
-				btn_name,
-				m.db.user_settings[ event.templateId .. "_specName" ]
-			)
+			m.msg.signup_edit( event.id, signup_id, btn_name )
 		end
 	end
 
 	local function change_spec()
+		if not popup.dd_class.selected then
+			m.error( "Class not selected" )
+			return
+		end
+
+		if not popup.dd_spec.selected then
+			m.error( "Spec not selected" )
+			return
+		end
+
 		popup.cs_change:Disable()
 
 		m.db.user_settings[ event.templateId .. "_className" ] = popup.dd_class.selected
 		m.db.user_settings[ event.templateId .. "_specName" ] = popup.dd_spec.selected
 
-		m.msg.signup_edit(
-			event.id,
-			signup_id,
-			m.db.user_settings[ event.templateId .. "_className" ],
-			m.db.user_settings[ event.templateId .. "_specName" ]
-		)
+		m.msg.signup_edit( event.id, signup_id )
 	end
 
 	---@param parent Frame
@@ -231,7 +221,6 @@ function M.new()
 				:height( 380 )
 				:movable()
 				:esc()
-				:hidden()
 				:on_drag_stop( save_position )
 				:on_hide( on_hide )
 				:build()
@@ -263,7 +252,7 @@ function M.new()
 
 		border_desc:EnableMouseWheel( true )
 		border_desc:SetScript( "OnMouseWheel", function()
-			local value = frame.scroll_bar:GetValue() - arg1 * 12
+			local value = frame.scroll_bar:GetValue() - arg1 * 11.851852176058
 			frame.scroll_bar:SetValue( value )
 		end )
 
@@ -272,7 +261,7 @@ function M.new()
 		scroll_bar:SetPoint( "TopRight", border_desc, "TopRight", -5, -20 )
 		scroll_bar:SetPoint( "Bottom", border_desc, "Bottom", 0, 20 )
 		scroll_bar:SetMinMaxValues( 0, 0 )
-		scroll_bar:SetValueStep( 12 )
+		scroll_bar:SetValueStep( 1 )
 		scroll_bar:SetScript( "OnValueChanged", function()
 			frame.desc:SetPoint( "Top", border_desc, "Top", 0, arg1 - 10 )
 		end )
@@ -339,6 +328,14 @@ function M.new()
 			end
 			prev = frame[ btn ]
 		end
+
+		frame.label_noaccess = frame:CreateFontString( nil, "ARTWORK", "GIFontHighlight" )
+		frame.label_noaccess:SetPoint( "TopLeft", frame[ "btn_signup" ], "BottomLeft", 0, -10 )
+		frame.label_noaccess:SetPoint( "BottomRight", frame[ "btn_signup" ], "BottomRight", 0, -110 )
+		frame.label_noaccess:SetJustifyV( "Top" )
+		frame.label_noaccess:SetJustifyH( "Left" )
+		frame.label_noaccess:SetText( "No access to signup for this event." )
+		frame.label_noaccess:Hide()
 
 		frame.cs_change = gui.create_button( frame, "Change", 100, change_spec )
 		frame.cs_change:SetPoint( "TopRight", frame, "TopRight", -10, -230 )
@@ -430,11 +427,7 @@ function M.new()
 		local signup_class
 		event = m.db.events[ event_id ]
 
-		if m.bot_online_status() then
-			popup.indicator_tex:SetVertexColor( 0, 1, 0, .9 )
-		else
-			popup.indicator_tex:SetVertexColor( 1, 0, 0, .9 )
-		end
+		popup.indicator_tex:SetVertexColor( m.bot_online_status() )
 
 		-- Reset cached elements
 		for _, type in frame_cache do
@@ -557,7 +550,7 @@ function M.new()
 		-- Buttons
 		--
 		local class = m.db.user_settings[ event.templateId .. "_className" ]
-		popup.dd_class:SetSelected( class and class or m.player_class, class or m.player_class )
+		popup.dd_class:SetSelected( class and class or "Select class", class or nil )
 		popup.dd_class:Hide()
 
 		local spec = m.db.user_settings[ event.templateId .. "_specName" ]
@@ -593,14 +586,24 @@ function M.new()
 			end
 		end
 
-		-- Event closed
-		if event.closingTime < now then
+		-- Event closed or no access
+		popup.label_noaccess:Hide()
+		local has_access = m.db.user_settings.channel_access[ event.channelId ]
+		if event.closingTime < now or has_access == false then
 			for _, v in buttons do
 				local btn = "btn_" .. string.gsub( string.lower( v ), "%s", "_" )
 				popup[ btn ]:Disable()
 			end
 			popup.dd_class:Hide()
 			popup.dd_spec:Hide()
+
+			if has_access == false then
+				popup.label_noaccess:Show()
+			end
+		end
+
+		if has_access == nil then
+			m.msg.check_channel_access( event.channelId )
 		end
 	end
 

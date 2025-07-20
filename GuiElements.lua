@@ -18,6 +18,10 @@ M.font_highlight = CreateFont( "GIFontHighlight" )
 M.font_highlight:SetFont( "Interface\\AddOns\\RaidCalendar\\assets\\Myriad-Pro.ttf", 12, "" )
 M.font_highlight:SetTextColor( HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b )
 
+M.font_highlight = CreateFont( "GIFontHighlightBig" )
+M.font_highlight:SetFont( "Interface\\AddOns\\RaidCalendar\\assets\\Myriad-Pro.ttf", 14, "" )
+M.font_highlight:SetTextColor( HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b )
+
 M.font_normal_small = CreateFont( "GIFontNormalSmall" )
 M.font_normal_small:SetFont( "Interface\\AddOns\\RaidCalendar\\assets\\Myriad-Pro.ttf", 11, "" )
 
@@ -67,7 +71,8 @@ M.spec_icons = {
 	Enhancement = "Interface\\Icons\\spell_nature_lightningshield",
 	Feral = "Interface\\Icons\\ability_druid_catform",
 	Assassination = "Interface\\AddOns\\RaidCalendar\\assets\\icon_assassination.tga",
-	Swords = "Interface\\Icons\\classicon_rogue"
+	Swords = "Interface\\Icons\\classicon_rogue",
+	Dreamstate = "Interface\\AddOns\\RaidCalendar\\assets\\icon_dreamstate.tga"
 }
 
 ---@param parent Frame

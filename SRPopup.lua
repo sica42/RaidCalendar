@@ -25,34 +25,10 @@ function M.new()
 	local event_id
 	local raid_id
 	local sr_list
-	local sr_items = nil
+	local sr_items
 	local frame_items = {}
 	local rows = 10
 	local gui = m.GuiElements
-
-	local raids = {
-		[ 94 ] = { "BWL", "Blackwing Lair", { "BWLRazorgore", "BWLVaelastrasz", "BWLLashlayer", "BWLFiremaw", "BWLEbonroc", "BWLFlamegor", "BWLChromaggus", "BWLNefarian", "BWLTrashMobs" } },
-		[ 95 ] = { "MC", "Molten Core", { "MCLucifron", "MCMagmadar", "MCGehennas", "MCGarr", "MCShazzrah", "MCGeddon", "MCGolemagg", "MCSulfuron", "MCMajordomo", "MCRagnaros", "MCTrashMobs", "MCRANDOMBOSSDROPS" } },
-		[ 96 ] = { "NAX", "Naxxramas", { "NAXPatchwerk", "NAXGrobbulus", "NAXGluth", "NAXThaddius", "NAXAnubRekhan", "NAXGrandWidowFaerlina", "NAXMaexxna", "NAXNoththePlaguebringer", "NAXHeigantheUnclean", "NAXLoatheb", "NAXInstructorRazuvious", "NAXGothiktheHarvester", "NAXTheFourHorsemen", "NAXSapphiron", "NAXKelThuzard", "NAXTrash" } },
-		[ 97 ] = { "Onyxia", "Onyxias Lair", { "Onyxia" } },
-		[ 98 ] = { "AQ20", "Ruins of Ahn'Qiraj", { "AQ20Kurinnaxx", "AQ20Andorov", "AQ20Rajaxx", "AQ20CAPTAIN", "AQ20Moam", "AQ20Buru", "AQ20Ayamiss", "AQ20Ossirian", "AQ20Trash", "AQ20ClassBooks", "AQ20Enchants" } },
-		[ 99 ] = { "AQ40", "Temple of Ahn'Qiraj", { "AQ40Skeram", "AQ40Trio", "AQ40Sartura", "AQ40Fankriss", "AQ40Viscidus", "AQ40Huhuran", "AQ40Emperors", "AQ40Ouro", "AQ40CThun", "AQ40Trash1", "AQEnchants" } },
-		[ 100 ] = { "ZG", "Zul Gurub", { "ZGJeklik", "ZGVenoxis", "ZGEnchants", "ZGMarli", "ZGMandokir", "ZGGrilek", "ZGHazzarah", "ZGRenataki", "ZGWushoolay", "ZGGahzranka", "ZGThekal", "ZGArlokk", "ZGJindo", "ZGHakkar", "ZGMuddyChurningWaters", "ZGJinxedHoodooPile", "ZGTrash1", "ZGShared" } },
-		[ 101 ] = { "LKH", "Karazhan", { "LKHRolfen", "LKHBroodQueenAraxxna", "LKHGrizikil", "LKHClawlordHowlfang", "LKHLordBlackwaldII", "LKHMoroes", "LKHTrash", "LKHEnchants" } },
-		[ 102 ] = { "ES", "Emerald Sanctum", { "ESErennius", "ESSolnius1", "ESHardMode", "ESTrash" } }
-	}
-
-	local atlas_classes = {
-		[ 1 ] = "Druid",
-		[ 2 ] = "Hunter",
-		[ 3 ] = "Mage",
-		[ 4 ] = "Paladin",
-		[ 5 ] = "Priest",
-		[ 6 ] = "Rogue",
-		[ 7 ] = "Shaman",
-		[ 8 ] = "Warlock",
-		[ 9 ] = "Warrior"
-	}
 
 	local specs = {
 		Druid = { "Balance", "Feral", "Restoration", "Bear" },
@@ -77,42 +53,31 @@ function M.new()
 		}
 	end
 
-	---@param item_id number
+	---@param raidItemId number
 	---@return string? name
 	---@return string? texture
 	---@return number? quality
-	local function get_iteminfo_atlas( item_id )
-		item_id = tonumber( item_id ) or 0
-		if item_id == 0 then
-			m.error( "Invalid itemID" )
-			return nil, nil, nil
-		end
+	---@return number? itemId
+	local function get_iteminfo( raidItemId )
+		for _, item in ipairs( m.loot_table[ raid_id ].raidItems ) do
+			if item.id == raidItemId then
+				local icon = "Interface\\Icons\\" .. item.icon
+				local name = ITEM_QUALITY_COLORS[ item.quality or 0 ].hex .. item.name .. "|r"
 
-		for _, v in ipairs( raids[ raid_id ][ 3 ] ) do
-			---@diagnostic disable-next-line: undefined-global
-			for _, item in ipairs( AtlasLoot_Data[ "AtlasLootItems" ][ v ] ) do
-				if item[ 1 ] == tonumber( item_id ) then
-					local tex = "Interface\\Icons\\" .. item[ 2 ]
-					local quality, name = string.match( item[ 3 ], "=q(%d)=(.*)" )
-					quality = tonumber( quality )
-					if name and quality then
-						name = (ITEM_QUALITY_COLORS[ quality ].hex) .. name .. "|r"
-					end
-					return name, tex, quality
-				end
+				return name, icon, item.quality, item.itemId
 			end
 		end
 
-		return nil, nil, nil
+		return nil, nil, nil, nil
 	end
 
-	---@param item_id number
+	---@param raidItemId number
 	---@return string?
-	local function get_itemlink_atlas( item_id )
-		local name = get_iteminfo_atlas( item_id )
-		if name then
-			local color, item = string.match( name, "(|cff%x%x%x%x%x%x)(.-)|r" ) --, "%1[%2]|r")
-			return string.format( "%s|Hitem:%d:0:0:0|h[%s]|h|r", color, item_id, item )
+	local function get_itemlink( raidItemId )
+		for _, item in ipairs( m.loot_table[ raid_id ].raidItems ) do
+			if item.id == raidItemId then
+				return string.format( "%s|Hitem:%d:0:0:0|h[%s]|h|r", ITEM_QUALITY_COLORS[ item.quality or 0 ].hex, item.itemId, item.name )
+			end
 		end
 
 		return nil
@@ -140,7 +105,7 @@ function M.new()
 				origin = "RaidCalendar",
 				id = sr.reference,
 				instance = raid_id,
-				instances = { raids[ raid_id ][ 2 ] },
+				instances = { m.loot_table[ raid_id ].name },
 			},
 			softreserves = {},
 			hardreserves = {}
@@ -148,11 +113,11 @@ function M.new()
 
 		for _, res in ipairs( sr.reservations ) do
 			local v = m.find( res.character.name, rollfor.softreserves, "name" )
-			local _, _, quality = get_iteminfo_atlas( res.itemId )
+			local _, _, quality = get_iteminfo( res.raidItemId )
 			if v then
 				table.insert( v.items, {
 					id = res.itemId,
-					sr_plus = res.srPlus,
+					sr_plus = res.srPlus and res.srPlus > 0 and res.srPlus or nil,
 					quality = quality or 1
 				} )
 			else
@@ -161,7 +126,7 @@ function M.new()
 					items = {
 						[ 1 ] = {
 							id = res.itemId,
-							sr_plus = res.srPlus,
+							sr_plus = res.srPlus and res.srPlus > 0 and res.srPlus or nil,
 							quality = quality or 1
 						}
 					}
@@ -234,7 +199,7 @@ function M.new()
 		item_label:SetScript( "OnMouseDown", function()
 			if m.api.IsShiftKeyDown() then
 				if m.api.ChatFrameEditBox:IsVisible() then
-					local item_link = get_itemlink_atlas( frame.item_id )
+					local item_link = get_itemlink( frame.raid_item_id )
 					m.api.ChatFrameEditBox:Insert( item_link )
 				end
 			end
@@ -255,7 +220,7 @@ function M.new()
 		frame.set_item = function( index )
 			local item = sr_list[ index ]
 			frame.index = index
-			frame.item_id = item.itemId
+			frame.raid_item_id = item.raidItemId
 
 			if mod( index, 2 ) == 0 then
 				frame:SetBackdropColor( 0.15, 0.15, 0.15, 1 )
@@ -275,7 +240,7 @@ function M.new()
 			local class = string.sub( item.character.specialization, string.find( item.character.specialization, "%u", 2 ) or 0 )
 			class_label.set( class )
 
-			if class == "Swords" or class == "Maces" then
+			if class == "Swords" or class == "Maces" or class == "Daggers" then
 				class_label.set_icon( "Interface\\Glues\\CharacterCreate\\UI-CharacterCreate-Classes" )
 				class_label.icon:SetTexCoord( unpack( gui.class_icons[ "ROGUE" ] ) )
 			elseif class == "Bear" then
@@ -286,11 +251,12 @@ function M.new()
 				class_label.icon:SetTexCoord( 0, 1, 0, 1 )
 			end
 
-			local item_name, item_tex = get_iteminfo_atlas( item.itemId )
+			local item_name, item_tex, _, item_id = get_iteminfo( item.raidItemId )
+			frame.item_id = item_id
 			if item_name and item_tex then
 				item_label.set( item_name )
 				item_label.set_icon( item_tex )
-			else
+--[[			else
 				local name, _, quality, _, _, _, _, _, tex = GetItemInfo( item.itemId )
 				if name then
 					name = (ITEM_QUALITY_COLORS[ quality ].hex) .. name .. "|r"
@@ -299,7 +265,7 @@ function M.new()
 				else
 					item_label.set( "Unkown item" )
 					item_label.set_icon( nil )
-				end
+				end]]
 			end
 
 			local w = item_label.label:GetStringWidth()
@@ -349,7 +315,7 @@ function M.new()
 		frame:SetScript( "OnMouseDown", function()
 			if m.api.IsShiftKeyDown() then
 				if m.api.ChatFrameEditBox:IsVisible() then
-					local item_link = get_itemlink_atlas( frame.item_id )
+					local item_link = get_itemlink( frame.raid_item_id )
 					m.api.ChatFrameEditBox:Insert( item_link )
 				end
 			end
@@ -368,15 +334,16 @@ function M.new()
 		end )
 
 		frame.set_item = function( item )
-			frame.item_id = item.itemId
-			frame.id = item.id
+			local item_name, item_tex, _, item_id = get_iteminfo( item.raidItemId )
 
-			local item_name, item_tex = get_iteminfo_atlas( item.itemId )
+			frame.item_id = item_id
+			frame.raid_item_id = item.raidItemId
+			frame.id = item.id
 
 			if item_name and item_tex then
 				icon:SetTexture( item_tex )
 				label_item:SetText( item_name )
-			else
+			--[[else
 				local name, _, quality, _, _, _, _, _, tex = GetItemInfo( item.itemId )
 				if name then
 					name = (ITEM_QUALITY_COLORS[ quality ].hex) .. name .. "|r"
@@ -385,7 +352,7 @@ function M.new()
 				else
 					icon:SetTexture( nil )
 					label_item:SetText( "Unkown item" )
-				end
+				end]]
 			end
 
 			btn_remove:Enable()
@@ -400,7 +367,7 @@ function M.new()
 	local function sr_dropdown_specs()
 		local list = {}
 
-		for k, v in specs[ m.player_class ] do
+		for _, v in specs[ m.player_class ] do
 			table.insert( list, {
 				value = v,
 				text = v,
@@ -410,56 +377,10 @@ function M.new()
 		return list
 	end
 
-	local function sr_dropdown_item_tooltip()
-		GameTooltip:SetOwner( this, "ANCHOR_RIGHT" )
-		GameTooltip:SetHyperlink( string.format( "item:%d:0:0:0", this.value ) )
+	local function sr_dropdown_item_tooltip( self )
+		GameTooltip:SetOwner( self, "ANCHOR_RIGHT" )
+		GameTooltip:SetHyperlink( string.format( "item:%d:0:0:0", self.value ) )
 		GameTooltip:Show()
-	end
-
-	local function sort_sections_by_text( t )
-		local sorted = {}
-		local group = nil
-
-		local function strip_color( text )
-			return string.gsub( text, "|cff%x%x%x%x%x%x(.-)|r", "%1" )
-		end
-
-		for _, entry in ipairs( t ) do
-			if entry.type == "header" then
-				-- Finish and sort the previous group (if any)
-				if group then
-					table.sort( group, function( a, b )
-						return string.lower( strip_color( a.text ) ) < string.lower( strip_color( b.text ) )
-					end )
-					for _, item in ipairs( group ) do
-						table.insert( sorted, item )
-					end
-				end
-
-				-- Add the new header and start a new group
-				table.insert( sorted, entry )
-				group = {}
-			else
-				if group then
-					table.insert( group, entry )
-				else
-					-- Safety fallback: item before any header
-					table.insert( sorted, entry )
-				end
-			end
-		end
-
-		-- Handle the final group
-		if group then
-			table.sort( group, function( a, b )
-				return string.lower( strip_color( a.text ) ) < string.lower( strip_color( b.text ) )
-			end )
-			for _, item in ipairs( group ) do
-				table.insert( sorted, item )
-			end
-		end
-
-		return sorted
 	end
 
 	--
@@ -467,92 +388,132 @@ function M.new()
 	--
 	local function sr_dropdown_items()
 		if not sr_items then
+			local raid = m.loot_table[ raid_id ]
+			local bosses = {}
+			local boss_lookup = {}
 			sr_items = {}
-			---@diagnostic disable-next-line: undefined-global
-			if not (AtlasLoot_Data and AtlasLoot_Data[ "AtlasLootItems" ]) then
-				m.error( "AtlasLoot is required for softres to work." )
-				return
+
+			-- Build boss lookup by ID
+			if raid.raidBosses then
+				for _, boss in ipairs( raid.raidBosses ) do
+					boss_lookup[ boss.id ] = boss
+					table.insert( bosses, boss )
+				end
+				table.sort( bosses, function( a, b )
+					return (a.position or 9999) < (b.position or 9999)
+				end )
 			end
 
-			local shared = {}
+			local items_by_boss = {}
+			local shared_items = {}
+			local ungrouped_items = {}
 
-			for _, v in raids[ raid_id ][ 3 ] do
-				---@diagnostic disable-next-line: undefined-global
-				local label = string.match( AtlasLoot_TableNames[ v ][ 1 ], "- (.*)" )
+			for _, item in ipairs( raid.raidItems or {} ) do
+				if not item.classes or m.find( m.player_class, item.classes ) then
+					local boss_refs = item.raidBosses
 
-				table.insert( sr_items, {
-					type = "header",
-					text = label,
-				} )
+					if type( boss_refs ) == "table" then
+						local boss_count = getn( boss_refs )
 
-				---@diagnostic disable-next-line: undefined-global
-				for _, item in pairs( AtlasLoot_Data[ "AtlasLootItems" ][ v ] ) do
-					if item[ 1 ] and item[ 1 ] > 0
-							and not string.find( item[ 4 ], "#m4#" ) then -- Don't show quest rewards
-						--	and item[ 5 ] then -- Don't show items without drop chance
-
-						local class_found = not string.find(item[ 4 ], "#c(%d)#")
-						for class in string.gmatch( item[ 4 ], "#c(%d)#" ) do
-							if atlas_classes[ tonumber( class ) ] == m.player_class then
-								class_found = true
-							end
-						end
-
-						if class_found then
-							local _, i = m.find( item[ 1 ], sr_items, "value" )
-							if i then
-								table.remove( sr_items, i )
-								if not m.find( item[ 1 ], shared, "value" ) then
-									table.insert( shared, {
-										value = item[ 1 ],
-										text = get_iteminfo_atlas( item[ 1 ] ),
-										icon = "Interface\\Icons\\" .. item[ 2 ],
-										tooltip = sr_dropdown_item_tooltip
-									} )
-								end
+						if boss_count > 1 then
+							table.insert( shared_items, item )
+						elseif boss_count == 1 then
+							local boss_id = boss_refs[ 1 ]
+							if boss_lookup[ boss_id ] then
+								items_by_boss[ boss_id ] = items_by_boss[ boss_id ] or {}
+								table.insert( items_by_boss[ boss_id ], item )
 							else
-								table.insert( sr_items, {
-									value = item[ 1 ],
-									text = get_iteminfo_atlas( item[ 1 ] ),
-									icon = "Interface\\Icons\\" .. item[ 2 ],
-									tooltip = sr_dropdown_item_tooltip
-								} )
+								table.insert( ungrouped_items, item )
 							end
+						else
+							table.insert( ungrouped_items, item )
 						end
+					else
+						table.insert( ungrouped_items, item )
 					end
 				end
 			end
-			if getn( shared ) > 0 then
-				table.insert( sr_items, {
-					type = "header",
-					text = "Shared"
-				} )
-				for _, v in ipairs( shared ) do
-					table.insert( sr_items, v )
+
+			local function sort_by_name( tbl )
+				table.sort( tbl, function( a, b )
+					return string.lower( a.name or "" ) < string.lower( b.name or "" )
+				end )
+			end
+
+			-- Add grouped items by boss
+			for _, boss in ipairs( bosses ) do
+				local items = items_by_boss[ boss.id ]
+				if items then
+					sort_by_name( items )
+					table.insert( sr_items, {
+						type = "header",
+						text = boss.name,
+					} )
+					for _, item in ipairs( items ) do
+						table.insert( sr_items, {
+							value = item.itemId,
+							text = m.get_item_name_colorized( item.name, item.quality ),
+							icon = "Interface\\Icons\\" .. item.icon,
+							raid_item_id = item.id,
+							tooltip = sr_dropdown_item_tooltip
+						} )
+					end
 				end
 			end
 
+			-- Add shared items
+			if getn( shared_items ) > 0 then
+				sort_by_name( shared_items )
+				table.insert( sr_items, {
+					type = "header",
+					text = "Shared",
+				} )
+				for _, item in ipairs( shared_items ) do
+					table.insert( sr_items, {
+						value = item.itemId,
+						text = m.get_item_name_colorized( item.name, item.quality ),
+						icon = "Interface\\Icons\\" .. item.icon,
+						raid_item_id = item.id,
+						tooltip = sr_dropdown_item_tooltip
+					} )
+				end
+			end
+
+			-- Add ungrouped items
+			if getn( ungrouped_items ) > 0 then
+				sort_by_name( ungrouped_items )
+				table.insert( sr_items, {
+					type = "header",
+					text = "Other Items",
+				} )
+				for _, item in ipairs( ungrouped_items ) do
+					table.insert( sr_items, {
+						value = item.itemId,
+						text = m.get_item_name_colorized( item.name, item.quality ),
+						icon = "Interface\\Icons\\" .. item.icon,
+						raid_item_id = item.id,
+						tooltip = sr_dropdown_item_tooltip
+					} )
+				end
+			end
+
+			-- Disable HR items
 			for _, item in pairs( m.db.events[ event_id ].sr.advancedHrItems ) do
-				local sr_item, index = m.find( item.itemId, sr_items, "value" )
+				local sr_item = m.find( item.itemId, sr_items, "value" )
 				if sr_item then
 					sr_item.disabled = true
 					sr_item.text = string.gsub( sr_item.text, "(|cff%x%x%x%x%x%x)", "|cffaaaaaa" )
-					--table.remove( sr_items, index )
 				end
 			end
-
-			sr_items = sort_sections_by_text( sr_items )
 		end
-
-
 
 		return sr_items
 	end
 
 	local function on_reserve_click()
 		local spec = popup.dd_spec.selected
-		local sr1 = popup.dd_sr1.selected
-		local sr2 = popup.dd_sr2.selected
+		local sr1 = popup.dd_sr1:GetSelected() and popup.dd_sr1:GetSelected().raid_item_id
+		local sr2 = popup.dd_sr2:GetSelected() and popup.dd_sr2:GetSelected().raid_item_id
 
 		if not spec then
 			m.error( "No specialization selected" )
@@ -761,9 +722,9 @@ function M.new()
 		popup.btn_refresh:Enable()
 
 		---@diagnostic disable-next-line: undefined-global
-		local atlas = AtlasLoot_Data and AtlasLoot_Data[ "AtlasLootItems" ]
+		--local atlas = AtlasLoot_Data and AtlasLoot_Data[ "AtlasLootItems" ]
 
-		if not m.db.events[ event_id ].sr or not atlas then
+		if not m.db.events[ event_id ].sr then
 			popup.yoursr:SetText( "Please wait while SR data is loading..." )
 			popup.dd_spec:Hide()
 			popup.label_sr1:Hide()
@@ -772,12 +733,12 @@ function M.new()
 			popup.dd_sr2:Hide()
 			popup.btn_reserve:Hide()
 
-			if atlas then
-				m.msg.request_sr( m.db.events[ event_id ].srId )
-			else
-				popup.yoursr:SetText( "AtlasLoot is required" )
-				popup.btn_refresh:Disable()
-			end
+			--if atlas then
+			m.msg.request_sr( m.db.events[ event_id ].srId )
+			--	else
+			--		popup.yoursr:SetText( "AtlasLoot is required" )
+			--		popup.btn_refresh:Disable()
+			--		end
 			return
 		end
 
@@ -785,7 +746,7 @@ function M.new()
 		raid_id = m.db.events[ event_id ].sr.raidId
 		sr_items = nil
 
-		popup.titlebar.title:SetText( string.format( "SR for %s (%s)", m.db.events[ event_id ].title, raids[ raid_id ][ 2 ] ) )
+		popup.titlebar.title:SetText( string.format( "SR for %s (%s)", m.db.events[ event_id ].title, m.loot_table[ raid_id ].name ) )
 		--
 		-- Get personal reservations
 		--

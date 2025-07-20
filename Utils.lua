@@ -60,24 +60,29 @@ function M.format_time_difference( diff )
 	end
 end
 
----@return boolean
+---@return number r
+---@return number g
+---@return number b
+---@return number a
 ---@nodiscard
 function M.bot_online_status()
 	if time() - bot_check_time > 600 or not bot_online then
 		M.debug( "Checking bot online status" )
 		bot_check_time = time()
+		bot_online = false
 		for i = 1, GetNumGuildMembers() do
 			local name, _, _, _, _, _, _, _, online = GetGuildRosterInfo( i )
-			if name == "Foxraider" and online == 1 then
+			if name == M.db.user_settings.bot_name and online == 1 then
 				bot_online = true
-				return true
+				break
 			end
 		end
+	end
 
-		bot_online = false
-		return false
+	if bot_online then
+		return 0, 1, 0, 0.9
 	else
-		return bot_online
+		return 1, 0, 0, 0.9
 	end
 end
 
@@ -173,7 +178,7 @@ end
 ---@param o any
 ---@return string
 function M.dump( o )
-	if not o then return "nil" end
+	--if not o then return "nil" end
 	if type( o ) ~= 'table' then return tostring( o ) end
 
 	local entries = 0
@@ -191,35 +196,6 @@ function M.dump( o )
 	end
 
 	if (entries > 0) then s = s .. " " end
-	return s .. "}"
-end
-
----@param o any
----@return string
-function M.____flatten( o )
-	if not o then return "nil" end
-	if type( o ) ~= 'table' then return tostring( o ) end
-
-	local entries = 0
-	local s = "{"
-
-	for k, v in pairs( o ) do
-		--if (entries == 0) then s = s .. "" end
-
-		local key = type( k ) ~= "number" and '"' .. k .. '"' or k
-
-		if (entries > 0) then s = s .. "," end
-
-		local f = M.flatten( v )
-		if string.sub( f, 1, 1 ) == "{" then
-			s = s .. "[" .. key .. ']=' .. f
-		else
-			s = s .. "[" .. key .. ']="' .. f .. '"'
-		end
-		entries = entries + 1
-	end
-
-	--if (entries > 0) then s = s .. " " end
 	return s .. "}"
 end
 
