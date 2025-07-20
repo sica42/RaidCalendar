@@ -129,6 +129,7 @@ function M.new()
 		input_discord:SetHeight( 22 )
 		input_discord:SetAutoFocus( false )
 		input_discord:SetScript( "OnEnterPressed", on_discord_check )
+		input_discord:SetFontObject(gui.font_highlight )
 		input_discord:SetText( m.db.user_settings.discord_id or "" )
 		frame.input_discord = input_discord
 

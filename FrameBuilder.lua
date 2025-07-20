@@ -78,6 +78,7 @@ function M.new()
 			title_label:SetTextColor( 1, 1, 1 )
 			title_label:SetJustifyH( "Left" )
 			title_label:SetText( title )
+			title_label:SetFontObject(m.GuiElements.font_highlight )
 			frame["title"] = title_label
 
 			return frame

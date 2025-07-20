@@ -42,21 +42,14 @@ function M.new()
 
 	local function on_save_settings()
 		local discord_id = popup.settings.discord:GetText()
-		local bot_name = popup.settings.botname:GetText()
 
 		if not string.find( discord_id, "^%d+$" ) then
 			m.error( "Invalid Discord ID" )
 			return
 		end
 
-		if not bot_name or bot_name == "" then
-			m.error( "Bot name is required" )
-			return
-		end
-
 		m.db.user_settings.channel_access = {}
 		m.db.user_settings.discord_id = discord_id
-		m.db.user_settings.bot_name = bot_name
 		m.db.user_settings.use_character_name = popup.settings.use_char_name:GetChecked()
 		m.db.user_settings.time_format = popup.settings.time_format.selected
 		m.time_format = m.db.user_settings.time_format == "24" and "%H:%M" or "%I:%M %p"
@@ -323,13 +316,14 @@ function M.new()
 		input_discord:SetWidth( 150 )
 		input_discord:SetHeight( 22 )
 		input_discord:SetAutoFocus( false )
+		input_discord:SetFontObject(gui.font_highlight )
 		frame.settings.discord = input_discord
 
 		local label_discord = frame.settings:CreateFontString( nil, "ARTWORK", "GIFontNormal" )
 		label_discord:SetPoint( "Right", input_discord, "Left", -15, 0 )
 		label_discord:SetText( "Discord name/ID" )
 
-		frame.settings.btn_loopup = gui.create_button( frame.settings, "Find Discord ID", 100, function()
+		frame.settings.btn_loopup = gui.create_button( frame.settings, "Find Discord ID", 120, function()
 			this:Disable()
 			m.msg.find_discord_id( input_discord:GetText() )
 		end )
@@ -364,17 +358,6 @@ function M.new()
 		label_timeformat:SetPoint( "Right", dd_timeformat, "Left", -10, 0 )
 		label_timeformat:SetText( "Time format" )
 
-		local label_botname = frame.settings:CreateFontString( nil, "ARTWORK", "GIFontNormal" )
-		label_botname:SetPoint( "Left", dd_timeformat, "Right", 40, 0 )
-		label_botname:SetText( "Bot name" )
-
-		local input_botname = CreateFrame( "EditBox", "RaidCalendarBotName", frame.settings, "InputBoxTemplate" )
-		input_botname:SetPoint( "Left", label_botname, "Right", 10, 0 )
-		input_botname:SetWidth( 90 )
-		input_botname:SetHeight( 22 )
-		input_botname:SetAutoFocus( false )
-		frame.settings.botname = input_botname
-
 		local btn_save = gui.create_button( frame.settings, "Save", 80, on_save_settings )
 		btn_save:SetPoint( "BottomRight", frame.settings, "BottomRight", -10, 10 )
 
@@ -386,7 +369,6 @@ function M.new()
 		popup.indicator_tex:SetVertexColor( m.bot_online_status() )
 
 		popup.settings.discord:SetText( m.db.user_settings.discord_id or "" )
-		popup.settings.botname:SetText( m.db.user_settings.bot_name or "" )
 		popup.settings.use_char_name:SetChecked( m.db.user_settings.use_character_name )
 		popup.settings.time_format:SetSelected( m.db.user_settings.time_format == "24" and "24-hour" or "12-hour", m.db.user_settings.time_format )
 

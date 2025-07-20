@@ -8,7 +8,7 @@ RaidCalendar.name = "RaidCalendar"
 RaidCalendar.prefix = "RaidCal"
 RaidCalendar.tagcolor = "FF7b1fa2"
 RaidCalendar.events = {}
-RaidCalendar.debug_enabled = false
+RaidCalendar.debug_enabled = true
 RaidCalendar.api = getfenv()
 
 function RaidCalendar:init()
