@@ -206,7 +206,7 @@ local function create_dropdown_list( max_items )
 			---@class DropdownItem
 			local btn = GetMouseFocus()
 
-			if btn.tooltip and type( btn.tooltip ) == "function" then
+			if btn and btn.tooltip and type( btn.tooltip ) == "function" then
 				btn:tooltip()
 			else
 				GameTooltip:Hide()
