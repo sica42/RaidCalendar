@@ -466,7 +466,9 @@ function M.pfui_skin( frame )
 		frame = frame
 
 		frame.btn_refresh:SetPoint( "Right", frame.titlebar.btn_close, "Left", -4, 0 )
-		frame.btn_export:SetPoint( "Right", frame.btn_refresh, "Left", -4, 0 )
+		if frame.btn_export then
+			frame.btn_export:SetPoint( "Right", frame.btn_refresh, "Left", -4, 0 )
+		end
 
 		m.api.pfUI.api.StripTextures( frame.border_reserve, nil, "BACKGROUND" )
 		m.api.pfUI.api.CreateBackdrop( frame.border_reserve, nil, true )

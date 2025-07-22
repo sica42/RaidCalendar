@@ -116,8 +116,17 @@ local function create_button( parent, i )
 		local value = btn.value
 		local text = btn:GetText()
 
-		dropdown.selected_index = parent.offset + btn.id
-		dropdown.selected = btn.value
+		dropdown.selected = value
+		if lib.search_str and lib.search_str ~= "" then
+			for index, item in dropdown.items do
+				if item.value == value then
+					dropdown.selected_index = index
+					break
+				end
+			end
+		else
+			dropdown.selected_index = parent.offset + btn.id
+		end
 
 		if text then
 			dropdown.label:SetText( dropdown.options.label_on_select == "text" and text or value )
@@ -659,7 +668,8 @@ function lib:New( parent, options )
 	end
 
 	function dropdown:GetSelected()
-		return dropdown.items[ dropdown.selected_index ]
+		RaidCalendar.debug( "index: " .. tostring(self.selected_index ))
+		return self.items[ self.selected_index ]
 	end
 
 	return dropdown
