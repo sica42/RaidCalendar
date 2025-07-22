@@ -25,7 +25,7 @@ if not lib then return end
 ---@class DropdownItem: Button
 ---@field id integer
 ---@field value any
----@field tooltip function|string
+---@field tooltip function|string|nil
 ---@field type? "normal"|"header"
 ---@field disabled boolean
 
@@ -34,7 +34,7 @@ if not lib then return end
 ---@field search? boolean
 ---@field width? integer
 ---@field dropdown_width? "auto"|integer
----@field dropdown_style? "classic"|"modern"
+---@field dropdown_style? "classic"|"modern"|"pfui"
 ---@field dropdown_text_justify? "Left"|"Right"|"Center"
 ---@field label_on_select? "text"|"value"
 ---@field default_text? string
@@ -70,25 +70,43 @@ local function merge_options( defaults, options )
 	return result
 end
 
+local function hide_timer( frame )
+	local timer = time()
+	frame:SetScript( "OnUpdate", function()
+		if time() >= timer + 2 then
+			frame:SetScript( "OnUpdate", nil )
+			lib.dropdown_list.frame:Hide()
+			lib.active_dropdown = nil
+		end
+	end )
+end
+
 ---@param parent DropdownList
 ---@param i integer
 ---@return DropdownItem
 local function create_button( parent, i )
 	---@class DropdownItem
 	local btn = CreateFrame( "Button", nil, parent )
-	btn:SetWidth( 130 )
 	btn:SetHeight( 16 )
 	btn:SetPoint( "TopLeft", parent, "TopLeft", 6, -((i - 1) * 16) - 4 )
+	btn:SetPoint( "Right", parent, "Right", -6, 0 )
 	btn:SetTextFontObject( GameFontHighlightSmall )
-	btn:GetTextFontObject():SetJustifyH( "Left" )
 	btn:SetHighlightTexture( "Interface\\QuestFrame\\UI-QuestTitleHighlight" )
+	btn:SetPushedTextOffset(0,0)
+
 	btn:GetHighlightTexture():SetBlendMode( "ADD" )
+	btn:SetText( "" )
+	btn:GetFontString():SetJustifyH( "Left" )
 	btn.id = i
 
 	btn.icon = btn:CreateTexture( nil, "ARTWORK" )
 	btn.icon:SetPoint( "Left", btn, "Left", 0, 0 )
 	btn.icon:SetWidth( 16 )
 	btn.icon:SetHeight( 16 )
+
+	local label = btn:GetFontString()
+	label:ClearAllPoints()
+	label:SetPoint( "Left", btn.icon, "Right", 2, 0 )
 
 	btn:SetScript( "OnClick", function()
 		if btn.type == "header" or btn.disabled then
@@ -114,13 +132,22 @@ local function create_button( parent, i )
 	end )
 
 	btn:SetScript( "OnEnter", function()
+		parent:SetScript( "OnUpdate", nil )
 		if btn.tooltip and type( btn.tooltip ) == "function" then
 			btn:tooltip()
+		end
+		if btn.type == "header" then
+			btn:GetHighlightTexture():Hide()
+		else
+			btn:GetHighlightTexture():Show()
 		end
 	end )
 	btn:SetScript( "OnLeave", function()
 		if btn.tooltip and GameTooltip:IsVisible() then
 			GameTooltip:Hide()
+		end
+		if not MouseIsOver( parent ) then
+			hide_timer( parent )
 		end
 	end )
 
@@ -131,16 +158,6 @@ local function create_dropdown_list( max_items )
 	if not lib.dropdown_list.frame then
 		---@class DropdownList: Frame
 		local frame = CreateFrame( "Frame", nil, UIParent )
-		--[[
-    frame:SetBackdrop( {
-      bgFile = "Interface/Buttons/WHITE8x8", --"Interface\\DialogFrame\\UI-DialogBox-Background",
-      edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-      tile = true,
-      tileSize = 16,
-      edgeSize = 16,
-      insets = { left = 4, right = 4, top = 4, bottom = 4 }
-    } )
-    frame:SetBackdropColor( 1, 0, 0, 1 )]]
 		frame:SetWidth( 160 )
 		frame:SetHeight( lib.default_options.max_visible * 16 + 8 )
 		frame:SetFrameStrata( "FULLSCREEN_DIALOG" )
@@ -177,18 +194,9 @@ local function create_dropdown_list( max_items )
 		end )
 
 		frame:SetScript( "OnLeave", function()
-			if MouseIsOver( frame ) then
-				return
+			if not MouseIsOver( frame ) then
+				hide_timer( frame )
 			end
-
-			frame.timer = time()
-			frame:SetScript( "OnUpdate", function()
-				if time() >= frame.timer + 1 then
-					frame:SetScript( "OnUpdate", nil )
-					lib.dropdown_list.frame:Hide()
-					lib.active_dropdown = nil
-				end
-			end )
 		end )
 
 		scrollbar:SetScript( "OnValueChanged", function()
@@ -204,6 +212,12 @@ local function create_dropdown_list( max_items )
 				GameTooltip:Hide()
 			end
 		end )
+
+		scrollbar:SetScript( "OnLeave", function()
+			if not MouseIsOver( frame ) then
+				hide_timer( frame )
+			end
+		end )
 	end
 end
 
@@ -211,6 +225,17 @@ local function config_dropdown_list()
 	local frame = lib.dropdown_list.frame
 	---@class DropdownOptions
 	local options = lib.active_dropdown.options
+
+	local _G = getfenv()
+	if options.dropdown_style == "pfui" and not _G.IsAddOnLoaded( "pfUI" ) then
+		options.dropdown_style = "classic"
+	end
+
+	if type( options.dropdown_width ) == "number" then
+		local width = options.dropdown_width
+		---@cast width integer
+		frame:SetWidth( width )
+	end
 
 	if options.dropdown_style == "classic" then
 		frame:SetBackdrop( {
@@ -226,16 +251,11 @@ local function config_dropdown_list()
 		frame:SetBackdropColor( 0, 0, 0, 0.9 )
 		frame:SetHeight( options.max_visible * 16 + 35 )
 
-		if type( options.dropdown_width ) == "number" then
-			local width = options.dropdown_width
-			---@cast width integer
-			frame:SetWidth( width )
-		end
-
 		for i, btn in frame.buttons do
 			btn:SetPoint( "TopLeft", frame, "TopLeft", 15, -((i - 1) * 16) - 12 )
-			btn:SetWidth( options.dp_width + 20 )
-			btn:GetTextFontObject():SetJustifyH( options.dropdown_text_justify )
+			btn:SetPoint( "Right", frame, "Right", -15, 0 )
+			--btn:SetWidth( options.dp_width + 20 )
+			btn:GetFontString():SetJustifyH( options.dropdown_text_justify )
 		end
 
 		frame.scrollbar:ClearAllPoints()
@@ -243,6 +263,17 @@ local function config_dropdown_list()
 		frame.scrollbar:SetPoint( "BottomRight", frame, "BottomRight", -10, 26 )
 	elseif options.dropdown_style == "modern" then
 
+	elseif options.dropdown_style == "pfui" then
+		_G.pfUI.api.CreateBackdrop( frame, nil, true, 0.8 )
+		frame:SetHeight( options.max_visible * 16 + 35 )
+
+		for i, btn in frame.buttons do
+			--btn:SetPoint( "TopLeft", frame, "TopLeft", 5, -((i - 1) * 16) - 4 )
+			--btn:SetWidth( options.dp_width + 20 )
+			btn:GetFontString():SetJustifyH( options.dropdown_text_justify )
+		end
+
+		_G.pfUI.api.SkinScrollbar( frame.scrollbar )
 	end
 end
 
@@ -317,6 +348,7 @@ local function create_dropdown( parent, options )
 	right:SetHeight( 64 )
 
 	local button = CreateFrame( "Button", nil, frame )
+	frame.dropdown_button = button
 	button:SetPoint( "Right", frame, "Right", 0, 0 )
 	button:SetWidth( 24 )
 	button:SetHeight( 24 )
@@ -445,9 +477,15 @@ function lib:UpdateList()
 
 	items = items or dropdown.items
 
+	local total_items = getn( items )
+	local show_scrollbar = total_items > dropdown.options.max_visible
+	local has_icon = false
+	local classic_style = dropdown.options.dropdown_style == "classic"
+	local padding = show_scrollbar and (classic_style and 28 or 22) or (classic_style and 15 or 6)
+
 	for i = 1, dropdown.options.max_visible do
-		local index = offset + i
-		local item = items and items[ index ]
+		local item = items and items[ offset + i ]
+		---@type DropdownItem
 		local btn = buttons[ i ]
 
 		if item then
@@ -456,23 +494,14 @@ function lib:UpdateList()
 			btn.tooltip = item.tooltip or nil
 			btn.disabled = item.disabled or false
 			btn:SetText( item.text )
+			btn:SetPoint( "Right", dropdown_frame, "Right", -padding, 0 )
 
-			local text = btn:GetFontString()
-			text:ClearAllPoints()
-			if item.icon then
-				btn.icon:SetTexture( item.icon )
-				text:SetPoint( "Left", btn, "Left", 18, 0 )
-			else
-				btn.icon:SetTexture( nil )
-				text:SetPoint( "Left", btn, "Left", 0, 0 )
-			end
+			btn.icon:SetWidth( item.icon and 16 or 1 )
+			btn.icon:SetTexture( item.icon or nil )
 
-			if item.type == "header" then
-				btn:SetTextFontObject( GameFontNormal )
-			else
-				btn:SetTextFontObject( GameFontHighlightSmall )
-			end
+			has_icon = has_icon or item.icon
 
+			btn:SetTextFontObject( item.type == "header" and GameFontNormal or GameFontHighlightSmall )
 			btn:UnlockHighlight()
 			btn:Show()
 		else
@@ -480,17 +509,19 @@ function lib:UpdateList()
 		end
 	end
 
-	local total = getn( items )
-	local padding = dropdown.options.dropdown_style == "classic" and 24 or 8
-	if total <= dropdown.options.max_visible then
-		dropdown_frame.scrollbar:Hide()
-		dropdown_frame:SetHeight( math.max(40, total * 16 + padding ))
-	else
+	local w = dropdown.options.dropdown_style == "classic" and 30 or 10
+	dropdown_frame:SetWidth( dropdown.options.dp_width + 6 + w + (show_scrollbar and 18 or 0) + (has_icon and 18 or 0) )
+
+	padding = dropdown.options.dropdown_style == "classic" and 24 or 8
+	if show_scrollbar then
 		dropdown_frame.scrollbar:Show()
 		dropdown_frame:SetHeight( dropdown.options.max_visible * 16 + padding )
+	else
+		dropdown_frame.scrollbar:Hide()
+		dropdown_frame:SetHeight( math.max( 40, total_items * 16 + padding ) )
 	end
 
-	dropdown_frame.scrollbar:SetMinMaxValues( 0, math.max( 0, total - dropdown.options.max_visible ) )
+	dropdown_frame.scrollbar:SetMinMaxValues( 0, math.max( 0, total_items - dropdown.options.max_visible ) )
 	dropdown_frame.scrollbar:SetValue( offset )
 end
 
@@ -503,6 +534,7 @@ function lib:ShowListFor( dropdown )
 	end
 
 	local frame = lib.dropdown_list.frame
+	frame:SetScript( "OnUpdate", nil )
 
 	if lib.active_dropdown == dropdown then
 		frame:Hide()
@@ -527,23 +559,26 @@ function lib:ShowListFor( dropdown )
 		dropdown.items = dropdown.on_open( dropdown ) or {}
 	end
 
-	if dropdown.options.dropdown_width == "auto" then
+	if dropdown.options.dropdown_width == "auto" and not dropdown.options.dp_width then
 		local btn = frame.buttons[ 1 ]
 		dropdown.options.dp_width = 0
+		frame:Show()
+		btn:Show()
+
 		for _, item in dropdown.items do
 			btn:SetText( item.text )
-
 			if btn:GetFontString():GetStringWidth() > dropdown.options.dp_width then
 				dropdown.options.dp_width = btn:GetFontString():GetStringWidth()
 			end
 		end
-		frame:SetWidth( dropdown.options.dp_width + 60 )
 	end
 
 	config_dropdown_list()
 
 	frame:ClearAllPoints()
-	frame:SetPoint( "TopRight", dropdown, "BottomRight", 4, 2 )
+	local x = dropdown.options.dropdown_style == "classic" and 4 or 0
+	local y = dropdown.options.dropdown_style == "classic" and 2 or 1
+	frame:SetPoint( "TopRight", dropdown, "BottomRight", x, y )
 	frame.offset = 0
 
 	self:UpdateList()
@@ -599,25 +634,33 @@ function lib:New( parent, options )
 		end
 	end
 
-	function dropdown:SetValue( value )
-		dropdown.label:SetText( value )
-		dropdown.selected = value
+	function dropdown:SetText( text )
+		dropdown.label:SetText( text )
+		dropdown.selected = nil
+		dropdown.selected_index = nil
 	end
 
-	---@param text string
 	---@param value string
-	function dropdown:SetSelected( text, value )
-		dropdown.label:SetText( text )
-		dropdown.selected = value
+	function dropdown:SetSelected( value )
+		if self.on_open or next(self.items) then
+			self.items = self.on_open and self.on_open( self ) or self.items
+
+			for index, item in self.items do
+				if item.value == value then
+					self.selected = value
+					self.selected_index = index
+					self.label:SetText( item.text )
+					return
+				end
+			end
+		end
+		self.selected = nil
+		self.selected_index = nil
 	end
 
 	function dropdown:GetSelected()
 		return dropdown.items[ dropdown.selected_index ]
 	end
-
-	--function dropdown:Get()
-	--return dropdown.selected
-	--end
 
 	return dropdown
 end

@@ -207,7 +207,7 @@ function M.new()
 	end
 
 	local function create_frame()
-		---@class CalendarFrame: Frame
+		---@class CalendarFrame: BuilderFrame
 		local frame = m.FrameBuilder.new()
 				:name( "RaidCalendarPopup" )
 				:title( string.format( "Raid Calendar v%s", m.version ) )
@@ -232,9 +232,9 @@ function M.new()
 		---
 		--- Titlebar buttons
 		---
-		local btn_settings = m.GuiElements.tiny_button( frame, "S", "Settings" )
-		btn_settings:SetPoint( "TopRight", frame, "TopRight", -20, -4 )
-		btn_settings:SetScript( "OnClick", function()
+		frame.btn_settings = m.GuiElements.tiny_button( frame, "S", "Settings", "#F3DF2B" )
+		frame.btn_settings:SetPoint( "Right", frame.titlebar.btn_close, "Left", 2, 0 )
+		frame.btn_settings:SetScript( "OnClick", function()
 			if frame.settings:IsVisible() then
 				frame.settings:Hide()
 				frame:SetHeight( 250 )
@@ -245,16 +245,19 @@ function M.new()
 			end
 		end )
 
+		frame.online_indicator = gui.create_online_indicator( frame, frame.btn_settings )
+--[[
 		local indicator = CreateFrame( "Frame", nil, frame )
-		indicator:SetPoint( "Center", frame, "TopRight", -45, -13 )
+		indicator:SetPoint( "Right", frame.btn_settings, "Left", -2, 0 )
 		indicator:SetWidth( 15 )
 		indicator:SetHeight( 15 )
+		frame.indicator = indicator
 
 		frame.indicator_tex = indicator:CreateTexture( nil, "ARTWORK" )
 		frame.indicator_tex:SetAllPoints( indicator )
 		frame.indicator_tex:SetTexture( "Interface\\TargetingFrame\\UI-TargetingFrame-AttackBackground" )
 		frame.indicator_tex:SetVertexColor( 1, 1, 0, 1 )
-
+]]
 		---
 		--- Events
 		---
@@ -273,12 +276,13 @@ function M.new()
 			local value = frame.scroll_bar:GetValue() - arg1
 			frame.scroll_bar:SetValue( value )
 		end )
+		frame.border_events = border_events
 
 		local bg = border_events:CreateTexture( nil, "ARTWORK" )
 		bg:SetTexture( "Interface\\AddOns\\RaidCalendar\\assets\\background.tga" )
 		bg:SetWidth( 190 )
 		bg:SetHeight( 190 )
-		bg:SetPoint( "Center", border_events, "Center", 0, 0)
+		bg:SetPoint( "Center", border_events, "Center", 0, 0 )
 
 		local scroll_bar = CreateFrame( "Slider", "RaidCalendarScrollBar", border_events, "UIPanelScrollBarTemplate" )
 		frame.scroll_bar = scroll_bar
@@ -316,7 +320,7 @@ function M.new()
 		input_discord:SetWidth( 150 )
 		input_discord:SetHeight( 22 )
 		input_discord:SetAutoFocus( false )
-		input_discord:SetFontObject(gui.font_highlight )
+		input_discord:SetFontObject( gui.font_highlight )
 		frame.settings.discord = input_discord
 
 		local label_discord = frame.settings:CreateFontString( nil, "ARTWORK", "GIFontNormal" )
@@ -342,7 +346,7 @@ function M.new()
 
 		local dd_timeformat = scroll_drop:New( frame.settings, {
 			default_text = "",
-			dropdown_style = "classic",
+			dropdown_style = m.pfui_skin_enabled and "pfui" or "classic",
 			search = false,
 			width = 95
 		} )
@@ -359,18 +363,20 @@ function M.new()
 		label_timeformat:SetText( "Time format" )
 
 		local btn_save = gui.create_button( frame.settings, "Save", 80, on_save_settings )
-		btn_save:SetPoint( "BottomRight", frame.settings, "BottomRight", -10, 10 )
+		btn_save:SetPoint( "BottomRight", frame.settings, "BottomRight", -10, 15 )
+		frame.settings.btn_save = btn_save
 
+		gui.pfui_skin( frame )
 		return frame
 	end
 
 	---@param refresh_data boolean?
 	function refresh( refresh_data )
-		popup.indicator_tex:SetVertexColor( m.bot_online_status() )
+		popup.online_indicator.update()
 
 		popup.settings.discord:SetText( m.db.user_settings.discord_id or "" )
 		popup.settings.use_char_name:SetChecked( m.db.user_settings.use_character_name )
-		popup.settings.time_format:SetSelected( m.db.user_settings.time_format == "24" and "24-hour" or "12-hour", m.db.user_settings.time_format )
+		popup.settings.time_format:SetSelected( m.db.user_settings.time_format )
 
 		if not events or refresh_data then
 			events = {}

@@ -208,7 +208,7 @@ function M.new()
 	end
 
 	local function create_frame()
-		---@class EventFrame: Frame
+		---@class EventFrame: BuilderFrame
 		local frame = m.FrameBuilder.new()
 				:name( "RaidCalendarEventPopup" )
 				:title( string.format( "Raid Calendar v%s", m.version ) )
@@ -231,15 +231,7 @@ function M.new()
 			frame:SetPoint( p.point, UIParent, p.relative_point, p.x, p.y )
 		end
 
-		local indicator = CreateFrame( "Frame", nil, frame )
-		indicator:SetPoint( "Center", frame, "TopRight", -30, -13 )
-		indicator:SetWidth( 15 )
-		indicator:SetHeight( 15 )
-
-		frame.indicator_tex = indicator:CreateTexture( nil, "ARTWORK" )
-		frame.indicator_tex:SetAllPoints( indicator )
-		frame.indicator_tex:SetTexture( "Interface\\TargetingFrame\\UI-TargetingFrame-AttackBackground" )
-		frame.indicator_tex:SetVertexColor( 0, 1, 0, 0 )
+		frame.online_indicator = gui.create_online_indicator( frame, frame.titlebar.btn_close )
 
 		local border_desc = m.FrameBuilder.new()
 				:parent( frame )
@@ -255,6 +247,7 @@ function M.new()
 			local value = frame.scroll_bar:GetValue() - arg1 * 11.851852176058
 			frame.scroll_bar:SetValue( value )
 		end )
+		frame.border_desc = border_desc
 
 		local scroll_bar = CreateFrame( "Slider", "RaidCalendarDescScrollBar", border_desc, "UIPanelScrollBarTemplate" )
 		frame.scroll_bar = scroll_bar
@@ -347,7 +340,7 @@ function M.new()
 
 		frame.dd_class = scroll_drop:New( frame, {
 			default_text = "Select class",
-			dropdown_style = "classic",
+			dropdown_style = m.pfui_skin_enabled and "pfui" or "classic",
 			label_on_select = "value",
 			search = false,
 			width = 95
@@ -368,12 +361,12 @@ function M.new()
 
 			return list
 		end, function( value )
-			frame.dd_spec:SetValue( "Select spec" )
+			frame.dd_spec:SetText( "Select spec" )
 		end )
 
 		frame.dd_spec = scroll_drop:New( frame, {
 			default_text = "Select spec",
-			dropdown_style = "classic",
+			dropdown_style = m.pfui_skin_enabled and "pfui" or "classic",
 			label_on_select = "value",
 			search = false,
 			width = 95
@@ -396,6 +389,7 @@ function M.new()
 			return list
 		end )
 
+		gui.pfui_skin( frame )
 		return frame
 	end
 
@@ -427,7 +421,7 @@ function M.new()
 		local signup_class
 		event = m.db.events[ event_id ]
 
-		popup.indicator_tex:SetVertexColor( m.bot_online_status() )
+		popup.online_indicator.update()
 
 		-- Reset cached elements
 		for _, type in frame_cache do
@@ -540,21 +534,21 @@ function M.new()
 			popup.missing:SetHeight( 0 )
 			popup.missing:Hide()
 		else
-			popup.missing:SetHeight( data[ "missing" ].max_y + 9 )
+			popup.missing:SetHeight( data[ "missing" ].total_y + data[ "missing" ].max_y + 9 )
 			popup.missing:Show()
 		end
 
-		popup:SetHeight( math.max( 365, 196 + data[ "attending" ].total_y + data[ "attending" ].max_y + data[ "missing" ].max_y ) )
+		popup:SetHeight( math.max( 345, 196 + data[ "attending" ].total_y + data[ "attending" ].max_y + data[ "missing" ].total_y + data[ "missing" ].max_y ) )
 
 		--
 		-- Buttons
 		--
 		local class = m.db.user_settings[ event.templateId .. "_className" ]
-		popup.dd_class:SetSelected( class and class or "Select class", class or nil )
+		popup.dd_class:SetSelected( class or nil )
 		popup.dd_class:Hide()
 
 		local spec = m.db.user_settings[ event.templateId .. "_specName" ]
-		popup.dd_spec:SetSelected( spec and string.match( spec, "(%a+)" ) or "Select spec", spec or nil )
+		popup.dd_spec:SetSelected( spec or nil )
 		popup.dd_spec:Hide()
 		popup.cs_change:Hide()
 		popup.cs_cancel:Hide()

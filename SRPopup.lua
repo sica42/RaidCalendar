@@ -83,24 +83,11 @@ function M.new()
 		return nil
 	end
 
-	local function rollfor_update_minimap_icon()
-		local result = _RollFor.softres_check.check_softres( true )
-
-		if result == _RollFor.softres_check.ResultType.NoItemsFound then
-			_RollFor.minimap_button.set_icon( _RollFor.minimap_button.ColorType.White )
-		elseif result == _RollFor.softres_check.ResultType.SomeoneIsNotSoftRessing then
-			_RollFor.minimap_button.set_icon( _RollFor.minimap_button.ColorType.Orange )
-		elseif result == _RollFor.softres_check.ResultType.FoundOutdatedData then
-			_RollFor.minimap_button.set_icon( _RollFor.minimap_button.ColorType.Red )
-		else
-			_RollFor.minimap_button.set_icon( _RollFor.minimap_button.ColorType.Green )
-		end
-	end
-
 	local function export_to_rollfor()
-		local sr = m.db.events[ event_id ].sr
+		if not RollFor and _RollFor then return end
 
-		local rollfor = {
+		local sr = m.db.events[ event_id ].sr
+		local rollfor_data = {
 			metadata = {
 				origin = "RaidCalendar",
 				id = sr.reference,
@@ -112,20 +99,20 @@ function M.new()
 		}
 
 		for _, res in ipairs( sr.reservations ) do
-			local v = m.find( res.character.name, rollfor.softreserves, "name" )
+			local v = m.find( res.character.name, rollfor_data.softreserves, "name" )
 			local _, _, quality = get_iteminfo( res.raidItemId )
 			if v then
 				table.insert( v.items, {
-					id = res.itemId,
+					id = m.find( res.raidItemId, m.loot_table[ raid_id ].raidItems, "id" ).itemId,
 					sr_plus = res.srPlus and res.srPlus > 0 and res.srPlus or nil,
 					quality = quality or 1
 				} )
 			else
-				table.insert( rollfor.softreserves, {
+				table.insert( rollfor_data.softreserves, {
 					name = res.character.name,
 					items = {
 						[ 1 ] = {
-							id = res.itemId,
+							id = m.find( res.raidItemId, m.loot_table[ raid_id ].raidItems, "id" ).itemId,
 							sr_plus = res.srPlus and res.srPlus > 0 and res.srPlus or nil,
 							quality = quality or 1
 						}
@@ -134,17 +121,28 @@ function M.new()
 			end
 		end
 
-		if RollFor and _RollFor then
-			_RollFor.import_softres_data( rollfor )
-			RollFor.pretty_print( "Soft-res data loaded successfully!" )
-			rollfor_update_minimap_icon()
+		math.huge = 1e99
+		---@diagnostic disable-next-line: undefined-global
+		local json = LibStub( "Json-0.1.2" )
+		local success, json_data = pcall( function() return json.encode( rollfor_data ) end )
+		if success then
+			local softres_data = m.encode_base64( json_data )
 
-			local result = _RollFor.softres_check.check_softres()
-			if result ~= _RollFor.softres_check.ResultType.NoItemsFound then
-				_RollFor.dropped_loot_announce.reset()
-			end
+			_RollFor.import_encoded_softres_data( softres_data, function()
+				local softres_check = _RollFor.softres_check
+				local result = softres_check.check_softres()
+
+				if result ~= softres_check.ResultType.NoItemsFound then
+					_RollFor.softres.persist( softres_data )
+					_RollFor.dropped_loot_announce.reset()
+					_RollFor.softres_gui.load( softres_data )
+				end
+			end )
+		else
+			m.error( "Encoding of SR data failed" )
 		end
 	end
+
 	--
 	-- Create SR list entry
 	--
@@ -256,7 +254,7 @@ function M.new()
 			if item_name and item_tex then
 				item_label.set( item_name )
 				item_label.set_icon( item_tex )
---[[			else
+				--[[			else
 				local name, _, quality, _, _, _, _, _, tex = GetItemInfo( item.itemId )
 				if name then
 					name = (ITEM_QUALITY_COLORS[ quality ].hex) .. name .. "|r"
@@ -343,7 +341,7 @@ function M.new()
 			if item_name and item_tex then
 				icon:SetTexture( item_tex )
 				label_item:SetText( item_name )
-			--[[else
+				--[[else
 				local name, _, quality, _, _, _, _, _, tex = GetItemInfo( item.itemId )
 				if name then
 					name = (ITEM_QUALITY_COLORS[ quality ].hex) .. name .. "|r"
@@ -538,7 +536,7 @@ function M.new()
 	-- Create main frame
 	--
 	local function create_frame()
-		---@class EventFrame: Frame
+		---@class SRFrame: BuilderFrame
 		local frame = m.FrameBuilder.new()
 				:name( "RaidCalendarSRPopup" )
 				:title( string.format( "Raid Calendar v%s", m.version ) )
@@ -575,17 +573,16 @@ function M.new()
 		--
 		-- Titlebar buttons
 		--
-		frame.btn_refresh = m.GuiElements.tiny_button( frame, "R", "Refresh" )
-		frame.btn_refresh:SetPoint( "TopRight", frame, "TopRight", -20, -4 )
+		frame.btn_refresh = m.GuiElements.tiny_button( frame, "R", "Refresh", "#20F99F" )
+		frame.btn_refresh:SetPoint( "Right", frame.titlebar.btn_close, "Left", 2, 0 )
 		frame.btn_refresh:SetScript( "OnClick", function()
 			frame.btn_refresh:Disable()
 			m.msg.request_sr( m.db.events[ event_id ].srId )
 		end )
 
-
 		---@diagnostic disable-next-line: undefined-global
 		if RollFor then
-			frame.btn_export = m.GuiElements.tiny_button( frame, "E", "Export to RollFor" )
+			frame.btn_export = m.GuiElements.tiny_button( frame, "E", "Export to RollFor", "#209FF9" )
 			frame.btn_export:SetPoint( "Right", frame.btn_refresh, "Left", 2, 0 )
 			frame.btn_export:SetScript( "OnClick", export_to_rollfor )
 		end
@@ -606,7 +603,7 @@ function M.new()
 
 		frame.dd_spec = scroll_drop:New( border_reserve, {
 			default_text = "Select spec",
-			dropdown_style = "classic",
+			dropdown_style = m.pfui_skin_enabled and "pfui" or "classic",
 			label_on_select = "text",
 			search = false,
 			width = 120
@@ -626,17 +623,18 @@ function M.new()
 
 		frame.dd_sr1 = scroll_drop:New( border_reserve, {
 			default_text = "Reserve item",
-			dropdown_style = "classic",
+			dropdown_style = m.pfui_skin_enabled and "pfui" or "classic",
 			label_on_select = "text",
 			search = true,
-			width = 200
+			width = 200,
+			max_visible = 15,
 		} )
 		frame.dd_sr1:SetPoint( "Left", frame.label_sr1, "Right", 5, 0 )
 		frame.dd_sr1:SetItems( sr_dropdown_items )
 
 		frame.dd_sr2 = scroll_drop:New( border_reserve, {
 			default_text = "Reserve item",
-			dropdown_style = "classic",
+			dropdown_style = m.pfui_skin_enabled and "pfui" or "classic",
 			label_on_select = "text",
 			search = true,
 			width = 200
@@ -661,6 +659,7 @@ function M.new()
 			local value = frame.scroll_bar:GetValue() - arg1
 			frame.scroll_bar:SetValue( value )
 		end )
+		frame.border_srlist = border_srlist
 
 		local scroll_bar = CreateFrame( "Slider", "RaidCalendarSRScrollBar", border_srlist, "UIPanelScrollBarTemplate" )
 		frame.scroll_bar = scroll_bar
@@ -680,6 +679,7 @@ function M.new()
 			table.insert( frame_items, item )
 		end
 
+		gui.pfui_skin( frame )
 		return frame
 	end
 
@@ -762,11 +762,11 @@ function M.new()
 
 		popup.yoursr:SetText( string.format( "Your reservations (%d/%d)", sr_count, sr_limit ) )
 		if m.db.user_settings.sr_specName then
-			popup.dd_spec:SetSelected( m.db.user_settings.sr_specName, m.db.user_settings.sr_specName )
+			popup.dd_spec:SetSelected( m.db.user_settings.sr_specName )
 		end
 
-		popup.dd_sr1:SetSelected( "Reserve item", nil )
-		popup.dd_sr2:SetSelected( "Reserve item", nil )
+		popup.dd_sr1:SetText( "Reserve item" )
+		popup.dd_sr2:SetText( "Reserve item" )
 		if sr_count < sr_limit then
 			popup.label_sr1:Show()
 			popup.dd_sr1:Show()

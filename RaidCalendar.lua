@@ -8,7 +8,7 @@ RaidCalendar.name = "RaidCalendar"
 RaidCalendar.prefix = "RaidCal"
 RaidCalendar.tagcolor = "FF7b1fa2"
 RaidCalendar.events = {}
-RaidCalendar.debug_enabled = true
+RaidCalendar.debug_enabled = false
 RaidCalendar.api = getfenv()
 
 function RaidCalendar:init()
@@ -21,10 +21,6 @@ function RaidCalendar:init()
 
 	for k, _ in pairs( m.events ) do
 		self.frame:RegisterEvent( k )
-	end
-
-	if m.api.IsAddOnLoaded( "pfUI" ) and m.api.pfUI and m.api.pfUI.api and m.api.pfUI.env and m.api.pfUI.env.C then
-		self.pfui_skin_enabled = true
 	end
 end
 
@@ -64,6 +60,17 @@ function RaidCalendar.events:ADDON_LOADED()
 
 	---@type MinimapIcon
 	m.minimap_icon = m.MinimapIcon.new()
+
+	if m.api.IsAddOnLoaded( "pfUI" ) and m.api.pfUI and m.api.pfUI.api and m.api.pfUI.env and m.api.pfUI.env.C then
+		m.pfui_skin_enabled = true
+    m.api.pfUI:RegisterSkin( "RaidCalendar", "vanilla", function()
+      if m.api.pfUI.env.C.disabled and m.api.pfUI.env.C.disabled[ "skin_RaidCalendar" ] == "1"  then
+				m.pfui_skin_enabled = false
+			end
+		end )
+	end
+
+	m.debug("pfui sking enabled: " .. tostring(m.pfui_skin_enabled))
 
 	m.api[ "SLASH_RaidCalendar1" ] = "/rc"
 	m.api[ "SLASH_RaidCalendar2" ] = "/RaidCalendar"

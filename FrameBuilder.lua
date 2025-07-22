@@ -46,8 +46,9 @@ function M.new()
 	local function create_frame()
 		---@param parent Frame
 		---@param title string
-		---@return Frame
+		---@return TitlebarFrame
 		local function create_titlebar( parent, title )
+			---@class TitlebarFrame: Frame
 			local frame = CreateFrame( "Frame", nil, parent )
 			frame:SetPoint( "TopLeft", parent, "TopLeft", 5, -5 )
 			frame:SetPoint( "BottomRight", parent, "TopRight", -5, -24 )
@@ -58,28 +59,27 @@ function M.new()
 				frame:SetFrameLevel( options.frame_level )
 			end
 
-			local bottom_border = frame:CreateTexture( nil, "ARTWORK" )
-			bottom_border:SetTexture( .6, .6, .6, 1 )
-			bottom_border:SetPoint( "TopLeft", frame, "BottomLeft", -1, 1 )
-			bottom_border:SetPoint( "BottomRight", frame, "BottomRight", 1, 0 )
+			frame.bottom_border = frame:CreateTexture( nil, "ARTWORK" )
+			frame.bottom_border:SetTexture( .6, .6, .6, 1 )
+			frame.bottom_border:SetPoint( "TopLeft", frame, "BottomLeft", -1, 1 )
+			frame.bottom_border:SetPoint( "BottomRight", frame, "BottomRight", 1, 0 )
 
 			if options.close_button then
-				local btn_close = m.GuiElements.tiny_button( parent, "X", "Close Window" )
-				btn_close:SetPoint( "TopRight", parent, "TopRight", -4, -4 )
-				btn_close:SetScript( "OnClick", function() parent:Hide() end )
+				frame.btn_close = m.GuiElements.tiny_button( parent, "X", "Close Window" )
+				frame.btn_close:SetPoint( "TopRight", parent, "TopRight", -4, -4 )
+				frame.btn_close:SetScript( "OnClick", function() parent:Hide() end )
 
 				if options.frame_level then
-					btn_close:SetFrameLevel( options.frame_level + 1 )
+					frame.btn_close:SetFrameLevel( options.frame_level + 1 )
 				end
 			end
 
-			local title_label = frame:CreateFontString( nil, "ARTWORK", "GameFontNormal" )
-			title_label:SetPoint( "TopLeft", frame, "TopLeft", 6, -3 )
-			title_label:SetTextColor( 1, 1, 1 )
-			title_label:SetJustifyH( "Left" )
-			title_label:SetText( title )
-			title_label:SetFontObject(m.GuiElements.font_highlight )
-			frame["title"] = title_label
+			frame.title = frame:CreateFontString( nil, "ARTWORK", "GameFontNormal" )
+			frame.title:SetPoint( "TopLeft", frame, "TopLeft", 6, -3 )
+			frame.title:SetTextColor( 1, 1, 1 )
+			frame.title:SetJustifyH( "Left" )
+			frame.title:SetText( title )
+			frame.title:SetFontObject(m.GuiElements.font_highlight )
 
 			return frame
 		end
@@ -88,6 +88,7 @@ function M.new()
 			local type = options.type or "Frame"
 			local parent = options.parent or UIParent
 
+			---@class BuilderFrame: Frame
 			local frame = CreateFrame( type, options.name, parent )
 
 			frame:SetWidth( options.width or 280 )
@@ -146,7 +147,7 @@ function M.new()
 			end
 
 			if options.title then
-				frame["titlebar"] = create_titlebar( frame, options.title )
+				frame.titlebar = create_titlebar( frame, options.title )
 			end
 
 			if options.hidden then

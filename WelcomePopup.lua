@@ -65,7 +65,7 @@ function M.new()
 	end
 
 	local function create_frame()
-		---@class WelcomeFrame: Frame
+		---@class WelcomeFrame: BuilderFrame
 		local frame = m.FrameBuilder.new()
 				:name( "RaidCalendarWelcomePopup" )
 				:title( string.format( "Raid Calendar v%s", m.version ) )
@@ -143,6 +143,7 @@ function M.new()
 		btn_complete:Hide()
 		frame.btn_complete = btn_complete
 
+		gui.pfui_skin( frame )
 		return frame
 	end
 

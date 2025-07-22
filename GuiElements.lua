@@ -8,6 +8,7 @@ if m.GuiElements then return end
 ---@field tiny_button fun( parent: Frame, text: string?, tooltip: string?, color: table|string?, font-size: number? ): TinyButton
 ---@field create_button fun( parent: Frame, title: string, width: integer?, onclick: function, on_receive_drag: function? ): MyButton
 ---@field create_icon_label fun( parent: Frame, icon: string, width: integer?, icon_size: integer? ): IconLabelFrame
+---@field pfui_skin fun( frame: Frame )
 local M = {}
 
 M.font_normal = CreateFont( "GIFontNormal" )
@@ -82,6 +83,8 @@ M.spec_icons = {
 ---@param font_size number?
 ---@return TinyButton
 function M.tiny_button( parent, text, tooltip, color, font_size )
+	local font_x, font_y
+	font_size = font_size or 13
 	---@class TinyButton: Button
 	local button = CreateFrame( "Button", nil, parent )
 	button.active = false
@@ -93,37 +96,63 @@ function M.tiny_button( parent, text, tooltip, color, font_size )
 		color.r, color.g, color.b, color.a = m.hex_to_rgba( str_color )
 	end
 
-
-	if not color then color = { r = .9, g = .8, b = .25 } end
-	button:SetWidth( 18 )
-	button:SetHeight( 18 )
-
-	button:SetHighlightTexture( "Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight" )
-	if text == 'X' then
-		button:SetNormalTexture( "Interface\\Buttons\\UI-Panel-MinimizeButton-Up" )
-		button:SetPushedTexture( "Interface\\Buttons\\UI-Panel-MinimizeButton-Down" )
-	else
-		button:SetNormalTexture( "Interface\\AddOns\\RaidCalendar\\assets\\tiny-button-up.tga" )
-		button:SetPushedTexture( "Interface\\AddOns\\RaidCalendar\\assets\\tiny-button-down.tga" )
-	end
-	button:GetHighlightTexture():SetTexCoord( .1875, .78125, .21875, .78125 )
-	button:GetNormalTexture():SetTexCoord( .1875, .78125, .21875, .78125 )
-	button:GetPushedTexture():SetTexCoord( .1875, .78125, .21875, .78125 )
-
-	if text ~= 'X' then
-		local font_x, font_y
-
+	if m.pfui_skin_enabled then
+		if not color then color = { r = 1, g = .25, b = .25 } end
+		button:SetBackdrop( {
+			bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+			edgeFile = "Interface\\Buttons\\WHITE8X8",
+			tile = false,
+			tileSize = 0,
+			edgeSize = 0.5,
+			insets = { left = 0, right = 0, top = 0, bottom = 0 }
+		} )
+		button:SetBackdropColor( 0, 0, 0, 1 )
+		button:SetBackdropBorderColor( .2, .2, .2, 1 )
+		button:SetHeight( 13 )
+		button:SetWidth( 13 )
 		button:SetText( text )
-		button:SetPushedTextOffset( -1.5, -1.5 )
+		button:SetPushedTextOffset( 0, 0 )
 
 		if string.upper( text ) == text then
-			font_x, font_y = 0, 0
-			font_size = font_size or 13
+			font_x = text == "?" and -.5 or 0
+			font_y = 0.5
+			font_size = font_size or 10
 		else
-			font_x, font_y = -1, 2
-			font_size = font_size or 15
+			font_x, font_y = -.5, 1.5
+			font_size = font_size or 14
 		end
+	else
+		if not color then color = { r = .9, g = .8, b = .25 } end
+		button:SetWidth( 18 )
+		button:SetHeight( 18 )
 
+		button:SetHighlightTexture( "Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight" )
+		if text == 'X' then
+			button:SetNormalTexture( "Interface\\Buttons\\UI-Panel-MinimizeButton-Up" )
+			button:SetPushedTexture( "Interface\\Buttons\\UI-Panel-MinimizeButton-Down" )
+		else
+			button:SetNormalTexture( "Interface\\AddOns\\RaidCalendar\\assets\\tiny-button-up.tga" )
+			button:SetPushedTexture( "Interface\\AddOns\\RaidCalendar\\assets\\tiny-button-down.tga" )
+		end
+		button:GetHighlightTexture():SetTexCoord( .1875, .78125, .21875, .78125 )
+		button:GetNormalTexture():SetTexCoord( .1875, .78125, .21875, .78125 )
+		button:GetPushedTexture():SetTexCoord( .1875, .78125, .21875, .78125 )
+
+		if text ~= 'X' then
+			button:SetText( text )
+			button:SetPushedTextOffset( -1.5, -1.5 )
+
+			if string.upper( text ) == text then
+				font_x, font_y = 0, 0
+				font_size = font_size or 13
+			else
+				font_x, font_y = -1, 2
+				font_size = font_size or 15
+			end
+		end
+	end
+
+	if m.pfui_skin_enabled or text ~= "X" then
 		button:GetFontString():SetFont( "FONTS\\FRIZQT__.TTF", font_size, "" )
 		button:GetFontString():SetTextColor( color.r, color.g, color.b, color.a or 1 )
 		button:GetFontString():SetPoint( "Center", button, "Center", font_x, font_y )
@@ -141,6 +170,10 @@ function M.tiny_button( parent, text, tooltip, color, font_size )
 	end )
 
 	button:SetScript( "OnLeave", function()
+		local self = button
+		if not self.active and m.pfui_skin_enabled then
+			self:SetBackdropBorderColor( .2, .2, .2, 1 )
+		end
 		if tooltip and GameTooltip:IsVisible() then
 			GameTooltip:SetScale( 1 )
 			GameTooltip:Hide()
@@ -244,7 +277,7 @@ function M.create_icon_label( parent, icon, width, icon_size )
 	frame.count:SetTextColor( 1, 1, 1 )
 	frame.count:SetJustifyH( "Left" )
 
-	frame.label_frame = CreateFrame( "Frame", nil, frame)
+	frame.label_frame = CreateFrame( "Frame", nil, frame )
 	frame.label_frame:SetPoint( "Left", frame, "Left", 20, 0 )
 	--frame.label_frame:EnableMouse( true )
 	frame.label_frame:SetWidth( (width or 100) - 35 )
@@ -267,7 +300,7 @@ function M.create_icon_label( parent, icon, width, icon_size )
 	end )
 
 	frame.label = frame.label_frame:CreateFontString( nil, "ARTWORK", "GIFontNormal" )
-	frame.label:SetAllPoints(frame.label_frame)
+	frame.label:SetAllPoints( frame.label_frame )
 	frame.label:SetNonSpaceWrap( false )
 	frame.label:SetTextColor( 1, 1, 1 )
 	frame.label:SetJustifyH( "Left" )
@@ -316,6 +349,156 @@ function M.create_icon_label( parent, icon, width, icon_size )
 	end
 
 	return frame
+end
+
+---@param parent BuilderFrame
+---@param relative_region Region
+---@return IndicatorFrame
+function M.create_online_indicator( parent, relative_region )
+	---@class IndicatorFrame: Frame
+	local frame = CreateFrame( "Frame", nil, parent )
+	frame:SetPoint( "Right", relative_region, "Left", -2, 0 )
+	frame:SetWidth( 15 )
+	frame:SetHeight( 15 )
+	frame.is_online = false
+
+	frame.texture = frame:CreateTexture( nil, "ARTWORK" )
+	frame.texture:SetAllPoints( frame )
+	frame.texture:SetTexture( "Interface\\TargetingFrame\\UI-TargetingFrame-AttackBackground" )
+	frame.texture:SetVertexColor( 1, 1, 0, 1 )
+
+	frame:EnableMouse( true )
+	frame:SetScript( "OnEnter", function()
+		GameTooltip:SetOwner( frame, "ANCHOR_RIGHT" )
+		GameTooltip:SetText( string.format( "%s is %s", m.db.user_settings.bot_name or "Bot", frame.is_online and "online" or "offline" ) )
+		GameTooltip:SetScale( 0.8 )
+		GameTooltip:Show()
+	end )
+
+	frame:SetScript( "OnLeave", function()
+		GameTooltip:SetScale( 1 )
+		GameTooltip:Hide()
+	end )
+
+	frame.update = function()
+		local r, g, b, a = m.bot_online_status()
+		frame.texture:SetVertexColor( r, g, b, a )
+		frame.is_online = r == 0
+	end
+
+
+	return frame
+end
+
+---@param frame BuilderFrame
+function M.pfui_skin( frame )
+	if not m.pfui_skin_enabled then return end
+
+	local function skin_dropdown( dd )
+		m.api.pfUI.api.StripTextures( dd )
+		m.api.pfUI.api.CreateBackdrop( dd, nil, true )
+
+		m.api.pfUI.api.SkinArrowButton( dd.dropdown_button, "down", 16 )
+		dd.dropdown_button:SetPoint( "Right", dd, "Right", -4, 0 )
+	end
+
+	local name = frame:GetName()
+
+	m.api.pfUI.api.StripTextures( frame, nil, "BACKGROUND" )
+	m.api.pfUI.api.CreateBackdrop( frame, nil, true, 0.8 )
+	frame.titlebar.bottom_border:SetTexture( nil )
+	frame.titlebar.btn_close:SetPoint( "TopRight", frame.titlebar, "TopRight", -4, -3 )
+
+	if name == "RaidCalendarPopup" then
+		---@class CalendarFrame
+		frame = frame
+
+		frame.btn_settings:SetPoint( "Right", frame.titlebar.btn_close, "Left", -4, 0 )
+
+		m.api.pfUI.api.StripTextures( frame.border_events, nil, "BACKGROUND" )
+		m.api.pfUI.api.CreateBackdrop( frame.border_events, nil, true )
+		m.api.pfUI.api.SkinScrollbar( frame.scroll_bar )
+
+		m.api.pfUI.api.StripTextures( frame.settings, nil, "BACKGROUND" )
+		m.api.pfUI.api.CreateBackdrop( frame.settings, nil, true )
+
+		m.api.pfUI.api.SkinButton( frame.settings.btn_loopup )
+		frame.settings.btn_loopup:SetHeight( 22 )
+		m.api.pfUI.api.SkinButton( frame.settings.btn_save )
+		frame.settings.btn_save:SetHeight( 22 )
+
+		m.api.pfUI.api.SkinCheckbox( frame.settings.use_char_name )
+
+		m.api.pfUI.api.StripTextures( frame.settings.discord, nil, "BACKGROUND" )
+		m.api.pfUI.api.CreateBackdrop( frame.settings.discord, nil, true )
+
+		skin_dropdown( frame.settings.time_format )
+	end
+
+	if name == "RaidCalendarEventPopup" then
+		---@class EventFrame
+		frame = frame
+		local buttons = { "Signup", "Bench", "Late", "Tentative", "Absence", "Change Spec" }
+
+		for _, v in buttons do
+			local btn = "btn_" .. string.gsub( string.lower( v ), "%s", "_" )
+			m.api.pfUI.api.SkinButton( frame[ btn ] )
+		end
+
+		m.api.pfUI.api.SkinButton( frame.cs_change )
+		m.api.pfUI.api.SkinButton( frame.cs_cancel )
+
+		m.api.pfUI.api.StripTextures( frame.border_desc, nil, "BACKGROUND" )
+		m.api.pfUI.api.CreateBackdrop( frame.border_desc, nil, true )
+		m.api.pfUI.api.SkinScrollbar( frame.scroll_bar )
+
+		m.api.pfUI.api.StripTextures( frame.attending, nil, "BACKGROUND" )
+		m.api.pfUI.api.CreateBackdrop( frame.attending, nil, true )
+		m.api.pfUI.api.StripTextures( frame.missing, nil, "BACKGROUND" )
+		m.api.pfUI.api.CreateBackdrop( frame.missing, nil, true )
+
+		skin_dropdown( frame.dd_spec )
+		skin_dropdown( frame.dd_class )
+	end
+
+	if name == "RaidCalendarSRPopup" then
+		---@class SRFrame
+		frame = frame
+
+		frame.btn_refresh:SetPoint( "Right", frame.titlebar.btn_close, "Left", -4, 0 )
+		frame.btn_export:SetPoint( "Right", frame.btn_refresh, "Left", -4, 0 )
+
+		m.api.pfUI.api.StripTextures( frame.border_reserve, nil, "BACKGROUND" )
+		m.api.pfUI.api.CreateBackdrop( frame.border_reserve, nil, true )
+
+		m.api.pfUI.api.StripTextures( frame.border_srlist, nil, "BACKGROUND" )
+		m.api.pfUI.api.CreateBackdrop( frame.border_srlist, nil, true )
+		m.api.pfUI.api.SkinScrollbar( frame.scroll_bar )
+
+		m.api.pfUI.api.SkinButton( frame.btn_reserve )
+		frame.btn_reserve:SetPoint( "BottomRight", frame.border_reserve, "BottomRight", -12, 14 )
+
+		m.api.pfUI.api.StripTextures( frame.sr1, nil, "BACKGROUND" )
+		m.api.pfUI.api.CreateBackdrop( frame.sr1, nil, true )
+		m.api.pfUI.api.StripTextures( frame.sr2, nil, "BACKGROUND" )
+		m.api.pfUI.api.CreateBackdrop( frame.sr2, nil, true )
+
+		skin_dropdown( frame.dd_spec )
+		skin_dropdown( frame.dd_sr1 )
+		skin_dropdown( frame.dd_sr2 )
+	end
+
+	if name == "RaidCalendarWelcomePopup" then
+		---@class WelcomeFrame
+		frame = frame
+
+		m.api.pfUI.api.SkinButton( frame.btn_verify )
+		frame.btn_verify:SetHeight( 22 )
+		m.api.pfUI.api.SkinButton( frame.btn_complete )
+
+		m.api.pfUI.api.StripTextures( frame.input_discord, nil, "BACKGROUND" )
+		m.api.pfUI.api.CreateBackdrop( frame.input_discord, nil, true )
+	end
 end
 
 m.GuiElements = M
