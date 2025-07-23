@@ -12,7 +12,12 @@ local bot_check_time = 0
 --- @return number b
 --- @return number a
 function M.hex_to_rgba( hex )
+	M.debug("color: " .. hex)
 	local r, g, b, a = string.match( hex, "^#?(%x%x)(%x%x)(%x%x)(%x?%x?)$" )
+	M.debug(r)
+	M.debug(g)
+	M.debug(b)
+	M.debug(a)
 
 	r, g, b = tonumber( r, 16 ) / 255, tonumber( g, 16 ) / 255, tonumber( b, 16 ) / 255
 	a = a ~= "" and tonumber( a, 16 ) / 255 or 1
@@ -260,7 +265,7 @@ end
 if not string.gmatch then string.gmatch = string.gfind end
 
 ---@diagnostic disable-next-line: duplicate-set-field
-string.match = string.match or function( str, pattern )
+string.match = function( str, pattern )
 	if not str then return nil end
 
 	local _, _, r1, r2, r3, r4, r5, r6, r7, r8, r9 = string.find( str, pattern )

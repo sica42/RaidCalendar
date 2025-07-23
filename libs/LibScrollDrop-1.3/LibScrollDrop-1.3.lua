@@ -668,7 +668,6 @@ function lib:New( parent, options )
 	end
 
 	function dropdown:GetSelected()
-		RaidCalendar.debug( "index: " .. tostring(self.selected_index ))
 		return self.items[ self.selected_index ]
 	end
 

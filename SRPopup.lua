@@ -578,6 +578,11 @@ function M.new()
 		frame.btn_refresh:SetScript( "OnClick", function()
 			frame.btn_refresh:Disable()
 			m.msg.request_sr( m.db.events[ event_id ].srId )
+			if not m.debug_enabled or m.db.events[ event_id ].leaderId == m.db.user_settings.discord_id then
+				m.ace_timer.ScheduleTimer( M, function()
+					frame.btn_refresh:Enable()
+				end, 60 * 5 )
+			end
 		end )
 
 		---@diagnostic disable-next-line: undefined-global
@@ -719,10 +724,7 @@ function M.new()
 	function refresh( refresh_data )
 		popup.sr1:Hide()
 		popup.sr2:Hide()
-		popup.btn_refresh:Enable()
-
-		---@diagnostic disable-next-line: undefined-global
-		--local atlas = AtlasLoot_Data and AtlasLoot_Data[ "AtlasLootItems" ]
+		if m.debug_enabled or m.db.events[ event_id ].leaderId == m.db.user_settings.discord_id then popup.btn_refresh:Enable() end
 
 		if not m.db.events[ event_id ].sr then
 			popup.yoursr:SetText( "Please wait while SR data is loading..." )
@@ -733,12 +735,7 @@ function M.new()
 			popup.dd_sr2:Hide()
 			popup.btn_reserve:Hide()
 
-			--if atlas then
 			m.msg.request_sr( m.db.events[ event_id ].srId )
-			--	else
-			--		popup.yoursr:SetText( "AtlasLoot is required" )
-			--		popup.btn_refresh:Disable()
-			--		end
 			return
 		end
 

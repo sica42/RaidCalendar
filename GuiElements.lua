@@ -180,6 +180,18 @@ function M.tiny_button( parent, text, tooltip, color, font_size )
 		end
 	end )
 
+	local orig_disable = button.Disable
+	function button:Disable()
+		button:GetFontString():SetTextColor( 0.5, 0.5, 0.5, 0.5 )
+		orig_disable( self )
+	end
+
+	local orig_enable = button.Enable
+	function button:Enable()
+		button:GetFontString():SetTextColor( color.r, color.g, color.b, color.a or 1 )
+		orig_enable( self )
+	end
+
 	return button
 end
 
@@ -413,7 +425,8 @@ function M.pfui_skin( frame )
 		---@class CalendarFrame
 		frame = frame
 
-		frame.btn_settings:SetPoint( "Right", frame.titlebar.btn_close, "Left", -4, 0 )
+		frame.btn_refresh:SetPoint( "Right", frame.titlebar.btn_close, "Left", -4, 0 )
+		frame.btn_settings:SetPoint( "Right", frame.btn_refresh, "Left", -4, 0 )
 
 		m.api.pfUI.api.StripTextures( frame.border_events, nil, "BACKGROUND" )
 		m.api.pfUI.api.CreateBackdrop( frame.border_events, nil, true )

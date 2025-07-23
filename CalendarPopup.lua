@@ -232,8 +232,20 @@ function M.new()
 		---
 		--- Titlebar buttons
 		---
+		frame.btn_refresh = m.GuiElements.tiny_button( frame, "R", "Refresh", "#20F99F" )
+		frame.btn_refresh:SetPoint( "Right", frame.titlebar.btn_close, "Left", 2, 0 )
+		frame.btn_refresh:SetScript( "OnClick", function()
+			frame.btn_refresh:Disable()
+			m.msg.request_events()
+			if not m.debug_enabled then
+				m.ace_timer.ScheduleTimer( M, function()
+					frame.btn_refresh:Enable()
+				end, 60 * 5 )
+			end
+		end )
+
 		frame.btn_settings = m.GuiElements.tiny_button( frame, "S", "Settings", "#F3DF2B" )
-		frame.btn_settings:SetPoint( "Right", frame.titlebar.btn_close, "Left", 2, 0 )
+		frame.btn_settings:SetPoint( "Right", frame.btn_refresh, "Left", 2, 0 )
 		frame.btn_settings:SetScript( "OnClick", function()
 			if frame.settings:IsVisible() then
 				frame.settings:Hide()
@@ -246,7 +258,7 @@ function M.new()
 		end )
 
 		frame.online_indicator = gui.create_online_indicator( frame, frame.btn_settings )
---[[
+		--[[
 		local indicator = CreateFrame( "Frame", nil, frame )
 		indicator:SetPoint( "Right", frame.btn_settings, "Left", -2, 0 )
 		indicator:SetWidth( 15 )
@@ -373,6 +385,7 @@ function M.new()
 	---@param refresh_data boolean?
 	function refresh( refresh_data )
 		popup.online_indicator.update()
+		if m.debug_enabled then popup.btn_refresh:Enable() end
 
 		popup.settings.discord:SetText( m.db.user_settings.discord_id or "" )
 		popup.settings.use_char_name:SetChecked( m.db.user_settings.use_character_name )

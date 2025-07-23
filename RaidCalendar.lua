@@ -3,6 +3,7 @@ RaidCalendar = RaidCalendar or {}
 
 ---@class RaidCalendar
 local m = RaidCalendar
+local lib_stub = LibStub
 
 RaidCalendar.name = "RaidCalendar"
 RaidCalendar.prefix = "RaidCal"
@@ -10,6 +11,15 @@ RaidCalendar.tagcolor = "FF7b1fa2"
 RaidCalendar.events = {}
 RaidCalendar.debug_enabled = false
 RaidCalendar.api = getfenv()
+
+---@alias NotAceTimer any
+---@alias TimerId number
+
+---@class AceTimer
+---@field ScheduleTimer fun( self: NotAceTimer, callback: function, delay: number, ... ): TimerId
+---@field ScheduleRepeatingTimer fun( self: NotAceTimer, callback: function, delay: number, arg: any ): TimerId
+---@field CancelTimer fun( self: NotAceTimer, timer_id: number )
+---@field TimeLeft fun( self: NotAceTimer, timer_id: number )
 
 function RaidCalendar:init()
 	self.frame = CreateFrame( "Frame" )
@@ -26,6 +36,9 @@ end
 
 function RaidCalendar.events:ADDON_LOADED()
 	if arg1 ~= self.name then return end
+
+	---@type AceTimer
+	m.ace_timer = lib_stub( "AceTimer-3.0" )
 
 	m.player = UnitName( "player" )
 	m.player_class = UnitClass( "player" )

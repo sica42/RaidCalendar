@@ -370,6 +370,9 @@ function M.new()
 			-- Channel access result
 			--
 			if data.player == m.player then
+				if data.success then
+					m.db.user_settings.discord_id = data.userId
+				end
 				m.db.user_settings.channel_access[ data.channelId ] = data.success
 				m.event_popup.update()
 			end
