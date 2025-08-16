@@ -76,14 +76,35 @@ function RaidCalendar.events:ADDON_LOADED()
 
 	if m.api.IsAddOnLoaded( "pfUI" ) and m.api.pfUI and m.api.pfUI.api and m.api.pfUI.env and m.api.pfUI.env.C then
 		m.pfui_skin_enabled = true
-    m.api.pfUI:RegisterSkin( "RaidCalendar", "vanilla", function()
-      if m.api.pfUI.env.C.disabled and m.api.pfUI.env.C.disabled[ "skin_RaidCalendar" ] == "1"  then
+		m.api.pfUI:RegisterSkin( "RaidCalendar", "vanilla", function()
+			if m.api.pfUI.env.C.disabled and m.api.pfUI.env.C.disabled[ "skin_RaidCalendar" ] == "1" then
 				m.pfui_skin_enabled = false
 			end
 		end )
 	end
 
-	m.debug("pfui sking enabled: " .. tostring(m.pfui_skin_enabled))
+	local orig_SetItemRef = SetItemRef
+	function SetItemRef( link, text, button, chatFrame )
+		local linkType, data = string.match( link, "^([^:]+):(.+)" )
+
+		if linkType == "raidcal" then
+			local type, id = string.match( data, "^(%w+):(.+)" )
+			if type == "event" then
+				m.event_popup.show( id )
+				return
+			elseif type == "sr" then
+				m.sr_popup.show( id )
+			end
+			return
+		end
+
+		return orig_SetItemRef( link, text, button, chatFrame )
+	end
+
+	for i = 1, NUM_CHAT_WINDOWS do
+		local frame = self.api[ "ChatFrame" .. i ]
+		if frame then self.wrap_chat_frame( frame ) end
+	end
 
 	m.api[ "SLASH_RaidCalendar1" ] = "/rc"
 	m.api[ "SLASH_RaidCalendar2" ] = "/RaidCalendar"
@@ -122,17 +143,39 @@ function RaidCalendar.events:ADDON_LOADED()
 	m.version = GetAddOnMetadata( m.name, "Version" )
 	self.info( string.format( "(v%s) Loaded", m.version ) )
 
-	if m.db.user_settings.bot_name and m.db.user_settings.discord_id then
+	if m.db.user_settings.bot_name and m.db.user_settings.bot_name ~= "" and m.db.user_settings.discord_id then
 		-- Refresh events if last update is older then 6h
 		if not m.db.user_settings.last_updated or time() - m.db.user_settings.last_updated > 3600 * 6 then
 			m.debug( "Fetching events..." )
 			m.msg.request_events()
 		end
-	else
+	elseif m.db.user_settings.show_welcome_popup ~= false then
 		m.welcome_popup.show()
 	end
 
 	self.check_new_version()
+end
+
+---@param frame Frame
+function RaidCalendar.wrap_chat_frame( frame )
+	local original_add_message = frame[ "AddMessage" ]
+
+	frame[ "AddMessage" ] = function( self, msg, ... )
+		if msg then
+			local pattern = "(%d%d%d%d)%-(%d%d)%-(%d%d)T(%d%d):(%d%d):(%d%d)Z"
+
+			if string.find( msg, pattern ) then
+				local year, month, day, hour, minute, second = string.match( msg, pattern )
+				local timestamp = time( { year = year, month = month, day = day, hour = hour, min = minute, sec = second } )
+
+				local date_formatted = date( "%A", timestamp ) .. " " .. tonumber( date( "%d", timestamp ) ) .. ". " .. date( "%B", timestamp )
+				local time_formatted = date( m.time_format, timestamp )
+				msg = string.gsub( msg, pattern, date_formatted )
+			end
+		end
+
+		return original_add_message( self, msg, unpack( arg ) )
+	end
 end
 
 function RaidCalendar.check_new_version()

@@ -41,15 +41,7 @@ function M.new()
 	end
 
 	local function on_save_settings()
-		local discord_id = popup.settings.discord:GetText()
-
-		if not string.find( discord_id, "^%d+$" ) then
-			m.error( "Invalid Discord ID" )
-			return
-		end
-
-		m.db.user_settings.channel_access = {}
-		m.db.user_settings.discord_id = discord_id
+		--m.db.user_settings.channel_access = {}
 		m.db.user_settings.use_character_name = popup.settings.use_char_name:GetChecked()
 		m.db.user_settings.time_format = popup.settings.time_format.selected
 		m.time_format = m.db.user_settings.time_format == "24" and "%H:%M" or "%I:%M %p"
@@ -93,8 +85,16 @@ function M.new()
 		selected_tex:SetVertexColor( 0.3, 0.3, 1, 0.6 )
 		selected_tex:Hide()
 
+		local color_bar = frame:CreateTexture( nil, "ARTWORK" )
+		color_bar:SetWidth( 2 )
+		color_bar:SetHeight( 40 )
+		color_bar:SetTexture( "Interface/Buttons/WHITE8x8" )
+		color_bar:SetPoint( "TopLeft", frame, "TopLeft", 0, 0 )
+		color_bar:SetVertexColor( 0, 0, 0, 0 )
+
+
 		local title = frame:CreateFontString( nil, "ARTWORK", "GIFontNormal" )
-		title:SetPoint( "TopLeft", frame, "TopLeft", 3, -2 )
+		title:SetPoint( "TopLeft", frame, "TopLeft", 5, -2 )
 		title:SetWidth( 260 )
 		title:SetHeight( 35 )
 		title:SetTextColor( NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b )
@@ -144,6 +144,14 @@ function M.new()
 		frame.set_item = function( index )
 			frame.index = index
 			local event = m.db.events[ events[ index ].key ]
+
+			local color = {}
+			for c in string.gmatch( event.color, "%s*([^,]+)%s*" ) do
+				table.insert( color, c )
+			end
+
+			color[ 4 ] = getn( color ) == 3 and 1 or 0
+			color_bar:SetVertexColor( (tonumber( color[ 1 ] ) or 0) / 255, (tonumber( color[ 2 ] ) or 0) / 255, (tonumber( color[ 3 ] ) or 0) / 255, color[ 4 ] )
 
 			title:SetText( event.title )
 			date_label.set( date( "%d. %b %Y", event.startTime ) )
@@ -251,25 +259,12 @@ function M.new()
 				frame.settings:Hide()
 				frame:SetHeight( 250 )
 			else
-				frame.settings.discord_response:SetText( "" )
 				frame.settings:Show()
 				frame:SetHeight( 360 )
 			end
 		end )
 
 		frame.online_indicator = gui.create_online_indicator( frame, frame.btn_settings )
-		--[[
-		local indicator = CreateFrame( "Frame", nil, frame )
-		indicator:SetPoint( "Right", frame.btn_settings, "Left", -2, 0 )
-		indicator:SetWidth( 15 )
-		indicator:SetHeight( 15 )
-		frame.indicator = indicator
-
-		frame.indicator_tex = indicator:CreateTexture( nil, "ARTWORK" )
-		frame.indicator_tex:SetAllPoints( indicator )
-		frame.indicator_tex:SetTexture( "Interface\\TargetingFrame\\UI-TargetingFrame-AttackBackground" )
-		frame.indicator_tex:SetVertexColor( 1, 1, 0, 1 )
-]]
 		---
 		--- Events
 		---
@@ -327,32 +322,10 @@ function M.new()
 				:hidden()
 				:build()
 
-		local input_discord = CreateFrame( "EditBox", "RaidCalendarDiscordId", frame.settings, "InputBoxTemplate" )
-		input_discord:SetPoint( "TopLeft", frame.settings, "TopLeft", 96, -8 )
-		input_discord:SetWidth( 150 )
-		input_discord:SetHeight( 22 )
-		input_discord:SetAutoFocus( false )
-		input_discord:SetFontObject( gui.font_highlight )
-		frame.settings.discord = input_discord
-
-		local label_discord = frame.settings:CreateFontString( nil, "ARTWORK", "GIFontNormal" )
-		label_discord:SetPoint( "Right", input_discord, "Left", -15, 0 )
-		label_discord:SetText( "Discord name/ID" )
-
-		frame.settings.btn_loopup = gui.create_button( frame.settings, "Find Discord ID", 120, function()
-			this:Disable()
-			m.msg.find_discord_id( input_discord:GetText() )
-		end )
-		frame.settings.btn_loopup:SetPoint( "Left", frame.settings.discord, "Right", 5, 0 )
-
-		local label_response = frame.settings:CreateFontString( nil, "ARTWORK", "GIFontNormal" )
-		label_response:SetPoint( "Left", frame.settings.btn_loopup, "Right", 5, 0 )
-		frame.settings.discord_response = label_response
-
 		local cb = CreateFrame( "CheckButton", "RaidCalendarPopupCheckbox", frame.settings, "UICheckButtonTemplate" )
 		cb:SetWidth( 22 )
 		cb:SetHeight( 22 )
-		cb:SetPoint( "TopLeft", frame.settings, "TopLeft", 8, -33 )
+		cb:SetPoint( "TopLeft", frame.settings, "TopLeft", 8, -5 )
 		getglobal( cb:GetName() .. 'Text' ):SetText( "Use character name instead of Discord name on signups" )
 		frame.settings.use_char_name = cb
 
@@ -363,7 +336,7 @@ function M.new()
 			width = 95
 		} )
 
-		dd_timeformat:SetPoint( "TopLeft", frame.settings, "TopLeft", 73, -60 )
+		dd_timeformat:SetPoint( "TopLeft", frame.settings, "TopLeft", 73, -30 )
 		dd_timeformat:SetItems( {
 			{ value = "24", text = "24-hour" },
 			{ value = "12", text = "12-hour" }
@@ -374,9 +347,16 @@ function M.new()
 		label_timeformat:SetPoint( "Right", dd_timeformat, "Left", -10, 0 )
 		label_timeformat:SetText( "Time format" )
 
-		local btn_save = gui.create_button( frame.settings, "Save", 80, on_save_settings )
+		local btn_save = gui.create_button( frame.settings, "Save", 100, on_save_settings )
 		btn_save:SetPoint( "BottomRight", frame.settings, "BottomRight", -10, 15 )
 		frame.settings.btn_save = btn_save
+
+		local btn_welcome = gui.create_button( frame.settings, "Welcome poup", 100, function()
+			m.welcome_popup.show()
+			popup:Hide()
+		end )
+		btn_welcome:SetPoint( "BottomLeft", btn_save, "TopLeft", 0, 5 )
+		frame.settings.btn_welcome = btn_welcome
 
 		gui.pfui_skin( frame )
 		return frame
@@ -387,7 +367,6 @@ function M.new()
 		popup.online_indicator.update()
 		if m.debug_enabled then popup.btn_refresh:Enable() end
 
-		popup.settings.discord:SetText( m.db.user_settings.discord_id or "" )
 		popup.settings.use_char_name:SetChecked( m.db.user_settings.use_character_name )
 		popup.settings.time_format:SetSelected( m.db.user_settings.time_format )
 

@@ -7,7 +7,6 @@ M.loot_table = {
 	[ 94 ] = {
 		[ "name" ] = "Blackwing Lair",
 		[ "reference" ] = "BWL",
-		[ "maxAttendance" ] = 40,
 		[ "raidBosses" ] = { {
 			[ "id" ] = 562,
 			[ "name" ] = "Razorgore",
@@ -1093,7 +1092,6 @@ M.loot_table = {
 	[ 95 ] = {
 		[ "name" ] = "Molten Core",
 		[ "reference" ] = "MC",
-		[ "maxAttendance" ] = 40,
 		[ "raidBosses" ] = { {
 			[ "id" ] = 571,
 			[ "name" ] = "Lucifron",
@@ -2413,7 +2411,6 @@ M.loot_table = {
 	[ 96 ] = {
 		[ "name" ] = "Naxxramas",
 		[ "reference" ] = "NAX",
-		[ "maxAttendance" ] = 40,
 		[ "raidBosses" ] = { {
 			[ "id" ] = 586,
 			[ "name" ] = "Anub'Rekhan (SW)",
@@ -3602,7 +3599,6 @@ M.loot_table = {
 	[ 97 ] = {
 		[ "name" ] = "Onyxia's Lair",
 		[ "reference" ] = "ONY",
-		[ "maxAttendance" ] = 40,
 		[ "raidBosses" ] = { {
 			[ "id" ] = 598,
 			[ "name" ] = "Onyxia",
@@ -3798,7 +3794,6 @@ M.loot_table = {
 	[ 98 ] = {
 		[ "name" ] = "Ruins of Ahn'Qiraj",
 		[ "reference" ] = "AQ20",
-		[ "maxAttendance" ] = 20,
 		[ "raidBosses" ] = { {
 			[ "id" ] = 599,
 			[ "name" ] = "Kurinnaxx",
@@ -4681,7 +4676,6 @@ M.loot_table = {
 	[ 99 ] = {
 		[ "name" ] = "Temple of Ahn'Qiraj",
 		[ "reference" ] = "AQ40",
-		[ "maxAttendance" ] = 40,
 		[ "raidBosses" ] = { {
 			[ "id" ] = 610,
 			[ "name" ] = "Skeram",
@@ -5763,7 +5757,6 @@ M.loot_table = {
 	[ 100 ] = {
 		[ "name" ] = "Zul'Gurub",
 		[ "reference" ] = "ZG",
-		[ "maxAttendance" ] = 20,
 		[ "raidBosses" ] = { {
 			[ "id" ] = 621,
 			[ "name" ] = "Jeklik",
@@ -6783,7 +6776,6 @@ M.loot_table = {
 	[ 101 ] = {
 		[ "name" ] = "Lower Karazhan Halls",
 		[ "reference" ] = "KARA",
-		[ "maxAttendance" ] = 10,
 		[ "raidBosses" ] = { {
 			[ "id" ] = 638,
 			[ "name" ] = "Rolfen",
@@ -7433,7 +7425,6 @@ M.loot_table = {
 	[ 102 ] = {
 		[ "name" ] = "Emerald Sanctum",
 		[ "reference" ] = "ES",
-		[ "maxAttendance" ] = 40,
 		[ "raidBosses" ] = { {
 			[ "id" ] = 646,
 			[ "name" ] = "Erennius",
@@ -7803,6 +7794,1783 @@ M.loot_table = {
 			[ "quality" ] = 4,
 			[ "itemId" ] = 84509,
 			[ "raidBosses" ] = { 650 }
+		} }
+	},
+	[ 106 ] = {
+		[ "name" ] = "Upper Blackrock Spire",
+		[ "reference" ] = "UBRS",
+		[ "raidBosses" ] = { {
+			[ "id" ] = 656,
+			[ "name" ] = "Pyroguard Emberseer",
+			[ "position" ] = 0
+		}, {
+			[ "id" ] = 657,
+			[ "name" ] = "Solakar Flamewreath",
+			[ "position" ] = 1
+		}, {
+			[ "id" ] = 658,
+			[ "name" ] = "Father Flame",
+			[ "position" ] = 2
+		}, {
+			[ "id" ] = 659,
+			[ "name" ] = "Jed Runewatcher (rare)",
+			[ "position" ] = 3
+		}, {
+			[ "id" ] = 660,
+			[ "name" ] = "Goraluk Anvilcrack (rare)",
+			[ "position" ] = 4
+		}, {
+			[ "id" ] = 661,
+			[ "name" ] = "Warchief Rend Blackhand",
+			[ "position" ] = 5
+		}, {
+			[ "id" ] = 662,
+			[ "name" ] = "Gyth",
+			[ "position" ] = 6
+		}, {
+			[ "id" ] = 663,
+			[ "name" ] = "The Beast",
+			[ "position" ] = 7
+		}, {
+			[ "id" ] = 664,
+			[ "name" ] = "Lord Valthalak",
+			[ "position" ] = 8
+		}, {
+			[ "id" ] = 665,
+			[ "name" ] = "General Drakkisath",
+			[ "position" ] = 9
+		} },
+		[ "raidItems" ] = { {
+			[ "id" ] = 6993,
+			[ "icon" ] = "inv_weapon_halberd_04",
+			[ "name" ] = "Blackhand Doomsaw",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12583,
+			[ "raidBosses" ] = { 661 }
+		}, {
+			[ "id" ] = 6983,
+			[ "icon" ] = "inv_helmet_46",
+			[ "name" ] = "Eye of Rend",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12587,
+			[ "raidBosses" ] = { 661 }
+		}, {
+			[ "id" ] = 6984,
+			[ "icon" ] = "inv_shoulder_11",
+			[ "name" ] = "Bonespike Shoulder",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12588,
+			[ "raidBosses" ] = { 661 }
+		}, {
+			[ "id" ] = 6957,
+			[ "icon" ] = "inv_belt_11",
+			[ "name" ] = "Dustfeather Sash",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12589,
+			[ "raidBosses" ] = { 657 }
+		}, {
+			[ "id" ] = 6981,
+			[ "icon" ] = "inv_weapon_shortblade_25",
+			[ "name" ] = "Felstriker",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 12590,
+			[ "raidBosses" ] = { 661 }
+		}, {
+			[ "id" ] = 7022,
+			[ "icon" ] = "inv_sword_29",
+			[ "name" ] = "Blackblade of Shahram",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 12592,
+			[ "raidBosses" ] = { 665 }
+		}, {
+			[ "id" ] = 7030,
+			[ "icon" ] = "inv_shield_20",
+			[ "name" ] = "Draconian Deflector",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12602,
+			[ "raidBosses" ] = { 665 }
+		}, {
+			[ "id" ] = 6956,
+			[ "icon" ] = "inv_chest_plate06",
+			[ "name" ] = "Nightbrace Tunic",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12603,
+			[ "raidBosses" ] = { 657 }
+		}, {
+			[ "id" ] = 6962,
+			[ "icon" ] = "inv_crown_02",
+			[ "name" ] = "Starfire Tiara",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12604,
+			[ "raidBosses" ] = { 659 }
+		}, {
+			[ "id" ] = 6964,
+			[ "icon" ] = "inv_misc_bone_elfskull_01",
+			[ "name" ] = "Serpentine Skuller",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12605,
+			[ "raidBosses" ] = { 659 }
+		}, {
+			[ "id" ] = 6958,
+			[ "icon" ] = "inv_belt_10",
+			[ "name" ] = "Crystallized Girdle",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12606,
+			[ "raidBosses" ] = { 657 }
+		}, {
+			[ "id" ] = 6955,
+			[ "icon" ] = "inv_chest_cloth_17",
+			[ "name" ] = "Polychromatic Visionwrap",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12609,
+			[ "raidBosses" ] = { 657 }
+		}, {
+			[ "id" ] = 6977,
+			[ "icon" ] = "inv_chest_plate10",
+			[ "name" ] = "Enchanted Thorium Breastplate",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12618,
+			[ "raidBosses" ] = { 660 }
+		}, {
+			[ "id" ] = 6980,
+			[ "icon" ] = "inv_chest_plate06",
+			[ "name" ] = "Demon Forged Breastplate",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12628,
+			[ "raidBosses" ] = { 660 }
+		}, {
+			[ "id" ] = 6974,
+			[ "icon" ] = "inv_chest_chain_07",
+			[ "name" ] = "Invulnerable Mail",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 12641,
+			[ "raidBosses" ] = { 660 }
+		}, {
+			[ "id" ] = 6979,
+			[ "icon" ] = "inv_scroll_03",
+			[ "name" ] = "Plans: Demon Forged Breastplate",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12696,
+			[ "raidBosses" ] = { 660 }
+		}, {
+			[ "id" ] = 7010,
+			[ "icon" ] = "inv_sword_33",
+			[ "name" ] = "Finkle's Skinner",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12709,
+			[ "raidBosses" ] = { 663 }
+		}, {
+			[ "id" ] = 6976,
+			[ "icon" ] = "inv_scroll_05",
+			[ "name" ] = "Plans: Enchanted Thorium Breastplate",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12727,
+			[ "raidBosses" ] = { 660 }
+		}, {
+			[ "id" ] = 6973,
+			[ "icon" ] = "inv_scroll_03",
+			[ "name" ] = "Plans: Invulnerable Mail",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 12728,
+			[ "raidBosses" ] = { 660 }
+		}, {
+			[ "id" ] = 7001,
+			[ "icon" ] = "inv_misc_monsterscales_15",
+			[ "name" ] = "Pristine Hide of the Beast",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 12731,
+			[ "raidBosses" ] = { 663 }
+		}, {
+			[ "id" ] = 6970,
+			[ "icon" ] = "inv_sword_39",
+			[ "name" ] = "Arcanite Champion",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12790,
+			[ "raidBosses" ] = { 660 }
+		}, {
+			[ "id" ] = 6972,
+			[ "icon" ] = "inv_hammer_04",
+			[ "name" ] = "Masterwork Stormhammer",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12794,
+			[ "raidBosses" ] = { 660 }
+		}, {
+			[ "id" ] = 6978,
+			[ "icon" ] = "inv_chest_plate04",
+			[ "name" ] = "Unforged Rune Covered Breastplate",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12806,
+			[ "raidBosses" ] = { 660 }
+		}, {
+			[ "id" ] = 6969,
+			[ "icon" ] = "inv_scroll_03",
+			[ "name" ] = "Plans: Arcanite Champion",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12834,
+			[ "raidBosses" ] = { 660 }
+		}, {
+			[ "id" ] = 6971,
+			[ "icon" ] = "inv_scroll_03",
+			[ "name" ] = "Plans: Masterwork Stormhammer",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12837,
+			[ "raidBosses" ] = { 660 }
+		}, {
+			[ "id" ] = 6994,
+			[ "icon" ] = "inv_shield_21",
+			[ "name" ] = "Chromatic Carapace",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 12871,
+			[ "raidBosses" ] = { 662 }
+		}, {
+			[ "id" ] = 6951,
+			[ "icon" ] = "inv_chest_cloth_16",
+			[ "name" ] = "Wildfire Cape",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12905,
+			[ "raidBosses" ] = { 656 }
+		}, {
+			[ "id" ] = 6952,
+			[ "icon" ] = "spell_holy_innerfire",
+			[ "name" ] = "Flaming Band",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12926,
+			[ "raidBosses" ] = { 656 }
+		}, {
+			[ "id" ] = 6950,
+			[ "icon" ] = "inv_shoulder_10",
+			[ "name" ] = "Truestrike Shoulders",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12927,
+			[ "raidBosses" ] = { 656 }
+		}, {
+			[ "id" ] = 6949,
+			[ "icon" ] = "inv_jewelry_necklace_05",
+			[ "name" ] = "Emberfury Talisman",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12929,
+			[ "raidBosses" ] = { 656 }
+		}, {
+			[ "id" ] = 6963,
+			[ "icon" ] = "inv_misc_root_02",
+			[ "name" ] = "Briarwood Reed",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12930,
+			[ "raidBosses" ] = { 659 }
+		}, {
+			[ "id" ] = 6987,
+			[ "icon" ] = "inv_pants_04",
+			[ "name" ] = "Warmaster Legguards",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12935,
+			[ "raidBosses" ] = { 661 }
+		}, {
+			[ "id" ] = 6985,
+			[ "icon" ] = "inv_bracer_17",
+			[ "name" ] = "Battleborn Armbraces",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12936,
+			[ "raidBosses" ] = { 661 }
+		}, {
+			[ "id" ] = 6992,
+			[ "icon" ] = "inv_sword_40",
+			[ "name" ] = "Dal'Rend's Tribal Guardian",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12939,
+			[ "raidBosses" ] = { 661 }
+		}, {
+			[ "id" ] = 6991,
+			[ "icon" ] = "inv_sword_43",
+			[ "name" ] = "Dal'Rend's Sacred Charge",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12940,
+			[ "raidBosses" ] = { 661 }
+		}, {
+			[ "id" ] = 6999,
+			[ "icon" ] = "inv_helmet_23",
+			[ "name" ] = "Gyth's Skull",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12952,
+			[ "raidBosses" ] = { 662 }
+		}, {
+			[ "id" ] = 6998,
+			[ "icon" ] = "inv_helmet_39",
+			[ "name" ] = "Dragoneye Coif",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12953,
+			[ "raidBosses" ] = { 662 }
+		}, {
+			[ "id" ] = 6997,
+			[ "icon" ] = "inv_helmet_24",
+			[ "name" ] = "Tribal War Feathers",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12960,
+			[ "raidBosses" ] = { 662 }
+		}, {
+			[ "id" ] = 7007,
+			[ "icon" ] = "inv_pants_06",
+			[ "name" ] = "Blademaster Leggings",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12963,
+			[ "raidBosses" ] = { 663 }
+		}, {
+			[ "id" ] = 7008,
+			[ "icon" ] = "inv_pants_04",
+			[ "name" ] = "Tristam Legguards",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12964,
+			[ "raidBosses" ] = { 663 }
+		}, {
+			[ "id" ] = 7006,
+			[ "icon" ] = "inv_pants_06",
+			[ "name" ] = "Spiritshroud Leggings",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12965,
+			[ "raidBosses" ] = { 663 }
+		}, {
+			[ "id" ] = 7005,
+			[ "icon" ] = "inv_bracer_07",
+			[ "name" ] = "Blackmist Armguards",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12966,
+			[ "raidBosses" ] = { 663 }
+		}, {
+			[ "id" ] = 7003,
+			[ "icon" ] = "inv_misc_cape_05",
+			[ "name" ] = "Bloodmoon Cloak",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12967,
+			[ "raidBosses" ] = { 663 }
+		}, {
+			[ "id" ] = 7004,
+			[ "icon" ] = "inv_misc_cape_18",
+			[ "name" ] = "Frostweaver Cape",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12968,
+			[ "raidBosses" ] = { 663 }
+		}, {
+			[ "id" ] = 7011,
+			[ "icon" ] = "inv_hammer_17",
+			[ "name" ] = "Seeping Willow",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 12969,
+			[ "raidBosses" ] = { 663 }
+		}, {
+			[ "id" ] = 7043,
+			[ "icon" ] = "inv_chest_chain_16",
+			[ "name" ] = "Breastplate of the Chosen",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 13090,
+			[ "raidBosses" ] = { 665 }
+		}, {
+			[ "id" ] = 7027,
+			[ "icon" ] = "inv_jewelry_ring_18",
+			[ "name" ] = "Painweaver Band",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 13098,
+			[ "raidBosses" ] = { 665 }
+		}, {
+			[ "id" ] = 7024,
+			[ "icon" ] = "inv_jewelry_necklace_09",
+			[ "name" ] = "Tooth of Gnarr",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 13141,
+			[ "raidBosses" ] = { 665 }
+		}, {
+			[ "id" ] = 7026,
+			[ "icon" ] = "inv_belt_33",
+			[ "name" ] = "Brigam Girdle",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 13142,
+			[ "raidBosses" ] = { 665 }
+		}, {
+			[ "id" ] = 7045,
+			[ "icon" ] = "inv_boots_01",
+			[ "name" ] = "Wind Dancer Boots",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 13260,
+			[ "raidBosses" ] = { 666 }
+		}, {
+			[ "id" ] = 6961,
+			[ "icon" ] = "inv_misc_orb_05",
+			[ "name" ] = "Father Flame",
+			[ "quality" ] = 2,
+			[ "itemId" ] = 13371,
+			[ "raidBosses" ] = { 658 }
+		}, {
+			[ "id" ] = 6966,
+			[ "icon" ] = "inv_pants_04",
+			[ "name" ] = "Handcrafted Mastersmith Leggings",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 13498,
+			[ "raidBosses" ] = { 660 }
+		}, {
+			[ "id" ] = 6965,
+			[ "icon" ] = "inv_belt_23",
+			[ "name" ] = "Handcrafted Mastersmith Girdle",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 13502,
+			[ "raidBosses" ] = { 660 }
+		}, {
+			[ "id" ] = 7033,
+			[ "icon" ] = "inv_scroll_06",
+			[ "name" ] = "Recipe: Flask of the Titans",
+			[ "quality" ] = 2,
+			[ "itemId" ] = 13519,
+			[ "raidBosses" ] = { 665 }
+		}, {
+			[ "id" ] = 7000,
+			[ "icon" ] = "inv_scroll_06",
+			[ "name" ] = "Recipe: Flask of Chromatic Resistance",
+			[ "quality" ] = 2,
+			[ "itemId" ] = 13522,
+			[ "raidBosses" ] = { 662 }
+		}, {
+			[ "id" ] = 7032,
+			[ "icon" ] = "inv_chest_chain_07",
+			[ "name" ] = "Red Dragonscale Breastplate",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 15047,
+			[ "raidBosses" ] = { 665 }
+		}, {
+			[ "id" ] = 7031,
+			[ "icon" ] = "inv_scroll_03",
+			[ "name" ] = "Pattern: Red Dragonscale Breastplate",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 15730,
+			[ "raidBosses" ] = { 665 }
+		}, {
+			[ "id" ] = 7054,
+			[ "icon" ] = "inv_misc_note_01",
+			[ "name" ] = "Formula: Enchant 2H Weapon - Superior Impact",
+			[ "quality" ] = 2,
+			[ "itemId" ] = 16247,
+			[ "raidBosses" ] = { 666 }
+		}, {
+			[ "id" ] = 7040,
+			[ "classes" ] = { "Shaman" },
+			[ "icon" ] = "inv_chest_chain_11",
+			[ "name" ] = "Vest of Elements",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 16666,
+			[ "raidBosses" ] = { 665 }
+		}, {
+			[ "id" ] = 6995,
+			[ "classes" ] = { "Shaman" },
+			[ "icon" ] = "inv_shoulder_29",
+			[ "name" ] = "Pauldrons of Elements",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 16669,
+			[ "raidBosses" ] = { 662 }
+		}, {
+			[ "id" ] = 6948,
+			[ "classes" ] = { "Shaman" },
+			[ "icon" ] = "inv_gauntlets_11",
+			[ "name" ] = "Gauntlets of Elements",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 16672,
+			[ "raidBosses" ] = { 656 }
+		}, {
+			[ "id" ] = 7052,
+			[ "classes" ] = { "Shaman" },
+			[ "icon" ] = "inv_belt_16",
+			[ "name" ] = "Cord of Elements",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 16673,
+			[ "raidBosses" ] = { 666 }
+		}, {
+			[ "id" ] = 7039,
+			[ "classes" ] = { "Hunter" },
+			[ "icon" ] = "inv_chest_chain_03",
+			[ "name" ] = "Beaststalker's Tunic",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 16674,
+			[ "raidBosses" ] = { 665 }
+		}, {
+			[ "id" ] = 7051,
+			[ "classes" ] = { "Hunter" },
+			[ "icon" ] = "inv_belt_28",
+			[ "name" ] = "Beaststalker's Belt",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 16680,
+			[ "raidBosses" ] = { 666 }
+		}, {
+			[ "id" ] = 7050,
+			[ "classes" ] = { "Hunter" },
+			[ "icon" ] = "inv_bracer_17",
+			[ "name" ] = "Beaststalker's Bindings",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 16681,
+			[ "raidBosses" ] = { 666 }
+		}, {
+			[ "id" ] = 7047,
+			[ "classes" ] = { "Mage" },
+			[ "icon" ] = "inv_jewelry_ring_23",
+			[ "name" ] = "Magister's Bindings",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 16683,
+			[ "raidBosses" ] = { 666 }
+		}, {
+			[ "id" ] = 7035,
+			[ "classes" ] = { "Mage" },
+			[ "icon" ] = "inv_chest_cloth_25",
+			[ "name" ] = "Magister's Robes",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 16688,
+			[ "raidBosses" ] = { 665 }
+		}, {
+			[ "id" ] = 7034,
+			[ "classes" ] = { "Priest" },
+			[ "icon" ] = "inv_chest_cloth_11",
+			[ "name" ] = "Devout Robe",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 16690,
+			[ "raidBosses" ] = { 665 }
+		}, {
+			[ "id" ] = 6954,
+			[ "classes" ] = { "Priest" },
+			[ "icon" ] = "inv_shoulder_02",
+			[ "name" ] = "Devout Mantle",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 16695,
+			[ "raidBosses" ] = { 657 }
+		}, {
+			[ "id" ] = 7046,
+			[ "classes" ] = { "Priest" },
+			[ "icon" ] = "inv_belt_10",
+			[ "name" ] = "Devout Belt",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 16696,
+			[ "raidBosses" ] = { 666 }
+		}, {
+			[ "id" ] = 7036,
+			[ "classes" ] = { "Warlock" },
+			[ "icon" ] = "inv_chest_cloth_49",
+			[ "name" ] = "Dreadmist Robe",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 16700,
+			[ "raidBosses" ] = { 665 }
+		}, {
+			[ "id" ] = 7048,
+			[ "classes" ] = { "Warlock" },
+			[ "icon" ] = "inv_bracer_13",
+			[ "name" ] = "Dreadmist Bracers",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 16703,
+			[ "raidBosses" ] = { 666 }
+		}, {
+			[ "id" ] = 7038,
+			[ "classes" ] = { "Druid" },
+			[ "icon" ] = "inv_chest_plate06",
+			[ "name" ] = "Wildheart Vest",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 16706,
+			[ "raidBosses" ] = { 665 }
+		}, {
+			[ "id" ] = 7049,
+			[ "classes" ] = { "Rogue" },
+			[ "icon" ] = "inv_belt_03",
+			[ "name" ] = "Shadowcraft Belt",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 16713,
+			[ "raidBosses" ] = { 666 }
+		}, {
+			[ "id" ] = 7037,
+			[ "classes" ] = { "Rogue" },
+			[ "icon" ] = "inv_chest_leather_07",
+			[ "name" ] = "Shadowcraft Tunic",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 16721,
+			[ "raidBosses" ] = { 665 }
+		}, {
+			[ "id" ] = 7041,
+			[ "classes" ] = { "Paladin" },
+			[ "icon" ] = "inv_chest_plate03",
+			[ "name" ] = "Lightforge Breastplate",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 16726,
+			[ "raidBosses" ] = { 665 }
+		}, {
+			[ "id" ] = 7002,
+			[ "classes" ] = { "Paladin" },
+			[ "icon" ] = "inv_shoulder_10",
+			[ "name" ] = "Lightforge Spaulders",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 16729,
+			[ "raidBosses" ] = { 663 }
+		}, {
+			[ "id" ] = 7042,
+			[ "classes" ] = { "Warrior" },
+			[ "icon" ] = "inv_chest_plate03",
+			[ "name" ] = "Breastplate of Valor",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 16730,
+			[ "raidBosses" ] = { 665 }
+		}, {
+			[ "id" ] = 6982,
+			[ "classes" ] = { "Warrior" },
+			[ "icon" ] = "inv_shoulder_30",
+			[ "name" ] = "Spaulders of Valor",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 16733,
+			[ "raidBosses" ] = { 661 }
+		}, {
+			[ "id" ] = 7053,
+			[ "classes" ] = { "Warrior" },
+			[ "icon" ] = "inv_bracer_18",
+			[ "name" ] = "Bracers of Valor",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 16735,
+			[ "raidBosses" ] = { 666 }
+		}, {
+			[ "id" ] = 6967,
+			[ "icon" ] = "inv_boots_02",
+			[ "name" ] = "Flame Walkers",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 18047,
+			[ "raidBosses" ] = { 660 }
+		}, {
+			[ "id" ] = 6968,
+			[ "icon" ] = "inv_hammer_06",
+			[ "name" ] = "Mastersmith's Hammer",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 18048,
+			[ "raidBosses" ] = { 660 }
+		}, {
+			[ "id" ] = 6988,
+			[ "icon" ] = "inv_boots_05",
+			[ "name" ] = "Dragonrider Boots",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 18102,
+			[ "raidBosses" ] = { 661 }
+		}, {
+			[ "id" ] = 6990,
+			[ "icon" ] = "inv_jewelry_ring_16",
+			[ "name" ] = "Band of Rumination",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 18103,
+			[ "raidBosses" ] = { 661 }
+		}, {
+			[ "id" ] = 6986,
+			[ "icon" ] = "inv_belt_03",
+			[ "name" ] = "Feralsurge Girdle",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 18104,
+			[ "raidBosses" ] = { 661 }
+		}, {
+			[ "id" ] = 6960,
+			[ "icon" ] = "inv_misc_enggizmos_04",
+			[ "name" ] = "Hyper-Radiant Flame Reflector",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 18638,
+			[ "raidBosses" ] = { 657 }
+		}, {
+			[ "id" ] = 6959,
+			[ "icon" ] = "inv_scroll_06",
+			[ "name" ] = "Schematic: Hyper-Radiant Flame Reflector",
+			[ "quality" ] = 2,
+			[ "itemId" ] = 18657,
+			[ "raidBosses" ] = { 657 }
+		}, {
+			[ "id" ] = 6975,
+			[ "icon" ] = "inv_misc_note_06",
+			[ "name" ] = "Bottom Half of Advanced Armorsmithing: Volume I",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 18779,
+			[ "raidBosses" ] = { 660 }
+		}, {
+			[ "id" ] = 7013,
+			[ "icon" ] = "inv_misc_ticket_tarot_beasts_01",
+			[ "name" ] = "Ace of Beasts",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 19227,
+			[ "raidBosses" ] = { 663 }
+		}, {
+			[ "id" ] = 6996,
+			[ "icon" ] = "inv_helmet_27",
+			[ "name" ] = "Dragonskin Cowl",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 22225,
+			[ "raidBosses" ] = { 662 }
+		}, {
+			[ "id" ] = 6989,
+			[ "icon" ] = "inv_boots_cloth_03",
+			[ "name" ] = "Faith Healer's Boots",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 22247,
+			[ "raidBosses" ] = { 661 }
+		}, {
+			[ "id" ] = 7029,
+			[ "icon" ] = "inv_misc_book_06",
+			[ "name" ] = "Tome of the Lost",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 22253,
+			[ "raidBosses" ] = { 665 }
+		}, {
+			[ "id" ] = 7023,
+			[ "icon" ] = "inv_helmet_62",
+			[ "name" ] = "Spellweaver's Turban",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 22267,
+			[ "raidBosses" ] = { 665 }
+		}, {
+			[ "id" ] = 7028,
+			[ "icon" ] = "inv_jewelry_talisman_09",
+			[ "name" ] = "Draconic Infused Emblem",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 22268,
+			[ "raidBosses" ] = { 665 }
+		}, {
+			[ "id" ] = 7025,
+			[ "icon" ] = "inv_misc_cape_20",
+			[ "name" ] = "Shadow Prowler's Cloak",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 22269,
+			[ "raidBosses" ] = { 665 }
+		}, {
+			[ "id" ] = 7014,
+			[ "classes" ] = { "Priest", "Mage", "Warlock" },
+			[ "icon" ] = "inv_helmet_30",
+			[ "name" ] = "Ironweave Cowl",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 22302,
+			[ "raidBosses" ] = { 664 }
+		}, {
+			[ "id" ] = 7009,
+			[ "classes" ] = { "Priest", "Mage", "Warlock" },
+			[ "icon" ] = "inv_boots_cloth_05",
+			[ "name" ] = "Ironweave Boots",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 22311,
+			[ "raidBosses" ] = { 663 }
+		}, {
+			[ "id" ] = 7021,
+			[ "icon" ] = "inv_staff_07",
+			[ "name" ] = "Lord Valthalak's Staff of Command",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 22335,
+			[ "raidBosses" ] = { 664 }
+		}, {
+			[ "id" ] = 7020,
+			[ "icon" ] = "inv_shield_02",
+			[ "name" ] = "Draconian Aegis of the Legion",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 22336,
+			[ "raidBosses" ] = { 664 }
+		}, {
+			[ "id" ] = 7016,
+			[ "icon" ] = "inv_misc_cape_19",
+			[ "name" ] = "Shroud of Domination",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 22337,
+			[ "raidBosses" ] = { 664 }
+		}, {
+			[ "id" ] = 7019,
+			[ "icon" ] = "inv_jewelry_ring_35",
+			[ "name" ] = "Rune Band of Wizardry",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 22339,
+			[ "raidBosses" ] = { 664 }
+		}, {
+			[ "id" ] = 7015,
+			[ "icon" ] = "inv_jewelry_necklace_04",
+			[ "name" ] = "Pendant of Celerity",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 22340,
+			[ "raidBosses" ] = { 664 }
+		}, {
+			[ "id" ] = 7018,
+			[ "icon" ] = "inv_pants_09",
+			[ "name" ] = "Leggings of Torment",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 22342,
+			[ "raidBosses" ] = { 664 }
+		}, {
+			[ "id" ] = 7017,
+			[ "icon" ] = "inv_gauntlets_11",
+			[ "name" ] = "Handguards of Savagery",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 22343,
+			[ "raidBosses" ] = { 664 }
+		}, {
+			[ "id" ] = 6953,
+			[ "classes" ] = { "Shaman" },
+			[ "icon" ] = "inv_misc_stonetablet_11",
+			[ "name" ] = "Tablet of Flame Shock VI",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 23320,
+			[ "raidBosses" ] = { 656 }
+		}, {
+			[ "id" ] = 7012,
+			[ "classes" ] = { "Druid" },
+			[ "icon" ] = "inv_misc_book_02",
+			[ "name" ] = "Book of Ferocious Bite VI",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 24101,
+			[ "raidBosses" ] = { 663 }
+		}, {
+			[ "id" ] = 7044,
+			[ "classes" ] = { "Rogue" },
+			[ "icon" ] = "inv_misc_book_14",
+			[ "name" ] = "Manual of Eviscerate IX",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 24102,
+			[ "raidBosses" ] = { 666 }
+		}, {
+			[ "id" ] = 7055,
+			[ "icon" ] = "inv_misc_ribbon_01",
+			[ "name" ] = "Fashion Coin",
+			[ "quality" ] = 2,
+			[ "itemId" ] = 51217,
+			[ "raidBosses" ] = { 656, 657, 661, 662, 663, 664, 665 }
+		}, {
+			[ "id" ] = 7794,
+			[ "icon" ] = "inv_misc_note_01",
+			[ "name" ] = "Plans: Blazefury Circlet",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 70213,
+			[ "raidBosses" ] = { 666 }
+		} }
+	},
+	[ 109 ] = {
+		[ "name" ] = "Tower of Karazhan",
+		[ "reference" ] = "TK",
+		[ "raidBosses" ] = { {
+			[ "id" ] = 669,
+			[ "name" ] = "Unknown boss",
+			[ "position" ] = 0
+		}, {
+			[ "id" ] = 671,
+			[ "name" ] = "Anomalus",
+			[ "position" ] = 1
+		}, {
+			[ "id" ] = 672,
+			[ "name" ] = "Keeper Gnarlmoon",
+			[ "position" ] = 2
+		}, {
+			[ "id" ] = 673,
+			[ "name" ] = "Ima'ghaol",
+			[ "position" ] = 3
+		}, {
+			[ "id" ] = 680,
+			[ "name" ] = "King's Council",
+			[ "position" ] = 4
+		}, {
+			[ "id" ] = 674,
+			[ "name" ] = "Incantagos",
+			[ "position" ] = 40
+		}, {
+			[ "id" ] = 676,
+			[ "name" ] = "Sanv Tas'dal",
+			[ "position" ] = 60
+		}, {
+			[ "id" ] = 677,
+			[ "name" ] = "Rupturan the Broken",
+			[ "position" ] = 70
+		}, {
+			[ "id" ] = 678,
+			[ "name" ] = "Mephistroth",
+			[ "position" ] = 80
+		}, {
+			[ "id" ] = 679,
+			[ "name" ] = "Kruul",
+			[ "position" ] = 90
+		}, {
+			[ "id" ] = 675,
+			[ "name" ] = "Echo of Medivh",
+			[ "position" ] = 97
+		}, {
+			[ "id" ] = 681,
+			[ "name" ] = "Trash",
+			[ "position" ] = 98
+		} },
+		[ "raidItems" ] = { {
+			[ "id" ] = 7079,
+			[ "icon" ] = "inv_gizmo_03",
+			[ "name" ] = "Broken Lock",
+			[ "quality" ] = 1,
+			[ "itemId" ] = 16747,
+			[ "raidBosses" ] = { 669 }
+		}, {
+			[ "id" ] = 7602,
+			[ "icon" ] = "ability_mount_ridinghorse",
+			[ "name" ] = "Mechanical Horse",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 20739,
+			[ "raidBosses" ] = { 680 }
+		}, {
+			[ "id" ] = 7603,
+			[ "icon" ] = "inv_misc_enggizmos_08",
+			[ "name" ] = "Draconic Focus",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 41373,
+			[ "raidBosses" ] = { 674 }
+		}, {
+			[ "id" ] = 7604,
+			[ "icon" ] = "inv_enchant_shardglowingsmall",
+			[ "name" ] = "Enchanted Amethyst",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 41403,
+			[ "raidBosses" ] = { 674 }
+		}, {
+			[ "id" ] = 7605,
+			[ "icon" ] = "inv_enchant_dustsoul",
+			[ "name" ] = "Cosmic Residue",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 41412,
+			[ "raidBosses" ] = { 671 }
+		}, {
+			[ "id" ] = 7606,
+			[ "icon" ] = "inv_enchant_essencemysticalsmall",
+			[ "name" ] = "Anima of the Guardian",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 41414,
+			[ "raidBosses" ] = { 675 }
+		}, {
+			[ "id" ] = 7607,
+			[ "icon" ] = "inv_misc_gem_pearl_06",
+			[ "name" ] = "Soul of the Dreadlord",
+			[ "quality" ] = 5,
+			[ "itemId" ] = 41447,
+			[ "raidBosses" ] = { 678 }
+		}, {
+			[ "id" ] = 7608,
+			[ "icon" ] = "inv_misc_gem_diamond_01",
+			[ "name" ] = "Pristine Ley Crystal",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 41485,
+			[ "raidBosses" ] = { 671, 680, 679, 674, 678, 677, 675, 681 }
+		}, {
+			[ "id" ] = 7219,
+			[ "icon" ] = "inv_jewelry_talisman_mana",
+			[ "name" ] = "Ley-attuned Choker",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55078,
+			[ "raidBosses" ] = { 672 }
+		}, {
+			[ "id" ] = 7221,
+			[ "icon" ] = "inv_chest_leather_04",
+			[ "name" ] = "Ravenkeeper's Frenzied Embrace",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55079,
+			[ "raidBosses" ] = { 672 }
+		}, {
+			[ "id" ] = 7216,
+			[ "icon" ] = "inv_bloodmoon",
+			[ "name" ] = "Bloodmoon, Sickle of the Murderous Flight",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55080,
+			[ "raidBosses" ] = { 672 }
+		}, {
+			[ "id" ] = 7220,
+			[ "icon" ] = "inv_boots_05",
+			[ "name" ] = "Manadrenched Feather Slippers",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55081,
+			[ "raidBosses" ] = { 672 }
+		}, {
+			[ "id" ] = 7320,
+			[ "classes" ] = { "Druid" },
+			[ "icon" ] = "inv_qirajidol_war",
+			[ "name" ] = "Idol of Laceration",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55082,
+			[ "raidBosses" ] = { 672 }
+		}, {
+			[ "id" ] = 7218,
+			[ "icon" ] = "inv_helmet_24",
+			[ "name" ] = "Crown of the Wildpack",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55083,
+			[ "raidBosses" ] = { 672 }
+		}, {
+			[ "id" ] = 7222,
+			[ "icon" ] = "inv_misc_cape_10",
+			[ "name" ] = "Torn Wings of Midnight",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55084,
+			[ "raidBosses" ] = { 672 }
+		}, {
+			[ "id" ] = 7253,
+			[ "icon" ] = "inv_pants_cloth_13",
+			[ "name" ] = "Magispark Leggings",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55085,
+			[ "raidBosses" ] = { 674 }
+		}, {
+			[ "id" ] = 7252,
+			[ "icon" ] = "inv_belt_22",
+			[ "name" ] = "Magehunter Belt",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55086,
+			[ "raidBosses" ] = { 674 }
+		}, {
+			[ "id" ] = 7247,
+			[ "icon" ] = "inv_misc_gem_variety_01",
+			[ "name" ] = "Jewel of Wild Magics",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55087,
+			[ "raidBosses" ] = { 674 }
+		}, {
+			[ "id" ] = 7229,
+			[ "icon" ] = "inv_gauntlets_05",
+			[ "name" ] = "Dragonclaw Gauntlets",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55088,
+			[ "raidBosses" ] = { 680 }
+		}, {
+			[ "id" ] = 7245,
+			[ "icon" ] = "inv_bracer_02",
+			[ "name" ] = "Bands of the Surgebreaker",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55089,
+			[ "raidBosses" ] = { 674 }
+		}, {
+			[ "id" ] = 7254,
+			[ "icon" ] = "inv_shield_23",
+			[ "name" ] = "Scaleshield of Azure Flight",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55090,
+			[ "raidBosses" ] = { 674 }
+		}, {
+			[ "id" ] = 7251,
+			[ "classes" ] = { "Paladin", "Priest", "Shaman", "Druid" },
+			[ "icon" ] = "inv_jewelry_ring_saphire",
+			[ "name" ] = "Loop of Infused Renewal",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55091,
+			[ "raidBosses" ] = { 674 }
+		}, {
+			[ "id" ] = 7300,
+			[ "icon" ] = "inv_boots_plate_06",
+			[ "name" ] = "Manahide Slippers",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55092,
+			[ "raidBosses" ] = { 671 }
+		}, {
+			[ "id" ] = 7215,
+			[ "icon" ] = "inv_enchant_dustsoul",
+			[ "name" ] = "Remains of Overwhelming Power",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55093,
+			[ "raidBosses" ] = { 671 }
+		}, {
+			[ "id" ] = 7294,
+			[ "icon" ] = "inv_jewelry_ring_jade",
+			[ "name" ] = "Medivh's Hindsight",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55094,
+			[ "raidBosses" ] = { 675 }
+		}, {
+			[ "id" ] = 7298,
+			[ "icon" ] = "inv_misc_cape_18",
+			[ "name" ] = "Cloak of the Bloody Ravager",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55095,
+			[ "raidBosses" ] = { 671 }
+		}, {
+			[ "id" ] = 7301,
+			[ "icon" ] = "inv_weapon_crossbow_18",
+			[ "name" ] = "Phase-shifting Crossbow",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55096,
+			[ "raidBosses" ] = { 671 }
+		}, {
+			[ "id" ] = 7297,
+			[ "icon" ] = "inv_jewelry_necklace_08",
+			[ "name" ] = "Choker of Chromatic Power",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55097,
+			[ "raidBosses" ] = { 671 }
+		}, {
+			[ "id" ] = 7299,
+			[ "icon" ] = "inv_gauntlets_05",
+			[ "name" ] = "Gloves of Nourishment",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55098,
+			[ "raidBosses" ] = { 671 }
+		}, {
+			[ "id" ] = 7248,
+			[ "icon" ] = "inv_pants_plate_18",
+			[ "name" ] = "Leysteel Legplates",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55099,
+			[ "raidBosses" ] = { 674 }
+		}, {
+			[ "id" ] = 7228,
+			[ "icon" ] = "inv_checkmate",
+			[ "name" ] = "Checkmate",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55100,
+			[ "raidBosses" ] = { 680 }
+		}, {
+			[ "id" ] = 7233,
+			[ "icon" ] = "inv_misc_book_11",
+			[ "name" ] = "King's Edict",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55101,
+			[ "raidBosses" ] = { 680 }
+		}, {
+			[ "id" ] = 7232,
+			[ "icon" ] = "inv_chest_plate08",
+			[ "name" ] = "Insomnius' Retribution",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55102,
+			[ "raidBosses" ] = { 680 }
+		}, {
+			[ "id" ] = 7235,
+			[ "icon" ] = "btnlancelot_ring",
+			[ "name" ] = "Royal Seal of Greymane",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55103,
+			[ "raidBosses" ] = { 680 }
+		}, {
+			[ "id" ] = 7234,
+			[ "icon" ] = "inv_boots_chain_05",
+			[ "name" ] = "Pawn's Advance",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55104,
+			[ "raidBosses" ] = { 680 }
+		}, {
+			[ "id" ] = 7223,
+			[ "icon" ] = "inv_bishophat",
+			[ "name" ] = "Bishop's Reverence",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55105,
+			[ "raidBosses" ] = { 680 }
+		}, {
+			[ "id" ] = 7302,
+			[ "icon" ] = "inv_bracer_10",
+			[ "name" ] = "Bindings of Contained Magic",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55106,
+			[ "raidBosses" ] = { 671 }
+		}, {
+			[ "id" ] = 7291,
+			[ "icon" ] = "inv_gauntlets_05",
+			[ "name" ] = "Gloves of Leyline Convergence",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55107,
+			[ "raidBosses" ] = { 675 }
+		}, {
+			[ "id" ] = 7288,
+			[ "icon" ] = "inv_demonhornshoulders",
+			[ "name" ] = "Dreadslayer Shoulderblades",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55108,
+			[ "raidBosses" ] = { 675 }
+		}, {
+			[ "id" ] = 7292,
+			[ "icon" ] = "inv_trickster_leggings",
+			[ "name" ] = "Legwraps of Meticulous Planning",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55109,
+			[ "raidBosses" ] = { 675 }
+		}, {
+			[ "id" ] = 7293,
+			[ "classes" ] = { "Paladin" },
+			[ "icon" ] = "inv_misc_book_07",
+			[ "name" ] = "Libram of the Eternal Tower",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55110,
+			[ "raidBosses" ] = { 675 }
+		}, {
+			[ "id" ] = 7289,
+			[ "icon" ] = "spell_shadow_soulgem",
+			[ "name" ] = "Eye of Dormant Corruption",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55111,
+			[ "raidBosses" ] = { 675 }
+		}, {
+			[ "id" ] = 7295,
+			[ "icon" ] = "inv_jewelry_talisman_health",
+			[ "name" ] = "Pendant of Forgiven Mistakes",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55112,
+			[ "raidBosses" ] = { 675 }
+		}, {
+			[ "id" ] = 7279,
+			[ "icon" ] = "inv_demonhornhelmet",
+			[ "name" ] = "Dreadslayer Horns",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55113,
+			[ "raidBosses" ] = { 676 }
+		}, {
+			[ "id" ] = 7287,
+			[ "classes" ] = { "Shaman" },
+			[ "icon" ] = "inv_qirajidol_sage",
+			[ "name" ] = "Totem of Broken Earth",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55114,
+			[ "raidBosses" ] = { 676 }
+		}, {
+			[ "id" ] = 7284,
+			[ "icon" ] = "inv_riftcarver",
+			[ "name" ] = "Riftcarver's Implement",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55115,
+			[ "raidBosses" ] = { 676 }
+		}, {
+			[ "id" ] = 7283,
+			[ "icon" ] = "inv_draeneispear",
+			[ "name" ] = "Raka'shishi, Spear of the Adrift Hunt",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55116,
+			[ "raidBosses" ] = { 676 }
+		}, {
+			[ "id" ] = 7281,
+			[ "icon" ] = "inv_belt_22",
+			[ "name" ] = "Girdle of the Faded Primals",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55117,
+			[ "raidBosses" ] = { 676 }
+		}, {
+			[ "id" ] = 7282,
+			[ "icon" ] = "inv_misc_cape_06",
+			[ "name" ] = "Kum'isha's Tattered Drape",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55118,
+			[ "raidBosses" ] = { 676 }
+		}, {
+			[ "id" ] = 7280,
+			[ "icon" ] = "inv_helmet_24",
+			[ "name" ] = "Forgotten Hide Helm",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55119,
+			[ "raidBosses" ] = { 676 }
+		}, {
+			[ "id" ] = 7271,
+			[ "icon" ] = "inv_elementalfist",
+			[ "name" ] = "Al'Kazeth, Claw of Ruptured Elements",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55120,
+			[ "raidBosses" ] = { 677 }
+		}, {
+			[ "id" ] = 7272,
+			[ "icon" ] = "inv_bulwark",
+			[ "name" ] = "Bulwark of Enduring Earth",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55121,
+			[ "raidBosses" ] = { 677 }
+		}, {
+			[ "id" ] = 7273,
+			[ "icon" ] = "inv_pants_mail_15",
+			[ "name" ] = "Earthquake Leggings",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55122,
+			[ "raidBosses" ] = { 677 }
+		}, {
+			[ "id" ] = 7276,
+			[ "icon" ] = "inv_jewelry_ring_bronze",
+			[ "name" ] = "Loop of Hardened Slate",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55123,
+			[ "raidBosses" ] = { 677 }
+		}, {
+			[ "id" ] = 7278,
+			[ "icon" ] = "inv_misc_gem_diamond_02",
+			[ "name" ] = "Pure Jewel of Draenor",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55124,
+			[ "raidBosses" ] = { 677 }
+		}, {
+			[ "id" ] = 7275,
+			[ "icon" ] = "inv_gauntlets_05",
+			[ "name" ] = "Handwraps of Dead Winds",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55125,
+			[ "raidBosses" ] = { 677 }
+		}, {
+			[ "id" ] = 7277,
+			[ "icon" ] = "inv_shoulder_14",
+			[ "name" ] = "Mantle of the Drifting Stars",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55126,
+			[ "raidBosses" ] = { 677 }
+		}, {
+			[ "id" ] = 7241,
+			[ "icon" ] = "inv_demonaxe",
+			[ "name" ] = "Shar'tateth, the Shattered Edge",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55127,
+			[ "raidBosses" ] = { 679 }
+		}, {
+			[ "id" ] = 7238,
+			[ "icon" ] = "ability_thunderbolt",
+			[ "name" ] = "Comet Signaller",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55128,
+			[ "raidBosses" ] = { 679 }
+		}, {
+			[ "id" ] = 7239,
+			[ "icon" ] = "inv_desecration",
+			[ "name" ] = "Desecration",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55129,
+			[ "raidBosses" ] = { 679 }
+		}, {
+			[ "id" ] = 7244,
+			[ "icon" ] = "inv_bracer_09",
+			[ "name" ] = "Wristwraps of Exiled Radiance",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55130,
+			[ "raidBosses" ] = { 679 }
+		}, {
+			[ "id" ] = 7242,
+			[ "icon" ] = "inv_misc_stonetablet_02",
+			[ "name" ] = "Shieldrender Talisman",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55131,
+			[ "raidBosses" ] = { 679 }
+		}, {
+			[ "id" ] = 7240,
+			[ "icon" ] = "spell_shadow_lifedrain",
+			[ "name" ] = "Pendant of Purified Demon's Blood",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55132,
+			[ "raidBosses" ] = { 679 }
+		}, {
+			[ "id" ] = 7311,
+			[ "icon" ] = "inv_weapon_shortblade_27",
+			[ "name" ] = "Claw of the Mageweaver",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55133,
+			[ "raidBosses" ] = { 681 }
+		}, {
+			[ "id" ] = 7315,
+			[ "classes" ] = { "Mage" },
+			[ "icon" ] = "inv_wand_05",
+			[ "name" ] = "Rod of Permafrost",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55134,
+			[ "raidBosses" ] = { 681 }
+		}, {
+			[ "id" ] = 7316,
+			[ "icon" ] = "inv_misc_monsterscales_09",
+			[ "name" ] = "Shard of Leyflow",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55135,
+			[ "raidBosses" ] = { 681 }
+		}, {
+			[ "id" ] = 7224,
+			[ "icon" ] = "inv_misc_cape_21",
+			[ "name" ] = "Chain-Cloak of the Rookguard",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55274,
+			[ "raidBosses" ] = { 680 }
+		}, {
+			[ "id" ] = 7317,
+			[ "icon" ] = "inv_misc_gem_amethyst_03",
+			[ "name" ] = "Slivers of Nullification",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55275,
+			[ "raidBosses" ] = { 681 }
+		}, {
+			[ "id" ] = 7290,
+			[ "icon" ] = "inv_mallet",
+			[ "name" ] = "Forgotten Raven's Mallet",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55276,
+			[ "raidBosses" ] = { 675 }
+		}, {
+			[ "id" ] = 7318,
+			[ "icon" ] = "inv_theend",
+			[ "name" ] = "The End of All Ambitions",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55277,
+			[ "raidBosses" ] = { 681 }
+		}, {
+			[ "id" ] = 7313,
+			[ "icon" ] = "inv_gauntlets_05",
+			[ "name" ] = "Ques' Gauntlets of Precision",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55278,
+			[ "raidBosses" ] = { 681 }
+		}, {
+			[ "id" ] = 7296,
+			[ "icon" ] = "inv_staff_22",
+			[ "name" ] = "Branch of Resolute Defense",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55279,
+			[ "raidBosses" ] = { 671 }
+		}, {
+			[ "id" ] = 7305,
+			[ "classes" ] = { "Shaman" },
+			[ "icon" ] = "inv_stormhowl_sabatons",
+			[ "name" ] = "Boots of Elemental Fury",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55280,
+			[ "raidBosses" ] = { 681 }
+		}, {
+			[ "id" ] = 7309,
+			[ "classes" ] = { "Shaman" },
+			[ "icon" ] = "inv_gauntlets_05",
+			[ "name" ] = "Gauntlets of Elemental Fury",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55281,
+			[ "raidBosses" ] = { 681 }
+		}, {
+			[ "id" ] = 7306,
+			[ "classes" ] = { "Paladin" },
+			[ "icon" ] = "inv_lionheart_sabatons",
+			[ "name" ] = "Boots of the Grand Crusader",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55282,
+			[ "raidBosses" ] = { 681 }
+		}, {
+			[ "id" ] = 7310,
+			[ "classes" ] = { "Paladin" },
+			[ "icon" ] = "inv_gauntlets_05",
+			[ "name" ] = "Gauntlets of the Grand Crusader",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55283,
+			[ "raidBosses" ] = { 681 }
+		}, {
+			[ "id" ] = 7308,
+			[ "icon" ] = "inv_belt_08",
+			[ "name" ] = "Dragunovi's Sash of Domination",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55284,
+			[ "raidBosses" ] = { 681 }
+		}, {
+			[ "id" ] = 7217,
+			[ "icon" ] = "inv_gauntlets_05",
+			[ "name" ] = "Crite's Holy Hands",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55285,
+			[ "raidBosses" ] = { 672 }
+		}, {
+			[ "id" ] = 7314,
+			[ "icon" ] = "inv_jewelry_ring_33",
+			[ "name" ] = "Ring of Holy Light",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55286,
+			[ "raidBosses" ] = { 681 }
+		}, {
+			[ "id" ] = 7265,
+			[ "icon" ] = "inv_weapon_bonebow2",
+			[ "name" ] = "Rain of Spiders",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55346,
+			[ "raidBosses" ] = { 678 }
+		}, {
+			[ "id" ] = 7267,
+			[ "icon" ] = "inv_thunderfall",
+			[ "name" ] = "Thunderfall, Stormhammer of the Chief Thane",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55347,
+			[ "raidBosses" ] = { 678 }
+		}, {
+			[ "id" ] = 7260,
+			[ "icon" ] = "inv_kirel",
+			[ "name" ] = "Kirel'narak, the Death Sentence",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55348,
+			[ "raidBosses" ] = { 678 }
+		}, {
+			[ "id" ] = 7264,
+			[ "icon" ] = "inv_nethraka",
+			[ "name" ] = "Nethraka, Wing of Oblivion",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55349,
+			[ "raidBosses" ] = { 678 }
+		}, {
+			[ "id" ] = 7255,
+			[ "icon" ] = "inv_censer",
+			[ "name" ] = "Censer of Soulwarding",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55350,
+			[ "raidBosses" ] = { 678 }
+		}, {
+			[ "id" ] = 7270,
+			[ "icon" ] = "inv_belt_22",
+			[ "name" ] = "Turalyon's Hope",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55351,
+			[ "raidBosses" ] = { 678 }
+		}, {
+			[ "id" ] = 7256,
+			[ "icon" ] = "inv_misc_cape_20",
+			[ "name" ] = "Cloak of Rapid Regeneration",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55352,
+			[ "raidBosses" ] = { 678 }
+		}, {
+			[ "id" ] = 7262,
+			[ "icon" ] = "inv_jewelry_ring_nightbreaker",
+			[ "name" ] = "Mephistroth's Cunning",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55353,
+			[ "raidBosses" ] = { 678 }
+		}, {
+			[ "id" ] = 7259,
+			[ "icon" ] = "inv_gauntlets_05",
+			[ "name" ] = "Khadgar's Guidance",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55354,
+			[ "raidBosses" ] = { 678 }
+		}, {
+			[ "id" ] = 7261,
+			[ "icon" ] = "inv_belt_03",
+			[ "name" ] = "Memory of the Last Guardian",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55355,
+			[ "raidBosses" ] = { 678 }
+		}, {
+			[ "id" ] = 7263,
+			[ "icon" ] = "inv_bracer_18",
+			[ "name" ] = "Netherwrought Bracers",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55356,
+			[ "raidBosses" ] = { 678 }
+		}, {
+			[ "id" ] = 7266,
+			[ "icon" ] = "inv_belt_26",
+			[ "name" ] = "Sash of the Grand Betrayal",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55357,
+			[ "raidBosses" ] = { 678 }
+		}, {
+			[ "id" ] = 7676,
+			[ "icon" ] = "inv_jewelry_necklace_29",
+			[ "name" ] = "Ephemeral Pendant",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55482,
+			[ "raidBosses" ] = { 680, 679, 678, 677 }
+		}, {
+			[ "id" ] = 7231,
+			[ "classes" ] = { "Warrior", "Priest", "Warlock", "Druid" },
+			[ "icon" ] = "inv_boots_cloth_01",
+			[ "name" ] = "Ethereal Boots of Conquest",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55483,
+			[ "raidBosses" ] = { 680 }
+		}, {
+			[ "id" ] = 7230,
+			[ "classes" ] = { "Paladin", "Hunter", "Rogue", "Shaman", "Mage" },
+			[ "icon" ] = "inv_boots_cloth_01",
+			[ "name" ] = "Ethereal Boots of Ascendancy",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55484,
+			[ "raidBosses" ] = { 680 }
+		}, {
+			[ "id" ] = 7286,
+			[ "classes" ] = { "Warrior", "Priest", "Warlock", "Druid" },
+			[ "icon" ] = "inv_shoulder_17",
+			[ "name" ] = "Shifting Mantle of Conquest",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55485,
+			[ "raidBosses" ] = { 676 }
+		}, {
+			[ "id" ] = 7285,
+			[ "classes" ] = { "Paladin", "Hunter", "Rogue", "Shaman", "Mage" },
+			[ "icon" ] = "inv_shoulder_17",
+			[ "name" ] = "Shifting Mantle of Ascendancy",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55486,
+			[ "raidBosses" ] = { 676 }
+		}, {
+			[ "id" ] = 7679,
+			[ "icon" ] = "inv_helmet_57",
+			[ "name" ] = "Fractured Crown of Conquest",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55487,
+			[ "raidBosses" ] = { 677 }
+		}, {
+			[ "id" ] = 7680,
+			[ "icon" ] = "inv_helmet_57",
+			[ "name" ] = "Fractured Crown of Ascendancy",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55488,
+			[ "raidBosses" ] = { 677 }
+		}, {
+			[ "id" ] = 7237,
+			[ "classes" ] = { "Warrior", "Priest", "Warlock", "Druid" },
+			[ "icon" ] = "inv_pants_plate_11",
+			[ "name" ] = "Brutal Leggings of Conquest",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55489,
+			[ "raidBosses" ] = { 679 }
+		}, {
+			[ "id" ] = 7236,
+			[ "classes" ] = { "Paladin", "Hunter", "Rogue", "Shaman", "Mage" },
+			[ "icon" ] = "inv_pants_plate_11",
+			[ "name" ] = "Brutal Leggings of Ascendancy",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55490,
+			[ "raidBosses" ] = { 679 }
+		}, {
+			[ "id" ] = 7683,
+			[ "icon" ] = "inv_chest_cloth_45",
+			[ "name" ] = "Nathrezim Armor of Treachery",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55491,
+			[ "raidBosses" ] = { 678 }
+		}, {
+			[ "id" ] = 7684,
+			[ "icon" ] = "inv_chest_cloth_45",
+			[ "name" ] = "Nathrezim Armor of Deceit",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55492,
+			[ "raidBosses" ] = { 678 }
+		}, {
+			[ "id" ] = 7243,
+			[ "icon" ] = "inv_belt_27",
+			[ "name" ] = "Worldbreaker Girdle",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55506,
+			[ "raidBosses" ] = { 679 }
+		}, {
+			[ "id" ] = 7246,
+			[ "icon" ] = "inv_jewelry_necklace_28",
+			[ "name" ] = "Choker of Terminal Arcanum",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55507,
+			[ "raidBosses" ] = { 674 }
+		}, {
+			[ "id" ] = 7307,
+			[ "icon" ] = "inv_jewelry_necklace_27",
+			[ "name" ] = "Brand of Karazhan",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55508,
+			[ "raidBosses" ] = { 681 }
+		}, {
+			[ "id" ] = 7274,
+			[ "icon" ] = "inv_stone_10",
+			[ "name" ] = "Fragments of Aldrach",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55510,
+			[ "raidBosses" ] = { 677 }
+		}, {
+			[ "id" ] = 7689,
+			[ "icon" ] = "inv_wand_06",
+			[ "name" ] = "Hellflame",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55511,
+			[ "raidBosses" ] = { 679 }
+		}, {
+			[ "id" ] = 7258,
+			[ "icon" ] = "inv_shoulder_01",
+			[ "name" ] = "Forgotten Hide Pauldrons",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55512,
+			[ "raidBosses" ] = { 678 }
+		}, {
+			[ "id" ] = 7269,
+			[ "icon" ] = "inv_chest_chain_07",
+			[ "name" ] = "Tunic of Demonic Deception",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55513,
+			[ "raidBosses" ] = { 678 }
+		}, {
+			[ "id" ] = 7691,
+			[ "icon" ] = "btnheartamulet",
+			[ "name" ] = "Heart of Mephistroth",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55579,
+			[ "raidBosses" ] = { 678 }
+		}, {
+			[ "id" ] = 7692,
+			[ "icon" ] = "spell_shadow_summonfelhunter",
+			[ "name" ] = "Felforged Dreadhound",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 92082,
+			[ "raidBosses" ] = { 678 }
+		} }
+	},
+	[ 110 ] = {
+		[ "name" ] = "Cla'ckora",
+		[ "reference" ] = "WBCC",
+		[ "raidBosses" ] = { {
+			[ "id" ] = 670,
+			[ "name" ] = "Cla'ckora",
+			[ "position" ] = 0
+		} },
+		[ "raidItems" ] = { {
+			[ "id" ] = 7088,
+			[ "icon" ] = "inv_misc_birdbeck_02",
+			[ "name" ] = "The Abyssal Pincer",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55494,
+			[ "raidBosses" ] = { 670 }
+		}, {
+			[ "id" ] = 7089,
+			[ "icon" ] = "inv_spear_04",
+			[ "name" ] = "Zandalar Predator's Glaive",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55495,
+			[ "raidBosses" ] = { 670 }
+		}, {
+			[ "id" ] = 7095,
+			[ "icon" ] = "inv_jewelry_necklace_25",
+			[ "name" ] = "Polychromatic Pearl Necklace",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55496,
+			[ "raidBosses" ] = { 670 }
+		}, {
+			[ "id" ] = 7098,
+			[ "classes" ] = { "Druid" },
+			[ "icon" ] = "inv_qirajidol_night",
+			[ "name" ] = "Idol of Ebb and Flow",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55497,
+			[ "raidBosses" ] = { 670 }
+		}, {
+			[ "id" ] = 7091,
+			[ "icon" ] = "inv_misc_shell_03",
+			[ "name" ] = "Clamshell of the Depths",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55498,
+			[ "raidBosses" ] = { 670 }
+		}, {
+			[ "id" ] = 7093,
+			[ "icon" ] = "inv_belt_35",
+			[ "name" ] = "Primal Murloc Scale Belt",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55499,
+			[ "raidBosses" ] = { 670 }
+		}, {
+			[ "id" ] = 7094,
+			[ "icon" ] = "inv_bracer_17",
+			[ "name" ] = "Barnacle Vambraces",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55500,
+			[ "raidBosses" ] = { 670 }
+		}, {
+			[ "id" ] = 7097,
+			[ "icon" ] = "inv_ore_arcanite_02",
+			[ "name" ] = "Sphere of the Endless Gulch",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55501,
+			[ "raidBosses" ] = { 670 }
+		}, {
+			[ "id" ] = 7092,
+			[ "icon" ] = "inv_pants_12",
+			[ "name" ] = "Iceplated Leggings",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55502,
+			[ "raidBosses" ] = { 670 }
+		}, {
+			[ "id" ] = 7096,
+			[ "icon" ] = "inv_jewelry_ring_38",
+			[ "name" ] = "Loop of Unceasing Frost",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55503,
+			[ "raidBosses" ] = { 670 }
+		}, {
+			[ "id" ] = 7090,
+			[ "icon" ] = "inv_generic_anchor",
+			[ "name" ] = "Anchor of the Wavecutter",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 55504,
+			[ "raidBosses" ] = { 670 }
+		}, {
+			[ "id" ] = 7213,
+			[ "icon" ] = "inv_misc_birdbeck_02",
+			[ "name" ] = "Spawn of Cla'ckora",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 92020,
+			[ "raidBosses" ] = { 670 }
 		} }
 	}
 }

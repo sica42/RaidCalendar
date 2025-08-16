@@ -402,6 +402,173 @@ function M.create_online_indicator( parent, relative_region )
 	return frame
 end
 
+function M.create_rich_text_frame( parent )
+	---@class RichTextFrame: Frame
+	---@field SetRichText fun( self: RichTextFrame, text: string )
+	local frame = CreateFrame( "Frame", nil, parent or UIParent )
+	frame:SetWidth( 400 )
+	frame:SetHeight( 300 )
+	frame:SetPoint( "Center", parent, "Center", 0, 0 )
+
+	-- Storage for text elements
+	local textElements = {}
+	local clickableElements = {}
+
+	-- Clear all elements
+	local function ClearElements()
+		for _, element in ipairs( textElements ) do
+			element:Hide()
+		end
+		for _, element in ipairs( clickableElements ) do
+			element:Hide()
+		end
+		textElements = {}
+		clickableElements = {}
+	end
+
+	-- Create a font string
+	local function CreateFontString( text, font, color, x, y )
+		local fs = frame:CreateFontString( nil, "OVERLAY", font or "GameFontNormal" )
+		fs:SetText( text )
+		fs:SetPoint( "TopLeft", frame, "TopLeft", x, y )
+		if color then
+			fs:SetTextColor( color.r, color.g, color.b )
+		end
+		table.insert( textElements, fs )
+		return fs
+	end
+
+	-- Create a clickable button over text
+	local function CreateClickableText( text, x, y, width, height, onClick )
+		local button = CreateFrame( "Button", nil, frame )
+		button:SetWidth( width )
+		button:SetHeight( height )
+		button:SetPoint( "TopLeft", frame, "TopLeft", x, y )
+		button:SetScript( "OnClick", onClick )
+
+		-- Visual feedback
+		button:SetScript( "OnEnter", function( self )
+			GameTooltip:SetOwner( self, "ANCHOR_RIGHT" )
+			GameTooltip:SetText( "Click to open link" )
+			GameTooltip:Show()
+		end )
+		button:SetScript( "OnLeave", function( self )
+			GameTooltip:Hide()
+		end )
+
+		table.insert( clickableElements, button )
+		return button
+	end
+
+	-- Parse and render rich text
+	function frame:SetRichText( text )
+		ClearElements()
+
+		local lines = {}
+		local currentLine = ""
+
+		-- Split into lines
+		local start = 1
+		while start <= string.len(text) do
+				local newlinePos = string.find(text, "\n", start)
+				if newlinePos then
+						local line = string.sub(text, start, newlinePos - 1)
+						if line ~= "" then
+								table.insert(lines, line)
+						end
+						start = newlinePos + 1
+				else
+						local line = string.sub(text, start)
+						if line ~= "" then
+								table.insert(lines, line)
+						end
+						break
+				end
+		end
+
+		local yOffset = -10
+		local lineHeight = 16
+
+		for _, line in ipairs( lines ) do
+			local xOffset = 10
+			local parts = {}
+			local remaining = line
+
+			-- Parse the line for special formatting
+			while remaining and remaining ~= "" do
+				local beforeHeader, header, afterHeader = string.find( remaining, "(%*%*__(.-)__%*%*)" )
+				local beforeURL, url, afterURL = string.find( remaining, "(https://raidres%.fly%.dev/res/([A-Z0-9a-z]+))" )
+
+				local nextHeader = beforeHeader or math.huge
+				local nextURL = beforeURL or math.huge
+
+				if nextHeader < nextURL then
+					-- Found header first
+					if beforeHeader > 1 then
+						-- Add text before header
+						local beforeText = string.sub( remaining, 1, beforeHeader - 1 )
+						table.insert( parts, { type = "text", content = beforeText } )
+					end
+					-- Add header
+					if header then
+						table.insert( parts, { type = "header", content = string.match( header, "__(.-)__" ) } )
+						remaining = string.sub( remaining, afterHeader + 1 )
+					end
+				elseif nextURL < nextHeader then
+					-- Found URL first
+					if beforeURL > 1 then
+						-- Add text before URL
+						local beforeText = string.sub( remaining, 1, beforeURL - 1 )
+						table.insert( parts, { type = "text", content = beforeText } )
+					end
+					-- Add URL
+					if url then
+						local urlId = string.match( url, "/res/([A-Z0-9a-z]+)" )
+						table.insert( parts, { type = "url", content = url, id = urlId } )
+					end
+					remaining = string.sub( remaining, afterURL + 1 )
+				else
+					-- No more special formatting
+					if remaining ~= "" then
+						table.insert( parts, { type = "text", content = remaining } )
+					end
+					break
+				end
+			end
+
+			-- Render the parts
+			for _, part in ipairs( parts ) do
+				if part.type == "text" then
+					local fs = CreateFontString( part.content, "GameFontNormal", nil, xOffset, yOffset )
+					xOffset = xOffset + fs:GetStringWidth()
+				elseif part.type == "header" then
+					local fs = CreateFontString( part.content, "GameFontNormalLarge", { r = 1, g = 1, b = 0 }, xOffset, yOffset )
+					xOffset = xOffset + fs:GetStringWidth()
+				elseif part.type == "url" then
+					local linkText = "link"
+					local fs = CreateFontString( linkText, "GameFontNormal", { r = 0.3, g = 0.7, b = 1 }, xOffset, yOffset )
+					local width = fs:GetStringWidth()
+				--	local height = fs:GetStringHeight()
+					local height = 16 -- Fixed height for clickable area
+
+					-- Create clickable area
+					CreateClickableText( linkText, xOffset, yOffset - height, width, height, function()
+						DEFAULT_CHAT_FRAME:AddMessage( "Opening raid SR: " .. part.id )
+						-- Add your custom action here
+						-- For example: OpenRaidSR(part.id)
+					end )
+
+					xOffset = xOffset + width
+				end
+			end
+
+			yOffset = yOffset - lineHeight
+		end
+	end
+
+	return frame
+end
+
 ---@param frame BuilderFrame
 function M.pfui_skin( frame )
 	if not m.pfui_skin_enabled then return end
@@ -435,10 +602,12 @@ function M.pfui_skin( frame )
 		m.api.pfUI.api.StripTextures( frame.settings, nil, "BACKGROUND" )
 		m.api.pfUI.api.CreateBackdrop( frame.settings, nil, true )
 
-		m.api.pfUI.api.SkinButton( frame.settings.btn_loopup )
-		frame.settings.btn_loopup:SetHeight( 22 )
+--		m.api.pfUI.api.SkinButton( frame.settings.btn_loopup )
+--		frame.settings.btn_loopup:SetHeight( 22 )
 		m.api.pfUI.api.SkinButton( frame.settings.btn_save )
+		m.api.pfUI.api.SkinButton( frame.settings.btn_welcome )
 		frame.settings.btn_save:SetHeight( 22 )
+		frame.settings.btn_welcome:SetHeight( 22 )
 
 		m.api.pfUI.api.SkinCheckbox( frame.settings.use_char_name )
 
@@ -457,6 +626,8 @@ function M.pfui_skin( frame )
 			local btn = "btn_" .. string.gsub( string.lower( v ), "%s", "_" )
 			m.api.pfUI.api.SkinButton( frame[ btn ] )
 		end
+
+		frame.btn_invite:SetPoint( "Right", frame.titlebar.btn_close, "Left", -4, 0 )
 
 		m.api.pfUI.api.SkinButton( frame.cs_change )
 		m.api.pfUI.api.SkinButton( frame.cs_cancel )

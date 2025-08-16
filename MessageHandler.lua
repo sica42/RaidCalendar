@@ -65,7 +65,7 @@ local MessageCommand = {
 
 ---@class MessageHandler
 ---@field find_discord_id fun( name: string )
----@field check_channel_access fun( channel_id: string )
+---@field check_channel_access fun( channel_id: string, renew: boolean? )
 ---@field authorize_user fun( user_id: string )
 ---@field add_sr fun( raid_id: number, sr_id: string, sr1: number, sr2: number )
 ---@field delete_sr fun( id: number )
@@ -258,10 +258,11 @@ function M.new()
 		broadcast( MessageCommand.RequestDiscordId, { name = name } )
 	end
 
-	local function check_channel_access( channel_id )
+	local function check_channel_access( channel_id, renew )
 		broadcast( MessageCommand.RequestChannelCheck, {
 			userId = m.db.user_settings.discord_id,
-			channelId = channel_id
+			channelId = channel_id,
+			renew = renew or false
 		} )
 	end
 
@@ -360,6 +361,7 @@ function M.new()
 			--
 			if data.player == m.player then
 				if data.success then
+					m.debug( "Saving Discord ID: " .. data.userId )
 					m.db.user_settings.discord_id = data.userId
 				end
 				m.calendar_popup.discord_response( data.success, data.userId )
@@ -370,9 +372,6 @@ function M.new()
 			-- Channel access result
 			--
 			if data.player == m.player then
-				if data.success then
-					m.db.user_settings.discord_id = data.userId
-				end
 				m.db.user_settings.channel_access[ data.channelId ] = data.success
 				m.event_popup.update()
 			end
@@ -381,6 +380,8 @@ function M.new()
 			-- Discord authentication response
 			--
 			if data.player == m.player then
+				m.debug( "Saving Discord ID: " .. data.userId )
+				m.db.user_settings.discord_id = data.userId
 				m.welcome_popup.auth_response( data.userId, data.success )
 			end
 		elseif command == MessageCommand.SR then
@@ -407,13 +408,32 @@ function M.new()
 			--
 			data = decode( data, key_map, value_map )
 
-			if data.player == m.player then
-				if data.success == true then
-					m.debug( "SR Added" )
-				else
-					m.error( "Adding SR failed: " .. (data.status or "Unknown error") )
+			if data.success then
+				m.debug( "SR Added" )
+				local _, event_id = m.find( data.srId, m.db.events, "srId" )
+				if not event_id then
+					m.debug( "SR added but no event found for it!" )
+					return
 				end
-				request_sr( data.srId )
+
+				if data.addedSRs and type( data.addedSRs ) == "table" then
+					for _, res in pairs( data.addedSRs ) do
+						if m.db.events[ event_id ].sr and m.db.events[ event_id ].sr.reservations then
+							table.insert( m.db.events[ event_id ].sr.reservations, {
+								id = res.id,
+								raidItemId = res.raidItemId,
+								srPlus = res.srPlus,
+								comment = res.comment,
+								character = res.character
+							} )
+						end
+					end
+				end
+
+				m.sr_popup.update( event_id )
+				m.calendar_popup.update()
+			elseif data.player == m.player then
+				m.error( "Adding SR failed: " .. (data.status or "Unknown error") )
 			end
 		elseif command == MessageCommand.DeleteSRResult then
 			--
@@ -434,7 +454,6 @@ function M.new()
 						end
 					end
 				end
-				--m.find( data.id, m.db.events)
 			elseif data.player == m.player then
 				m.error( "Delete SR failed: " .. (data.status or "Unknown error") )
 			end

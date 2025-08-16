@@ -28,6 +28,7 @@ local M = {}
 ---@field border_color fun( self: FrameBuilder, r: number, g: number, b: number, a: number ): FrameBuilder
 ---@field esc fun( self: FrameBuilder ): FrameBuilder
 ---@field close_button fun( self: FrameBuilder ): FrameBuilder
+---@field on_close fun( self: FrameBuilder, callback: function ): FrameBuilder
 ---@field on_drag_stop fun( self: FrameBuilder, callback: function ): FrameBuilder
 ---@field on_hide fun( self: FrameBuilder, on_hide: function ): FrameBuilder
 ---@field hidden fun( self: FrameBuilder ): FrameBuilder
@@ -67,7 +68,13 @@ function M.new()
 			if options.close_button then
 				frame.btn_close = m.GuiElements.tiny_button( parent, "X", "Close Window" )
 				frame.btn_close:SetPoint( "TopRight", parent, "TopRight", -4, -4 )
-				frame.btn_close:SetScript( "OnClick", function() parent:Hide() end )
+				frame.btn_close:SetScript( "OnClick", function()
+					if options.on_close then
+						options.on_close( frame )
+					else
+						parent:Hide()
+					end
+				end )
 
 				if options.frame_level then
 					frame.btn_close:SetFrameLevel( options.frame_level + 1 )
@@ -299,6 +306,14 @@ function M.new()
 		return self
 	end
 
+	local function on_close( self, callback )
+		options.on_close = callback
+		if not options.close_button then
+			options.close_button = true
+		end
+		return self
+	end
+
 	local function on_drag_stop( self, callback )
 		options.on_drag_stop = callback
 		return self
@@ -336,6 +351,7 @@ function M.new()
 		border_color = border_color,
 		esc = esc,
 		close_button = close_button,
+		on_close = on_close,
 		on_drag_stop = on_drag_stop,
 		on_hide = on_hide,
 		hidden = hidden,

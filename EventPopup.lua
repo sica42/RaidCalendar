@@ -34,6 +34,7 @@ function M.new()
 	local event
 	local signup_id
 	local frame_cache = {}
+	local guild_online_cache = {}
 	local refresh
 	local gui = m.GuiElements
 
@@ -62,6 +63,76 @@ function M.new()
 			if not frame_cache[ frame_type ][ i ].is_used then
 				return frame_cache[ frame_type ][ i ]
 			end
+		end
+	end
+
+	local function update_guild_online_cache()
+		m.wipe( guild_online_cache )
+		if IsInGuild() then
+			for i = 1, GetNumGuildMembers() do
+				local name, _, _, _, _, _, _, _, isOnline = GetGuildRosterInfo( i )
+				guild_online_cache[ name ] = isOnline
+			end
+		end
+	end
+
+	local function is_player_online( signup_name )
+		for name in string.gmatch( signup_name, "([^/]+)" ) do
+			name = strtrim( name ) -- Remove leading/trailing spaces if any
+			if guild_online_cache[ name ] then
+				return name
+			end
+		end
+		return false
+	end
+
+	---@param name string
+	local function is_in_group( name )
+		-- Check party
+		for i = 1, GetNumPartyMembers() do
+			if UnitName( "party" .. i ) == name then
+				return true
+			end
+		end
+		-- Check raid
+		for i = 1, GetNumRaidMembers() do
+			if UnitName( "raid" .. i ) == name then
+				return true
+			end
+		end
+		return false
+	end
+
+	local function on_invite_click()
+		local invite_list = {}
+		for _, v in pairs( event.signUps ) do
+			if v.userId and v.userId ~= m.db.user_settings.discord_id and v.status ~= "Absence" then
+				local name = is_player_online( v.name )
+				if name and not is_in_group( name ) then
+					table.insert( invite_list, name )
+				end
+			end
+		end
+
+		local i = 1
+		local function invite_next()
+			if i <= getn( invite_list ) then
+				InviteByName( invite_list[ i ] )
+				i = i + 1
+				if i > 4 and not IsInRaid() then
+					ConvertToRaid()
+				end
+				m.ace_timer.ScheduleTimer( M, function()
+					invite_next()
+				end, 0.7 )
+			end
+		end
+
+		if getn( invite_list ) > 0 then
+			m.debug( "Inviting " .. getn( invite_list ) .. " players to event: " .. event.title )
+			invite_next()
+		else
+			m.error( "No players to invite" )
 		end
 	end
 
@@ -202,6 +273,9 @@ function M.new()
 		local entry_time = date( "%d. %b %Y " .. m.time_format, signup.entryTime )
 		frame.player.set( signup.name, signup.position, entry_time )
 		frame.player.set_icon( gui.spec_icons[ signup.specName ] and gui.spec_icons[ signup.specName ] or "", string.match( signup.specName, "(%a+)" ) )
+
+		local online = is_player_online( signup.name )
+		frame.player.label:SetTextColor( online and 1 or 0.75, online and 1 or 0.7, online and 1 or 0.7 )
 		frame:Show()
 
 		return frame
@@ -231,7 +305,14 @@ function M.new()
 			frame:SetPoint( p.point, UIParent, p.relative_point, p.x, p.y )
 		end
 
-		frame.online_indicator = gui.create_online_indicator( frame, frame.titlebar.btn_close )
+		---
+		--- Titlebar buttons
+		---
+		frame.btn_invite = m.GuiElements.tiny_button( frame, "I", "Invite to raid", "#7b1fa2" )
+		frame.btn_invite:SetPoint( "Right", frame.titlebar.btn_close, "Left", 2, 0 )
+		frame.btn_invite:SetScript( "OnClick", on_invite_click )
+
+		frame.online_indicator = gui.create_online_indicator( frame, frame.btn_invite )
 
 		local border_desc = m.FrameBuilder.new()
 				:parent( frame )
@@ -394,6 +475,7 @@ function M.new()
 	end
 
 	local function set_description( desc )
+		--desc = string.gsub( desc, "https://raidres%.fly%.dev/res/([A-Z0-9]+)", "|cffffffff|Hraidcal:sr:%1|h[https://raidres%.fly%.dev/res/%1]|h|r" )
 		popup.desc:SetText( desc )
 
 		local lineHeight = 14
@@ -420,8 +502,8 @@ function M.new()
 		local now = time( date( "*t" ) )
 		local signup_class
 		event = m.db.events[ event_id ]
-
 		popup.online_indicator.update()
+		update_guild_online_cache()
 
 		-- Reset cached elements
 		for _, type in frame_cache do
@@ -429,6 +511,13 @@ function M.new()
 				frame.is_used = false
 				frame:Hide()
 			end
+		end
+
+		local show_invite = event.leaderId == m.db.user_settings.discord_id or m.debug_enabled
+		if show_invite then
+			popup.btn_invite:Enable()
+		else
+			popup.btn_invite:Disable()
 		end
 
 		-- Event details

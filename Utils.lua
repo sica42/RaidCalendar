@@ -100,6 +100,14 @@ function M.find( value, t, extract_field )
 	return nil
 end
 
+function M.wipe( tbl )
+	if type( tbl ) ~= "table" then return end
+
+	for k in pairs( tbl ) do
+		tbl[ k ] = nil
+	end
+end
+
 ---@param t table
 ---@return number
 function M.count( t )
@@ -268,6 +276,7 @@ string.match = function( str, pattern )
 end
 
 ---@diagnostic disable-next-line: lowercase-global
+---@return string
 strtrim = strtrim or function( s )
 	if type( s ) ~= "string" then
 		return ""

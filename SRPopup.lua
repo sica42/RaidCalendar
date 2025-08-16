@@ -110,6 +110,7 @@ function M.new()
 			else
 				table.insert( rollfor_data.softreserves, {
 					name = res.character.name,
+					role = res.character.specialization,
 					items = {
 						[ 1 ] = {
 							id = m.find( res.raidItemId, m.loot_table[ raid_id ].raidItems, "id" ).itemId,
@@ -254,16 +255,6 @@ function M.new()
 			if item_name and item_tex then
 				item_label.set( item_name )
 				item_label.set_icon( item_tex )
-				--[[			else
-				local name, _, quality, _, _, _, _, _, tex = GetItemInfo( item.itemId )
-				if name then
-					name = (ITEM_QUALITY_COLORS[ quality ].hex) .. name .. "|r"
-					item_label.set( name )
-					item_label.set_icon( tex )
-				else
-					item_label.set( "Unkown item" )
-					item_label.set_icon( nil )
-				end]]
 			end
 
 			local w = item_label.label:GetStringWidth()
@@ -341,16 +332,6 @@ function M.new()
 			if item_name and item_tex then
 				icon:SetTexture( item_tex )
 				label_item:SetText( item_name )
-				--[[else
-				local name, _, quality, _, _, _, _, _, tex = GetItemInfo( item.itemId )
-				if name then
-					name = (ITEM_QUALITY_COLORS[ quality ].hex) .. name .. "|r"
-					icon:SetTexture( tex )
-					label_item:SetText( name )
-				else
-					icon:SetTexture( nil )
-					label_item:SetText( "Unkown item" )
-				end]]
 			end
 
 			btn_remove:Enable()
@@ -581,7 +562,7 @@ function M.new()
 			if not m.debug_enabled or m.db.events[ event_id ].leaderId == m.db.user_settings.discord_id then
 				m.ace_timer.ScheduleTimer( M, function()
 					frame.btn_refresh:Enable()
-				end, 60 * 5 )
+				end, 60 )
 			end
 		end )
 
@@ -753,7 +734,9 @@ function M.new()
 		for _, res in ipairs( sr_list ) do
 			if res.character.name == m.player then
 				sr_count = sr_count + 1
-				popup[ "sr" .. sr_count ].set_item( res )
+				if sr_count < 3 then
+					popup[ "sr" .. sr_count ].set_item( res )
+				end
 			end
 		end
 

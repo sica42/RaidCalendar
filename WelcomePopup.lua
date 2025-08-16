@@ -23,6 +23,14 @@ function M.new()
 		local tick = timer + 1
 		local sent = false
 
+		popup.status1:SetText("Checking for bot in guild.")
+		popup.status2:SetText("")
+		popup.status3:SetText("")
+		popup.step2:Hide()
+		popup.input_discord:SetText( "" )
+		popup.btn_verify:Enable()
+		popup.btn_complete:Hide()
+
 		popup:SetScript( "OnUpdate", function()
 			local now = GetTime()
 
@@ -37,9 +45,9 @@ function M.new()
 				m.msg.bot_status()
 			end
 
-			if now - timer >= 5 then
+			if now - timer >= 7 then
 				popup:SetScript( "OnUpdate", nil )
-				popup.status1:SetText( popup.status1:GetText() .. " No response!" )
+				popup.status1:SetText( "Checking for bot in guild. No response!" )
 			end
 		end )
 	end
@@ -64,6 +72,26 @@ function M.new()
 		m.msg.find_discord_id( discord_id )
 	end
 
+	local function on_close()
+		StaticPopupDialogs["RC_WELCOME_CLOSE"] = {
+			text = "Show welcome popup on this character again?\nYou can type /rc welcome to show it again.",
+			button1 = "Yes",
+			button2 = "Never",
+			OnAccept = function()
+				popup:Hide()
+			end,
+			OnCancel = function()
+				m.db.user_settings.show_welcome_popup = false
+				popup:Hide()
+			end,
+			timeout = 0,
+			whileDead = true,
+			hideOnEscape = true,
+		}
+
+		StaticPopup_Show("RC_WELCOME_CLOSE")
+	end
+
 	local function create_frame()
 		---@class WelcomeFrame: BuilderFrame
 		local frame = m.FrameBuilder.new()
@@ -75,6 +103,7 @@ function M.new()
 				:backdrop( { bgFile = "Interface/Buttons/WHITE8x8" } )
 				:backdrop_color( 0, 0, 0, 0.8 )
 				:close_button()
+				:on_close( on_close )
 				:width( 300 )
 				:height( 210 )
 				:movable()
@@ -130,7 +159,6 @@ function M.new()
 		input_discord:SetAutoFocus( false )
 		input_discord:SetScript( "OnEnterPressed", on_discord_check )
 		input_discord:SetFontObject(gui.font_highlight )
-		input_discord:SetText( m.db.user_settings.discord_id or "" )
 		frame.input_discord = input_discord
 
 		local btn_verify = gui.create_button( step2, "Verify", 70, on_discord_check )
@@ -152,8 +180,8 @@ function M.new()
 			popup:SetScript( "OnUpdate", nil )
 
 			local s = popup.status1:GetText()
-			popup.status1:SetText( s .. " Got response from \"" .. name .. "\"." )
-			popup.status2:SetText( "Enter your Discord ID or username.")
+			popup.status1:SetText( "Checking for bot in guild. Got response from \"" .. name .. "\"." )
+			popup.status2:SetText( "Enter your Discord username/server nick.")
 			popup.step2:Show()
 			popup.input_discord:SetFocus()
 		end
@@ -190,8 +218,8 @@ function M.new()
 	local function show()
 		if not popup then
 			popup = create_frame()
-			start_timer()
 		end
+		start_timer()
 
 		popup:Show()
 	end

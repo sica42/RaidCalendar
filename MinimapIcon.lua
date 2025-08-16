@@ -23,15 +23,15 @@ function M.new()
 
 	local obj = ldb:NewDataObject( "Broker_RaidCalendar", data ) ---[[@as LibDataBroker.DataDisplay]]
 
-	local function group_by_day(sorted_events)
+	local function group_by_day( sorted_events )
 		local grouped = {}
 		local now = time()
-		local today = date("*t", now)
-		local tomorrow = date("*t", now + 86400)
+		local today = date( "*t", now )
+		local tomorrow = date( "*t", now + 86400 )
 
-		for _, event in ipairs(sorted_events) do
+		for _, event in ipairs( sorted_events ) do
 			local eventTime = event.startTime
-			local dt = date("*t", eventTime)
+			local dt = date( "*t", eventTime )
 
 			local label
 			if dt.year == today.year and dt.yday == today.yday then
@@ -41,17 +41,17 @@ function M.new()
 			elseif eventTime - now > 604800 then
 				label = "In the distant future"
 			else
-				label = date("%A", eventTime)
+				label = date( "%A", eventTime )
 			end
 
-			local _, index = m.find(label, grouped, "label")
+			local _, index = m.find( label, grouped, "label" )
 
 			if not index then
-				table.insert( grouped, { label=label, entries={} })
+				table.insert( grouped, { label = label, entries = {} } )
 				index = getn( grouped )
 			end
 
-			table.insert(grouped[index].entries, event)
+			table.insert( grouped[ index ].entries, event )
 		end
 
 		return grouped
@@ -69,27 +69,46 @@ function M.new()
 			end
 		end
 
-		table.sort(events, function(a, b)
+		table.sort( events, function( a, b )
 			return a.startTime < b.startTime
-		end)
+		end )
 
-		local grouped = group_by_day(events )
+		local grouped = group_by_day( events )
 
 		self:AddLine( "Upcoming raids" )
 		self:AddLine( " " )
 
-		for _, group in ipairs(grouped) do
+		for _, group in ipairs( grouped ) do
 			self:AddLine( group.label )
-			for _, e in ipairs(group.entries) do
+			for _, e in ipairs( group.entries ) do
 				local event = m.db.events[ e.key ]
 				local start_time = date( m.time_format, event.startTime )
-				self:AddLine(string.format("  - %s |cffffffff[%s]|r", m.capitalize_words(event.title), start_time))
+				self:AddLine( string.format( "  - %s |cffffffff[%s]|r", m.capitalize_words( event.title ), start_time ) )
 			end
 		end
 	end
 
 	function obj:OnClick( button )
-		m.calendar_popup.toggle()
+		m.debug( button )
+		if button == "LeftButton" then
+			if m.api.IsShiftKeyDown() then
+				m.event_popup.toggle()
+				-- show current raid
+			elseif m.api.IsControlKeyDown() then
+				local events = m.db.events
+				for _, event in pairs( events ) do
+					if event.startTime - time() > 0 and event.srId then
+						m.debug(tostring(event.srId))
+						m.sr_popup.toggle( event.srId)
+						break
+					end
+				end
+				-- show current SR
+			else
+				-- show calendar
+				m.calendar_popup.toggle()
+			end
+		end
 	end
 
 	icon:Register( m.name, obj, m.db.minimap_icon )
