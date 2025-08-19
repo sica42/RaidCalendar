@@ -89,23 +89,12 @@ function M.new()
 	end
 
 	function obj:OnClick( button )
-		m.debug( button )
 		if button == "LeftButton" then
 			if m.api.IsShiftKeyDown() then
 				m.event_popup.toggle()
-				-- show current raid
 			elseif m.api.IsControlKeyDown() then
-				local events = m.db.events
-				for _, event in pairs( events ) do
-					if event.startTime - time() > 0 and event.srId then
-						m.debug(tostring(event.srId))
-						m.sr_popup.toggle( event.srId)
-						break
-					end
-				end
-				-- show current SR
+				m.sr_popup.toggle()
 			else
-				-- show calendar
 				m.calendar_popup.toggle()
 			end
 		end

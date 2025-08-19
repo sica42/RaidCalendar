@@ -8,7 +8,7 @@ if m.SRPopup then return end
 ---@class SRPopup
 ---@field show fun( event_id: string )
 ---@field hide fun()
----@field toggle fun( event_id: string )
+---@field toggle fun( event_id: string? )
 ---@field is_visible fun(): boolean
 ---@field update fun( event_id: string? )
 
@@ -786,10 +786,10 @@ function M.new()
 	end
 
 	local function toggle( _event_id )
-		if popup and popup:IsVisible() and _event_id == event_id then
+		if popup and popup:IsVisible() and (_event_id == event_id or not _event_id) then
 			popup:Hide()
-		else
-			show( _event_id )
+		elseif _event_id or event_id then
+			show( _event_id or event_id )
 		end
 	end
 

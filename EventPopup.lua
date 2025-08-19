@@ -708,8 +708,8 @@ function M.new()
 	local function toggle()
 		if popup and popup:IsVisible() then
 			popup:Hide()
-		else
-			show()
+		elseif event and event.id then
+			show( event.id)
 		end
 	end
 
