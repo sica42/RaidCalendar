@@ -122,25 +122,10 @@ function M.new()
 			end
 		end
 
-		math.huge = 1e99
-		---@diagnostic disable-next-line: undefined-global
-		local json = LibStub( "Json-0.1.2" )
-		local success, json_data = pcall( function() return json.encode( rollfor_data ) end )
-		if success then
-			local softres_data = m.encode_base64( json_data )
-
-			_RollFor.import_encoded_softres_data( softres_data, function()
-				local softres_check = _RollFor.softres_check
-				local result = softres_check.check_softres()
-
-				if result ~= softres_check.ResultType.NoItemsFound then
-					_RollFor.softres.persist( softres_data )
-					_RollFor.dropped_loot_announce.reset()
-					_RollFor.softres_gui.load( softres_data )
-				end
-			end )
+		if RollFor.key_bindings then
+			RollFor.key_bindings.import( rollfor_data )
 		else
-			m.error( "Encoding of SR data failed" )
+			m.info( "RollFor v4.8.1 or higher is required." )
 		end
 	end
 

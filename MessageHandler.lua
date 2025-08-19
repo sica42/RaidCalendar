@@ -233,6 +233,8 @@ function M.new()
 	---@return table
 	local function decode( tbl, keymap, valuemap )
 		local ret = {}
+		if not table then return ret end
+
 		for key, value in pairs( tbl ) do
 			if type( value ) == "table" then
 				value = decode( value, keymap, valuemap )
