@@ -91,7 +91,6 @@ function RaidCalendar.events:ADDON_LOADED()
 			local type, id = string.match( data, "^(%w+):(.+)" )
 			if type == "event" then
 				m.event_popup.show( id )
-				return
 			elseif type == "sr" then
 				m.sr_popup.show( id )
 			end

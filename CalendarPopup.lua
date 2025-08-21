@@ -93,7 +93,7 @@ function M.new()
 		color_bar:SetVertexColor( 0, 0, 0, 0 )
 
 
-		local title = frame:CreateFontString( nil, "ARTWORK", "GIFontNormal" )
+		local title = frame:CreateFontString( nil, "ARTWORK", "RCFontNormal" )
 		title:SetPoint( "TopLeft", frame, "TopLeft", 5, -2 )
 		title:SetWidth( 260 )
 		title:SetHeight( 35 )
@@ -343,7 +343,7 @@ function M.new()
 		} )
 		frame.settings.time_format = dd_timeformat
 
-		local label_timeformat = frame.settings:CreateFontString( nil, "ARTWORK", "GIFontNormal" )
+		local label_timeformat = frame.settings:CreateFontString( nil, "ARTWORK", "RCFontNormal" )
 		label_timeformat:SetPoint( "Right", dd_timeformat, "Left", -10, 0 )
 		label_timeformat:SetText( "Time format" )
 

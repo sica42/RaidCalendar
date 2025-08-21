@@ -349,12 +349,9 @@ function M.new()
 		frame.desc_frame:SetWidth( 480 )
 		frame.desc_frame:SetHeight( 1 )
 
-		frame.desc = frame.desc_frame:CreateFontString( nil, "ARTWORK", "GIFontNormal" )
+		frame.desc = gui.create_rich_text_frame( frame.desc_frame, 480 )
 		frame.desc:SetPoint( "Top", frame.desc_frame, "Top", 0, 0 )
 		frame.desc:SetPoint( "Left", frame.desc_frame, "Left", 0, 0 )
-		frame.desc:SetPoint( "Right", frame.desc_frame, "Right", 0, 0 )
-		frame.desc:SetJustifyH( "Left" )
-		frame.desc:SetJustifyV( "Top" )
 
 		frame.leader = gui.create_icon_label( frame, "Interface\\AddOns\\RaidCalendar\\assets\\icon_leader.tga", 140 )
 		frame.leader:SetPoint( "TopLeft", frame, "TopLeft", 20, -140 )
@@ -403,7 +400,7 @@ function M.new()
 			prev = frame[ btn ]
 		end
 
-		frame.label_noaccess = frame:CreateFontString( nil, "ARTWORK", "GIFontHighlight" )
+		frame.label_noaccess = frame:CreateFontString( nil, "ARTWORK", "RCFontHighlight" )
 		frame.label_noaccess:SetPoint( "TopLeft", frame[ "btn_signup" ], "BottomLeft", 0, -10 )
 		frame.label_noaccess:SetPoint( "BottomRight", frame[ "btn_signup" ], "BottomRight", 0, -110 )
 		frame.label_noaccess:SetJustifyV( "Top" )
@@ -474,30 +471,6 @@ function M.new()
 		return frame
 	end
 
-	local function set_description( desc )
-		--desc = string.gsub( desc, "https://raidres%.fly%.dev/res/([A-Z0-9]+)", "|cffffffff|Hraidcal:sr:%1|h[https://raidres%.fly%.dev/res/%1]|h|r" )
-		popup.desc:SetText( desc )
-
-		local lineHeight = 14
-		local frameWidth = popup.desc_frame:GetWidth()
-		local textWidth = popup.desc:GetStringWidth()
-		local numLines = math.ceil( textWidth / frameWidth )
-
-		local newlineCount = 0
-		for i = 1, string.len( desc ) do
-			if string.sub( desc, i, i ) == "\n" then
-				newlineCount = newlineCount + 1
-			end
-		end
-
-		local totalLines = newlineCount + numLines
-		local textHeight = totalLines * lineHeight + 10
-
-		popup.desc:SetHeight( 700 )
-		popup.scroll_bar:SetMinMaxValues( 0, math.max( 0, textHeight - 100 ) )
-		popup.scroll_bar:SetValue( 0 )
-	end
-
 	function refresh( event_id )
 		local now = time( date( "*t" ) )
 		local signup_class
@@ -524,11 +497,14 @@ function M.new()
 		popup.titlebar.title:SetText( event.title )
 
 		if not event.description then
-			set_description( 'Hang on while event data is loaded...' )
+			popup.desc:SetRightText( 'Hang on while event data is loaded...' )
 			m.msg.request_event( event_id )
 			return
 		end
-		set_description( event.description )
+
+		popup.desc:SetRichText( event.description )
+		popup.scroll_bar:SetMinMaxValues( 0, math.max( 0, popup.desc:GetHeight() - 65 ) )
+		popup.scroll_bar:SetValue( 0 )
 
 		popup.leader.set( event.leaderName )
 		popup.date.set( date( "%d. %B %Y", event.startTime ) )
@@ -709,7 +685,7 @@ function M.new()
 		if popup and popup:IsVisible() then
 			popup:Hide()
 		elseif event and event.id then
-			show( event.id)
+			show( event.id )
 		end
 	end
 

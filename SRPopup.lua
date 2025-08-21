@@ -145,7 +145,7 @@ function M.new()
 				:height( 20 )
 				:build()
 
-		local player_label = frame:CreateFontString( nil, "ARTWORK", "GIFontHighlight" )
+		local player_label = frame:CreateFontString( nil, "ARTWORK", "RCFontHighlight" )
 		player_label:SetPoint( "TopLeft", frame, "TopLeft", 3, -2 )
 		player_label:SetHeight( 16 )
 		player_label:SetJustifyH( "Left" )
@@ -176,7 +176,7 @@ function M.new()
 		item_label:SetPoint( "Left", class_label, "Right", 5, 0 )
 		item_label:EnableMouse( true )
 
-		local sr_label = frame:CreateFontString( nil, "ARTWORK", "GIFontHighlight" )
+		local sr_label = frame:CreateFontString( nil, "ARTWORK", "RCFontHighlight" )
 		sr_label:SetPoint( "Right", frame, "Right", -5, 0 )
 		sr_label:SetJustifyH( "Left" )
 
@@ -271,7 +271,7 @@ function M.new()
 		icon:SetWidth( 32 )
 		icon:SetHeight( 32 )
 
-		local label_item = frame:CreateFontString( nil, "ARTWORK", "GIFontHighlight" )
+		local label_item = frame:CreateFontString( nil, "ARTWORK", "RCFontHighlight" )
 		label_item:SetPoint( "Left", icon, "Right", 5, 0 )
 
 		local btn_remove = CreateFrame( "Button", nil, frame )
@@ -561,7 +561,7 @@ function M.new()
 		--
 		-- Main content
 		--
-		local label_yoursr = border_reserve:CreateFontString( nil, "ARTWORK", "GIFontHighlight" )
+		local label_yoursr = border_reserve:CreateFontString( nil, "ARTWORK", "RCFontHighlight" )
 		label_yoursr:SetPoint( "TopLeft", border_reserve, "TopLeft", 10, -10 )
 		label_yoursr:SetText( "Your reservations (0/0)" )
 		frame.yoursr = label_yoursr
@@ -582,12 +582,12 @@ function M.new()
 		frame.dd_spec:SetPoint( "TopLeft", border_reserve, "TopLeft", 10, -30 )
 		frame.dd_spec:SetItems( sr_dropdown_specs )
 
-		frame.label_sr1 = border_reserve:CreateFontString( nil, "ARTWORK", "GIFontHighlight" )
+		frame.label_sr1 = border_reserve:CreateFontString( nil, "ARTWORK", "RCFontHighlight" )
 		frame.label_sr1:SetPoint( "TopLeft", border_reserve, "TopLeft", 140, -36 )
 		frame.label_sr1:SetWidth( 30 )
 		frame.label_sr1:SetText( "SR 1" )
 
-		frame.label_sr2 = border_reserve:CreateFontString( nil, "ARTWORK", "GIFontHighlight" )
+		frame.label_sr2 = border_reserve:CreateFontString( nil, "ARTWORK", "RCFontHighlight" )
 		frame.label_sr2:SetPoint( "TopLeft", frame.label_sr1, "BottomLeft", 0, -20 )
 		frame.label_sr2:SetWidth( 30 )
 		frame.label_sr2:SetText( "SR 2" )

@@ -11,22 +11,40 @@ if m.GuiElements then return end
 ---@field pfui_skin fun( frame: Frame )
 local M = {}
 
-M.font_normal = CreateFont( "GIFontNormal" )
+M.font_normal = CreateFont( "RCFontNormal" )
 M.font_normal:SetFont( "Interface\\AddOns\\RaidCalendar\\assets\\Myriad-Pro.ttf", 12, "" )
 M.font_normal:SetTextColor( NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b )
 
-M.font_highlight = CreateFont( "GIFontHighlight" )
+M.font_normal_bold = CreateFont( "RCFontNormalBold" )
+M.font_normal_bold:SetFont( "Interface\\AddOns\\RaidCalendar\\assets\\Myriad-Pro.ttf", 13, "" )
+M.font_normal_bold:SetTextColor( NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b )
+
+M.font_normal_h1 = CreateFont( "RCFontNormalH1" )
+M.font_normal_h1:SetFont( "Interface\\AddOns\\RaidCalendar\\assets\\Myriad-Pro.ttf", 16, "" )
+
+M.font_normal_h2 = CreateFont( "RCFontNormalH2" )
+M.font_normal_h2:SetFont( "Interface\\AddOns\\RaidCalendar\\assets\\Myriad-Pro.ttf", 15, "" )
+
+M.font_normal_h3 = CreateFont( "RCFontNormalH3" )
+M.font_normal_h3:SetFont( "Interface\\AddOns\\RaidCalendar\\assets\\Myriad-Pro.ttf", 14, "" )
+
+M.font_normal_small = CreateFont( "RCFontNormalSmall" )
+M.font_normal_small:SetFont( "Interface\\AddOns\\RaidCalendar\\assets\\Myriad-Pro.ttf", 11, "" )
+
+M.font_normal_subtext = CreateFont( "RCFontNormalSmall" )
+M.font_normal_subtext:SetFont( "Interface\\AddOns\\RaidCalendar\\assets\\Myriad-Pro.ttf", 10, "" )
+
+M.font_highlight = CreateFont( "RCFontHighlight" )
 M.font_highlight:SetFont( "Interface\\AddOns\\RaidCalendar\\assets\\Myriad-Pro.ttf", 12, "" )
 M.font_highlight:SetTextColor( HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b )
 
-M.font_highlight_big = CreateFont( "GIFontHighlightBig" )
+M.font_highlight_big = CreateFont( "RCFontHighlightBig" )
 M.font_highlight_big:SetFont( "Interface\\AddOns\\RaidCalendar\\assets\\Myriad-Pro.ttf", 14, "" )
 M.font_highlight_big:SetTextColor( HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b )
 
-M.font_normal_small = CreateFont( "GIFontNormalSmall" )
-M.font_normal_small:SetFont( "Interface\\AddOns\\RaidCalendar\\assets\\Myriad-Pro.ttf", 11, "" )
 
-M.font_highlight_small = CreateFont( "GIFontHighlightSmall" )
+
+M.font_highlight_small = CreateFont( "RCFontHighlightSmall" )
 M.font_highlight_small:SetFont( "Interface\\AddOns\\RaidCalendar\\assets\\Myriad-Pro.ttf", 11, "" )
 M.font_highlight_small:SetTextColor( HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b )
 
@@ -284,7 +302,7 @@ function M.create_icon_label( parent, icon, width, icon_size )
 		end
 	end )
 
-	frame.count = frame.count_frame:CreateFontString( nil, "ARTWORK", "GIFontNormal" )
+	frame.count = frame.count_frame:CreateFontString( nil, "ARTWORK", "RCFontNormal" )
 	frame.count:SetPoint( "Left", frame.count_frame, "Left", 0, 0 )
 	frame.count:SetTextColor( 1, 1, 1 )
 	frame.count:SetJustifyH( "Left" )
@@ -311,7 +329,7 @@ function M.create_icon_label( parent, icon, width, icon_size )
 		end
 	end )
 
-	frame.label = frame.label_frame:CreateFontString( nil, "ARTWORK", "GIFontNormal" )
+	frame.label = frame.label_frame:CreateFontString( nil, "ARTWORK", "RCFontNormal" )
 	frame.label:SetAllPoints( frame.label_frame )
 	frame.label:SetNonSpaceWrap( false )
 	frame.label:SetTextColor( 1, 1, 1 )
@@ -402,168 +420,282 @@ function M.create_online_indicator( parent, relative_region )
 	return frame
 end
 
-function M.create_rich_text_frame( parent )
+---@param parent Frame
+---@param frame_width number
+function M.create_rich_text_frame( parent, frame_width )
 	---@class RichTextFrame: Frame
 	---@field SetRichText fun( self: RichTextFrame, text: string )
-	local frame = CreateFrame( "Frame", nil, parent or UIParent )
-	frame:SetWidth( 400 )
+	local frame = CreateFrame( "Frame", nil, parent )
+	frame:SetWidth( frame_width )
 	frame:SetHeight( 300 )
-	frame:SetPoint( "Center", parent, "Center", 0, 0 )
+	frame:SetBackdrop( { bgFile = "Interface\\Buttons\\WHITE8X8" } )
+	frame:SetBackdropColor( 0, 0, 0, 1 )
 
-	-- Storage for text elements
-	local textElements = {}
-	local clickableElements = {}
+	local sizer = frame:CreateFontString( nil, "OVERLAY", "RCFontNormal" )
+	local padding = 0
+	local frame_cache = {}
 
-	-- Clear all elements
-	local function ClearElements()
-		for _, element in ipairs( textElements ) do
-			element:Hide()
+	local function clear_cache()
+		for _, type in frame_cache do
+			for _, f in type do
+				f.is_used = false
+				f:Hide()
+			end
 		end
-		for _, element in ipairs( clickableElements ) do
-			element:Hide()
-		end
-		textElements = {}
-		clickableElements = {}
 	end
 
-	-- Create a font string
-	local function CreateFontString( text, font, color, x, y )
-		local fs = frame:CreateFontString( nil, "OVERLAY", font or "GameFontNormal" )
+	---@param frame_type string
+	local function get_from_cache( frame_type )
+		frame_cache[ frame_type ] = frame_cache[ frame_type ] or {}
+
+		for i = getn( frame_cache[ frame_type ] ), 1, -1 do
+			if not frame_cache[ frame_type ][ i ].is_used then
+				return frame_cache[ frame_type ][ i ]
+			end
+		end
+	end
+
+	---@param text string
+	---@param font Font
+	---@param color table?
+	---@param x number
+	---@param y number
+	local function create_fontstring( text, font, color, x, y )
+		local fs = get_from_cache( "font_string" )
+		if not fs then
+			fs = frame:CreateFontString( nil, "OVERLAY", "GameFontHighlight" )
+		end
+
+		fs:SetFontObject( font )
+		fs.is_used = true
+		fs:Show()
 		fs:SetText( text )
-		fs:SetPoint( "TopLeft", frame, "TopLeft", x, y )
+		fs:SetPoint( "BottomLeft", frame, "TopLeft", x, y )
+
 		if color then
 			fs:SetTextColor( color.r, color.g, color.b )
 		end
-		table.insert( textElements, fs )
+		table.insert( frame_cache[ "font_string" ], fs )
 		return fs
 	end
 
-	-- Create a clickable button over text
-	local function CreateClickableText( text, x, y, width, height, onClick )
-		local button = CreateFrame( "Button", nil, frame )
-		button:SetWidth( width )
-		button:SetHeight( height )
-		button:SetPoint( "TopLeft", frame, "TopLeft", x, y )
+	---@param x number
+	---@param y number
+	---@param area_width number
+	---@param area_height number
+	---@param onClick function
+	local function create_clickable_area( x, y, area_width, area_height, onClick )
+		local button = get_from_cache( "button" )
+		if not button then
+			button = CreateFrame( "Button", nil, frame )
+		end
+
+		button.is_used = true
+		button:Show()
+		button:SetWidth( area_width )
+		button:SetHeight( area_height )
+		button:SetPoint( "BottomLeft", frame, "TopLeft", x, y )
 		button:SetScript( "OnClick", onClick )
 
-		-- Visual feedback
-		button:SetScript( "OnEnter", function( self )
-			GameTooltip:SetOwner( self, "ANCHOR_RIGHT" )
-			GameTooltip:SetText( "Click to open link" )
-			GameTooltip:Show()
-		end )
-		button:SetScript( "OnLeave", function( self )
-			GameTooltip:Hide()
-		end )
-
-		table.insert( clickableElements, button )
+		table.insert( frame_cache[ "button" ], button )
 		return button
+	end
+
+	---@param x number
+	---@param y number
+	---@param width number
+	---@param color table
+	local function create_underline( x, y, width, color )
+		local line = get_from_cache( "line" )
+		if not line then
+			line = frame:CreateTexture( nil, "ARTWORK" )
+			line:SetTexture("Interface\\Buttons\\WHITE8x8")
+		end
+
+		line.is_used = true
+		line:Show()
+		line:SetVertexColor( color.r, color.g, color.b, color.a or 1 )
+		line:SetPoint( "BottomLeft", frame, "TopLeft", x, y )
+		line:SetWidth( width )
+		line:SetHeight( 1 )
+
+		table.insert( frame_cache[ "line" ], line )
+		return line
+	end
+
+	local function split_line( lines, line )
+		sizer:SetText( line )
+		if sizer:GetStringWidth() > frame_width - padding * 2 then
+			local words = {}
+			for word in string.gmatch( line, "%S+" ) do
+				table.insert( words, word )
+			end
+
+			local currentLine = ""
+			for _, word in ipairs( words ) do
+				sizer:SetText( currentLine .. " " .. word )
+				if currentLine == "" then
+					currentLine = word
+				elseif sizer:GetStringWidth() <= frame_width - padding * 2 then
+					currentLine = currentLine .. " " .. word
+				else
+					table.insert( lines, currentLine )
+					currentLine = word
+				end
+			end
+
+			if currentLine ~= "" then
+				table.insert( lines, currentLine )
+			end
+		else
+			table.insert( lines, line )
+		end
+
+		return lines
 	end
 
 	-- Parse and render rich text
 	function frame:SetRichText( text )
-		ClearElements()
+		clear_cache()
 
 		local lines = {}
-		local currentLine = ""
-
-		-- Split into lines
 		local start = 1
-		while start <= string.len(text) do
-				local newlinePos = string.find(text, "\n", start)
-				if newlinePos then
-						local line = string.sub(text, start, newlinePos - 1)
-						if line ~= "" then
-								table.insert(lines, line)
-						end
-						start = newlinePos + 1
-				else
-						local line = string.sub(text, start)
-						if line ~= "" then
-								table.insert(lines, line)
-						end
-						break
+
+		while start <= string.len( text ) do
+			local newlinePos = string.find( text, "\n", start )
+			if newlinePos then
+				local line = string.sub( text, start, newlinePos - 1 )
+				lines = split_line( lines, line )
+				start = newlinePos + 1
+			else
+				local line = string.sub( text, start )
+				if line ~= "" then
+					lines = split_line( lines, line )
 				end
+				break
+			end
 		end
 
-		local yOffset = -10
-		local lineHeight = 16
+		local lineHeight = 12
+		local yOffset = -padding - lineHeight
 
 		for _, line in ipairs( lines ) do
-			local xOffset = 10
+			local xOffset = padding
 			local parts = {}
 			local remaining = line
 
 			-- Parse the line for special formatting
 			while remaining and remaining ~= "" do
-				local beforeHeader, header, afterHeader = string.find( remaining, "(%*%*__(.-)__%*%*)" )
-				local beforeURL, url, afterURL = string.find( remaining, "(https://raidres%.fly%.dev/res/([A-Z0-9a-z]+))" )
+				local b1_s, b1_e, b1_inner = string.find( remaining, "__%*%*(.-)%*%*__" )
+				local b2_s, b2_e, b2_inner = string.find( remaining, "%*%*__(.-)__%*%*" )
+				local beforeBoldUnderline, afterBoldUnderline, boldUnderline
+				if b1_s and (not b2_s or b1_s < b2_s) then
+					beforeBoldUnderline, afterBoldUnderline, boldUnderline = b1_s, b1_e, b1_inner
+				elseif b2_s then
+					beforeBoldUnderline, afterBoldUnderline, boldUnderline = b2_s, b2_e, b2_inner
+				end
 
-				local nextHeader = beforeHeader or math.huge
-				local nextURL = beforeURL or math.huge
+				local beforeBold, afterBold, bold = string.find( remaining, "%*%*(.-)%*%*" )
+				local beforeUnderline, afterUnderline, underline = string.find( remaining, "__(.-)__" )
+				local beforeItalic, afterItalic, italic = string.find( remaining, "%*(.-)%*" )
+				local url_s, url_e, url_full, url_id = string.find( remaining, "(https://raidres%.fly%.dev/res/([A-Za-z0-9]+))" )
 
-				if nextHeader < nextURL then
-					-- Found header first
-					if beforeHeader > 1 then
-						-- Add text before header
-						local beforeText = string.sub( remaining, 1, beforeHeader - 1 )
+				-- Pick earliest match
+				local candidates = {
+					{ before = beforeBoldUnderline, after = afterBoldUnderline, kind = "bold_underline", content = boldUnderline },
+					{ before = beforeBold,          after = afterBold,          kind = "bold",           content = bold },
+					{ before = beforeUnderline,     after = afterUnderline,     kind = "underline",      content = underline },
+					{ before = beforeItalic,        after = afterItalic,        kind = "text",           content = italic }, -- no italic support, use text
+					{ before = url_s,               after = url_e,              kind = "url",            content = url_full,     id = url_id },
+				}
+
+				local earliest = nil
+				for _, c in ipairs( candidates ) do
+					if c.before and (not earliest or c.before < earliest.before) then
+						earliest = c
+					end
+				end
+
+				if earliest then
+					-- Add text before the match
+					if earliest.before > 1 then
+						local beforeText = string.sub( remaining, 1, earliest.before - 1 )
 						table.insert( parts, { type = "text", content = beforeText } )
 					end
-					-- Add header
-					if header then
-						table.insert( parts, { type = "header", content = string.match( header, "__(.-)__" ) } )
-						remaining = string.sub( remaining, afterHeader + 1 )
-					end
-				elseif nextURL < nextHeader then
-					-- Found URL first
-					if beforeURL > 1 then
-						-- Add text before URL
-						local beforeText = string.sub( remaining, 1, beforeURL - 1 )
-						table.insert( parts, { type = "text", content = beforeText } )
-					end
-					-- Add URL
-					if url then
-						local urlId = string.match( url, "/res/([A-Z0-9a-z]+)" )
-						table.insert( parts, { type = "url", content = url, id = urlId } )
-					end
-					remaining = string.sub( remaining, afterURL + 1 )
+
+					table.insert( parts, { type = earliest.kind, content = earliest.content, id = earliest.id } )
+
+					-- Continue parsing after match
+					remaining = string.sub( remaining, earliest.after + 1 )
 				else
-					-- No more special formatting
+					-- No formatting match, handle as plain text or headers
 					if remaining ~= "" then
-						table.insert( parts, { type = "text", content = remaining } )
+						if string.find( remaining, "^#%s" ) then
+							table.insert( parts, { type = "h1", content = string.sub( remaining, 3 ) } )
+						elseif string.find( remaining, "^##%s" ) then
+							table.insert( parts, { type = "h2", content = string.sub( remaining, 4 ) } )
+						elseif string.find( remaining, "^###%s" ) then
+							table.insert( parts, { type = "h3", content = string.sub( remaining, 5 ) } )
+						elseif string.find( remaining, "^-#%s" ) then
+							table.insert( parts, { type = "subtext", content = string.sub( remaining, 4 ) } )
+						else
+							table.insert( parts, { type = "text", content = remaining } )
+						end
 					end
 					break
 				end
 			end
 
 			-- Render the parts
+			local part_height = lineHeight
 			for _, part in ipairs( parts ) do
 				if part.type == "text" then
-					local fs = CreateFontString( part.content, "GameFontNormal", nil, xOffset, yOffset )
+					local fs = create_fontstring( part.content, M.font_normal, NORMAL_FONT_COLOR, xOffset, yOffset )
 					xOffset = xOffset + fs:GetStringWidth()
-				elseif part.type == "header" then
-					local fs = CreateFontString( part.content, "GameFontNormalLarge", { r = 1, g = 1, b = 0 }, xOffset, yOffset )
+				elseif part.type == "subtext" then
+					local fs = create_fontstring( part.content, M.font_normal_subtext, { r = 0.6, g = 0.6, b = 0 }, xOffset, yOffset )
 					xOffset = xOffset + fs:GetStringWidth()
+				elseif part.type == "bold" then
+					local fs = create_fontstring( strtrim( part.content ), M.font_normal_bold, { r = 1, g = 1, b = 0 }, xOffset, yOffset )
+					xOffset = xOffset + fs:GetStringWidth()
+				elseif part.type == "underline" then
+					local fs = create_fontstring( strtrim( part.content ), M.font_normal, NORMAL_FONT_COLOR, xOffset, yOffset )
+					create_underline( xOffset, yOffset, fs:GetStringWidth(), { r = 1, g = 1, b = 0 } )
+					xOffset = xOffset + fs:GetStringWidth()
+				elseif part.type == "bold_underline" then
+					local fs = create_fontstring( strtrim( part.content ), M.font_normal_bold, { r = 1, g = 1, b = 0 }, xOffset, yOffset )
+					create_underline( xOffset, yOffset, fs:GetStringWidth(), { r = 1, g = 1, b = 0 } )
+					xOffset = xOffset + fs:GetStringWidth()
+				elseif part.type == "h1" then
+					local fs = create_fontstring( part.content, M.font_normal_h1, { r = 1, g = 1, b = 0 }, xOffset, yOffset - 3 )
+					xOffset = xOffset + fs:GetStringWidth()
+					part_height = 15
+				elseif part.type == "h2" then
+					local fs = create_fontstring( part.content, M.font_normal_h2, { r = 1, g = 1, b = 0 }, xOffset, yOffset - 2 )
+					xOffset = xOffset + fs:GetStringWidth()
+					part_height = 14
+				elseif part.type == "h3" then
+					local fs = create_fontstring( part.content, M.font_normal_h3, { r = 1, g = 1, b = 0 }, xOffset, yOffset - 1 )
+					xOffset = xOffset + fs:GetStringWidth()
+					part_height = 13
 				elseif part.type == "url" then
-					local linkText = "link"
-					local fs = CreateFontString( linkText, "GameFontNormal", { r = 0.3, g = 0.7, b = 1 }, xOffset, yOffset )
-					local width = fs:GetStringWidth()
-				--	local height = fs:GetStringHeight()
-					local height = 16 -- Fixed height for clickable area
+					local fs = create_fontstring( part.content, M.font_normal, { r = 0.3, g = 0.7, b = 1 }, xOffset, yOffset )
+					local url_width = fs:GetStringWidth()
+					local sr_id = part.id
 
-					-- Create clickable area
-					CreateClickableText( linkText, xOffset, yOffset - height, width, height, function()
-						DEFAULT_CHAT_FRAME:AddMessage( "Opening raid SR: " .. part.id )
-						-- Add your custom action here
-						-- For example: OpenRaidSR(part.id)
+					create_clickable_area( xOffset, yOffset, url_width, lineHeight, function()
+						local _, id = m.find( sr_id, m.db.events, "srId" )
+						if id then
+							m.sr_popup.toggle( id )
+						end
 					end )
 
-					xOffset = xOffset + width
+					xOffset = xOffset + url_width
 				end
 			end
-
-			yOffset = yOffset - lineHeight
+			yOffset = yOffset - part_height
 		end
+		frame:SetHeight( math.abs( yOffset + lineHeight * 2 ) + padding * 2 )
 	end
 
 	return frame
@@ -602,8 +734,6 @@ function M.pfui_skin( frame )
 		m.api.pfUI.api.StripTextures( frame.settings, nil, "BACKGROUND" )
 		m.api.pfUI.api.CreateBackdrop( frame.settings, nil, true )
 
---		m.api.pfUI.api.SkinButton( frame.settings.btn_loopup )
---		frame.settings.btn_loopup:SetHeight( 22 )
 		m.api.pfUI.api.SkinButton( frame.settings.btn_save )
 		m.api.pfUI.api.SkinButton( frame.settings.btn_welcome )
 		frame.settings.btn_save:SetHeight( 22 )

@@ -110,31 +110,31 @@ function M.new()
 				:esc()
 				:build()
 
-		local label_welcome = frame:CreateFontString( nil, "ARTWORK", "GIFontHighlightBig" )
+		local label_welcome = frame:CreateFontString( nil, "ARTWORK", "RCFontHighlightBig" )
 		label_welcome:SetPoint( "Top", frame, "Top", 0, -40 )
 		label_welcome:SetPoint( "Center", frame, "Center", 0, 0 )
 		label_welcome:SetText( "Welcome to RaidCalendar" )
 
-		local label_info = frame:CreateFontString( nil, "ARTWORK", "GIFontNormal" )
+		local label_info = frame:CreateFontString( nil, "ARTWORK", "RCFontNormal" )
 		label_info:SetPoint( "TopLeft", frame, "TopLeft", 15, -60 )
 		label_info:SetPoint( "BottomRight", frame, "TopRight", -15, -90 )
 		label_info:SetJustifyH( "Left" )
 		label_info:SetText( "Before using RaidCalendar you need to link and verify your Discord account. Please follow the instructions." )
 
-		local label_status1 = frame:CreateFontString( nil, "ARTWORK", "GIFontNormal" )
+		local label_status1 = frame:CreateFontString( nil, "ARTWORK", "RCFontNormal" )
 		label_status1:SetPoint( "TopLeft", label_info, "BottomLeft", 0, -3 )
 		label_status1:SetPoint( "Right", label_info, "Right", 0, 0 )
 		label_status1:SetJustifyH( "Left" )
 		label_status1:SetText("Checking for bot in guild.")
 		frame.status1 = label_status1
 
-		local label_status2 = frame:CreateFontString( nil, "ARTWORK", "GIFontNormal" )
+		local label_status2 = frame:CreateFontString( nil, "ARTWORK", "RCFontNormal" )
 		label_status2:SetPoint( "TopLeft", label_status1, "BottomLeft", 0, -3 )
 		label_status2:SetPoint( "Right", label_status1, "Right", 0, 0 )
 		label_status2:SetJustifyH( "Left" )
 		frame.status2 = label_status2
 
-		local label_status3 = frame:CreateFontString( nil, "ARTWORK", "GIFontNormal" )
+		local label_status3 = frame:CreateFontString( nil, "ARTWORK", "RCFontNormal" )
 		label_status3:SetPoint( "TopLeft", label_status2, "BottomLeft", 0, -3 )
 		label_status3:SetPoint( "BottomRight", label_status2, "BottomRight", 0, -63 )
 		label_status3:SetJustifyV( "Top" )
@@ -147,7 +147,7 @@ function M.new()
 		step2:Hide()
 		frame.step2 = step2
 
-		local label_discord = step2:CreateFontString( nil, "ARTWORK", "GIFontNormal" )
+		local label_discord = step2:CreateFontString( nil, "ARTWORK", "RCFontNormal" )
 		label_discord:SetPoint( "TopLeft", step2, "TopLeft", 0, -5 )
 		label_discord:SetText( "Discord name/ID" )
 		frame.label_discord = label_discord
