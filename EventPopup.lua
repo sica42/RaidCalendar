@@ -401,12 +401,22 @@ function M.new()
 		end
 
 		frame.label_noaccess = frame:CreateFontString( nil, "ARTWORK", "RCFontHighlight" )
-		frame.label_noaccess:SetPoint( "TopLeft", frame[ "btn_signup" ], "BottomLeft", 0, -10 )
-		frame.label_noaccess:SetPoint( "BottomRight", frame[ "btn_signup" ], "BottomRight", 0, -110 )
+		frame.label_noaccess:SetPoint( "TopLeft", frame.attending, "TopRight", 10, 0 )
+		frame.label_noaccess:SetPoint( "Right", frame, "Right", -10, 0 )
+		frame.label_noaccess:SetHeight( 40 )
 		frame.label_noaccess:SetJustifyV( "Top" )
 		frame.label_noaccess:SetJustifyH( "Left" )
-		frame.label_noaccess:SetText( "No access to signup for this event." )
+		frame.label_noaccess:SetText( "You do not have access to signup for this event." )
 		frame.label_noaccess:Hide()
+
+		frame.btn_access = gui.create_button( frame, "Refresh Access", 100, function()
+			this:Disable()
+			frame.label_noaccess:SetText( "Checking access..." )
+			m.msg.check_channel_access( event.channelId, true )
+		end )
+		frame.btn_access:SetPoint( "Top", frame.label_noaccess, "Bottom", 0, -10)
+		frame.btn_access:SetPoint( "Right", frame, "TopRight", -10, 0)
+		frame.btn_access:Hide()
 
 		frame.cs_change = gui.create_button( frame, "Change", 100, change_spec )
 		frame.cs_change:SetPoint( "TopRight", frame, "TopRight", -10, -230 )
@@ -645,23 +655,33 @@ function M.new()
 			end
 		end
 
-		-- Event closed or no access
-		popup.label_noaccess:Hide()
-		local has_access = m.db.user_settings.channel_access[ event.channelId ]
-		if event.closingTime < now or has_access == false then
+		-- Event closed
+		if event.closingTime < now then
 			for _, v in buttons do
 				local btn = "btn_" .. string.gsub( string.lower( v ), "%s", "_" )
 				popup[ btn ]:Disable()
 			end
 			popup.dd_class:Hide()
 			popup.dd_spec:Hide()
-
-			if has_access == false then
-				popup.label_noaccess:Show()
-			end
 		end
 
-		if has_access == nil then
+		popup.label_noaccess:Hide()
+		popup.btn_access:Hide()
+		local has_access = m.db.user_settings.channel_access[ event.channelId ]
+
+		-- No access
+		if has_access == false then
+			for _, v in buttons do
+				local btn = "btn_" .. string.gsub( string.lower( v ), "%s", "_" )
+				popup[ btn ]:Hide()
+			end
+			popup.dd_class:Hide()
+			popup.dd_spec:Hide()
+			popup.label_noaccess:Show()
+			popup.label_noaccess:SetText( "You do not have access to signup for this event." )
+			popup.btn_access:Enable()
+			popup.btn_access:Show()
+		elseif has_access == nil then
 			m.msg.check_channel_access( event.channelId )
 		end
 	end

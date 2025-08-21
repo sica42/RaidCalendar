@@ -660,7 +660,7 @@ function M.create_rich_text_frame( parent, frame_width )
 					xOffset = xOffset + fs:GetStringWidth()
 				elseif part.type == "underline" then
 					local fs = create_fontstring( strtrim( part.content ), M.font_normal, NORMAL_FONT_COLOR, xOffset, yOffset )
-					create_underline( xOffset, yOffset, fs:GetStringWidth(), { r = 1, g = 1, b = 0 } )
+					create_underline( xOffset, yOffset, fs:GetStringWidth(), NORMAL_FONT_COLOR )
 					xOffset = xOffset + fs:GetStringWidth()
 				elseif part.type == "bold_underline" then
 					local fs = create_fontstring( strtrim( part.content ), M.font_normal_bold, { r = 1, g = 1, b = 0 }, xOffset, yOffset )
