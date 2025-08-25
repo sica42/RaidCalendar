@@ -90,9 +90,9 @@ function RaidCalendar.events:ADDON_LOADED()
 		if linkType == "raidcal" then
 			local type, id = string.match( data, "^(%w+):(.+)" )
 			if type == "event" then
-				m.event_popup.show( id )
+				m.event_popup.toggle( id )
 			elseif type == "sr" then
-				m.sr_popup.show( id )
+				m.sr_popup.toggle( id )
 			end
 			return
 		end

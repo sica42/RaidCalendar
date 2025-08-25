@@ -190,9 +190,11 @@ function M.new()
 		end )
 
 		item_label:SetScript( "OnEnter", function()
-			GameTooltip:SetOwner( item_label, "ANCHOR_RIGHT" )
-			GameTooltip:SetHyperlink( string.format( "item:%d:0:0:0", frame.item_id ) )
-			GameTooltip:Show()
+			if frame.item_id then
+				GameTooltip:SetOwner( item_label, "ANCHOR_RIGHT" )
+				GameTooltip:SetHyperlink( string.format( "item:%d:0:0:0", frame.item_id ) )
+				GameTooltip:Show()
+			end
 		end )
 
 		item_label:SetScript( "OnLeave", function()

@@ -1102,7 +1102,7 @@ M.loot_table = {
 			[ "position" ] = 1
 		}, {
 			[ "id" ] = 573,
-			[ "name" ] = "Gehennas",
+			[ "name" ] = "Incindis",
 			[ "position" ] = 2
 		}, {
 			[ "id" ] = 574,
@@ -1136,6 +1136,14 @@ M.loot_table = {
 			[ "id" ] = 581,
 			[ "name" ] = "Trash mobs",
 			[ "position" ] = 10
+		}, {
+			[ "id" ] = 707,
+			[ "name" ] = "Basalthar & Smoldaris",
+			[ "position" ] = 12
+		}, {
+			[ "id" ] = 708,
+			[ "name" ] = "Sorcerer T. Thaurassian",
+			[ "position" ] = 13
 		} },
 		[ "raidItems" ] = { {
 			[ "id" ] = 6817,
@@ -1967,63 +1975,63 @@ M.loot_table = {
 			[ "name" ] = "Pattern: Core Armor Kit",
 			[ "quality" ] = 3,
 			[ "itemId" ] = 18252,
-			[ "raidBosses" ] = { 571, 572, 573, 574, 575, 576, 577 }
+			[ "raidBosses" ] = { 571, 573, 575, 572, 574, 576, 577 }
 		}, {
 			[ "id" ] = 6012,
 			[ "icon" ] = "inv_scroll_05",
 			[ "name" ] = "Recipe: Major Rejuvenation Potion",
 			[ "quality" ] = 3,
 			[ "itemId" ] = 18257,
-			[ "raidBosses" ] = { 571, 572, 573, 574, 575, 576, 577 }
+			[ "raidBosses" ] = { 571, 573, 575, 572, 574, 576, 577 }
 		}, {
 			[ "id" ] = 6005,
 			[ "icon" ] = "inv_misc_note_01",
 			[ "name" ] = "Formula: Enchant Weapon - Spell Power",
 			[ "quality" ] = 3,
 			[ "itemId" ] = 18259,
-			[ "raidBosses" ] = { 571, 572, 573, 574, 575, 576, 577 }
+			[ "raidBosses" ] = { 571, 573, 575, 572, 574, 576, 577 }
 		}, {
 			[ "id" ] = 6014,
 			[ "icon" ] = "inv_misc_note_01",
 			[ "name" ] = "Formula: Enchant Weapon - Healing Power",
 			[ "quality" ] = 3,
 			[ "itemId" ] = 18260,
-			[ "raidBosses" ] = { 571, 572, 573, 574, 575, 576, 577 }
+			[ "raidBosses" ] = { 571, 573, 575, 572, 574, 576, 577 }
 		}, {
 			[ "id" ] = 5997,
 			[ "icon" ] = "inv_scroll_05",
 			[ "name" ] = "Plans: Elemental Sharpening Stone",
 			[ "quality" ] = 3,
 			[ "itemId" ] = 18264,
-			[ "raidBosses" ] = { 571, 572, 573, 574, 575, 576, 577 }
+			[ "raidBosses" ] = { 571, 573, 575, 572, 574, 576, 577 }
 		}, {
 			[ "id" ] = 6008,
 			[ "icon" ] = "inv_scroll_05",
 			[ "name" ] = "Pattern: Flarecore Wraps",
 			[ "quality" ] = 3,
 			[ "itemId" ] = 18265,
-			[ "raidBosses" ] = { 571, 572, 573, 574, 575, 576, 577 }
+			[ "raidBosses" ] = { 571, 573, 575, 572, 574, 576, 577 }
 		}, {
 			[ "id" ] = 6003,
 			[ "icon" ] = "inv_scroll_05",
 			[ "name" ] = "Schematic: Biznicks 247x128 Accurascope",
 			[ "quality" ] = 3,
 			[ "itemId" ] = 18290,
-			[ "raidBosses" ] = { 571, 572, 573, 574, 575, 576, 577 }
+			[ "raidBosses" ] = { 571, 573, 575, 572, 574, 576, 577 }
 		}, {
 			[ "id" ] = 6001,
 			[ "icon" ] = "inv_scroll_05",
 			[ "name" ] = "Schematic: Force Reactive Disk",
 			[ "quality" ] = 3,
 			[ "itemId" ] = 18291,
-			[ "raidBosses" ] = { 571, 572, 573, 574, 575, 576, 577 }
+			[ "raidBosses" ] = { 571, 573, 575, 572, 574, 576, 577 }
 		}, {
 			[ "id" ] = 5999,
 			[ "icon" ] = "inv_scroll_05",
 			[ "name" ] = "Schematic: Core Marksman Rifle",
 			[ "quality" ] = 3,
 			[ "itemId" ] = 18292,
-			[ "raidBosses" ] = { 571, 572, 573, 574, 575, 576, 577 }
+			[ "raidBosses" ] = { 571, 573, 575, 572, 574, 576, 577 }
 		}, {
 			[ "id" ] = 5909,
 			[ "classes" ] = { "Warrior", "Paladin", "Hunter", "Rogue" },
@@ -2160,7 +2168,7 @@ M.loot_table = {
 			[ "name" ] = "Obsidian Edged Blade",
 			[ "quality" ] = 4,
 			[ "itemId" ] = 18822,
-			[ "raidBosses" ] = { 572, 574, 576, 577 }
+			[ "raidBosses" ] = { 572, 574, 576, 577, 707 }
 		}, {
 			[ "id" ] = 5865,
 			[ "icon" ] = "inv_gauntlets_23",
@@ -2181,7 +2189,7 @@ M.loot_table = {
 			[ "name" ] = "Deep Earth Spaulders",
 			[ "quality" ] = 4,
 			[ "itemId" ] = 18829,
-			[ "raidBosses" ] = { 572, 574, 576, 577 }
+			[ "raidBosses" ] = { 572, 574, 576, 577, 707, 708 }
 		}, {
 			[ "id" ] = 5897,
 			[ "icon" ] = "inv_sword_15",
@@ -2202,7 +2210,7 @@ M.loot_table = {
 			[ "name" ] = "Flamewaker Legplates",
 			[ "quality" ] = 4,
 			[ "itemId" ] = 18861,
-			[ "raidBosses" ] = { 571, 572, 573, 574, 575, 576, 577, 578 }
+			[ "raidBosses" ] = { 571, 573, 575, 578, 572, 574, 576, 577 }
 		}, {
 			[ "id" ] = 5842,
 			[ "icon" ] = "inv_helmet_18",
@@ -2335,7 +2343,113 @@ M.loot_table = {
 			[ "name" ] = "Pattern: Core Felcloth Bag",
 			[ "quality" ] = 3,
 			[ "itemId" ] = 21371,
-			[ "raidBosses" ] = { 571, 572, 573, 574, 575, 576, 577 }
+			[ "raidBosses" ] = { 571, 573, 575, 572, 574, 576, 577 }
+		}, {
+			[ "id" ] = 7808,
+			[ "icon" ] = "inv_wand_09",
+			[ "name" ] = "Primal Flameslinger",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 58205,
+			[ "raidBosses" ] = { 573 }
+		}, {
+			[ "id" ] = 7813,
+			[ "icon" ] = "inv_misc_questionmark",
+			[ "name" ] = "Fist of the Flamewaker",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 58207,
+			[ "raidBosses" ] = { 573 }
+		}, {
+			[ "id" ] = 7801,
+			[ "icon" ] = "inv_misc_cape_10",
+			[ "name" ] = "Shroud of Flowing Magma",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 58208,
+			[ "raidBosses" ] = { 573 }
+		}, {
+			[ "id" ] = 7797,
+			[ "icon" ] = "inv_misc_questionmark",
+			[ "name" ] = "Grasps of Sundering Power",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 58210,
+			[ "raidBosses" ] = { 707 }
+		}, {
+			[ "id" ] = 7814,
+			[ "icon" ] = "inv_misc_questionmark",
+			[ "name" ] = "Molten Emberstone",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 58211,
+			[ "raidBosses" ] = { 707 }
+		}, {
+			[ "id" ] = 7799,
+			[ "icon" ] = "inv_boots_cloth_09",
+			[ "name" ] = "Treads of Scalding Rage",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 58212,
+			[ "raidBosses" ] = { 708 }
+		}, {
+			[ "id" ] = 7804,
+			[ "icon" ] = "inv_misc_questionmark",
+			[ "name" ] = "Smoldaris' Fractured Eye",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 58213,
+			[ "raidBosses" ] = { 707 }
+		}, {
+			[ "id" ] = 7798,
+			[ "icon" ] = "inv_misc_questionmark",
+			[ "name" ] = "Modrag'zan, Heart of the Mountain",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 58214,
+			[ "raidBosses" ] = { 708 }
+		}, {
+			[ "id" ] = 7806,
+			[ "icon" ] = "inv_misc_questionmark",
+			[ "name" ] = "Ash-Forged Greaves",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 58215,
+			[ "raidBosses" ] = { 707 }
+		}, {
+			[ "id" ] = 7803,
+			[ "icon" ] = "inv_chest_cloth_18",
+			[ "name" ] = "Emberwoven Binding Garments",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 58237,
+			[ "raidBosses" ] = { 708 }
+		}, {
+			[ "id" ] = 7800,
+			[ "icon" ] = "inv_misc_questionmark",
+			[ "name" ] = "Overheated Skyrazors",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 58239,
+			[ "raidBosses" ] = { 707 }
+		}, {
+			[ "id" ] = 7809,
+			[ "classes" ] = { "Paladin" },
+			[ "icon" ] = "inv_misc_questionmark",
+			[ "name" ] = "Libram of Final Judgement",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 58240,
+			[ "raidBosses" ] = { 708 }
+		}, {
+			[ "id" ] = 7805,
+			[ "icon" ] = "inv_misc_questionmark",
+			[ "name" ] = "Sulfuron Aegis",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 58242,
+			[ "raidBosses" ] = { 707 }
+		}, {
+			[ "id" ] = 7802,
+			[ "icon" ] = "inv_misc_questionmark",
+			[ "name" ] = "Sigil of Ancient Accord",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 58244,
+			[ "raidBosses" ] = { 708 }
+		}, {
+			[ "id" ] = 7815,
+			[ "icon" ] = "inv_misc_stonetablet_11",
+			[ "name" ] = "Tablet of Molten Blast VI",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 58246,
+			[ "raidBosses" ] = { 707 }
 		}, {
 			[ "id" ] = 7790,
 			[ "icon" ] = "inv_misc_note_01",
@@ -3564,6 +3678,13 @@ M.loot_table = {
 			[ "itemId" ] = 36666,
 			[ "raidBosses" ] = { 596 }
 		}, {
+			[ "id" ] = 7796,
+			[ "icon" ] = "inv_misc_monsterspidercarapace_01",
+			[ "name" ] = "Maexxna's Hatchling",
+			[ "quality" ] = 2,
+			[ "itemId" ] = 37012,
+			[ "raidBosses" ] = { 588 }
+		}, {
 			[ "id" ] = 7083,
 			[ "classes" ] = { "Warrior", "Rogue" },
 			[ "icon" ] = "inv_jewelry_ring_15",
@@ -3726,13 +3847,6 @@ M.loot_table = {
 			[ "itemId" ] = 17078,
 			[ "raidBosses" ] = { 598 }
 		}, {
-			[ "id" ] = 5825,
-			[ "icon" ] = "inv_misc_bag_10_blue",
-			[ "name" ] = "Blue Sack of Gems",
-			[ "quality" ] = 2,
-			[ "itemId" ] = 17962,
-			[ "raidBosses" ] = { 598 }
-		}, {
 			[ "id" ] = 6825,
 			[ "icon" ] = "inv_misc_bag_10",
 			[ "name" ] = "Yellow Sack of Gems",
@@ -3840,6 +3954,13 @@ M.loot_table = {
 			[ "position" ] = 10
 		} },
 		[ "raidItems" ] = { {
+			[ "id" ] = 7812,
+			[ "icon" ] = "inv_misc_questionmark",
+			[ "name" ] = "Plans: Obsidian Belt Buckle",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 132,
+			[ "raidBosses" ] = { 606 }
+		}, {
 			[ "id" ] = 6321,
 			[ "icon" ] = "inv_misc_note_01",
 			[ "name" ] = "Formula: Enchant Gloves - Shadow Power",
@@ -3959,7 +4080,7 @@ M.loot_table = {
 			[ "name" ] = "Qiraji Magisterial Ring",
 			[ "quality" ] = 3,
 			[ "itemId" ] = 20884,
-			[ "raidBosses" ] = { 599, 601, 603, 604, 605 }
+			[ "raidBosses" ] = { 599, 601, 604, 605, 603 }
 		}, {
 			[ "id" ] = 6195,
 			[ "classes" ] = { "Warrior", "Rogue", "Mage", "Priest" },
@@ -3975,7 +4096,7 @@ M.loot_table = {
 			[ "name" ] = "Qiraji Spiked Hilt",
 			[ "quality" ] = 4,
 			[ "itemId" ] = 20886,
-			[ "raidBosses" ] = { 603, 604, 605, 606 }
+			[ "raidBosses" ] = { 604, 605, 603, 606 }
 		}, {
 			[ "id" ] = 6197,
 			[ "classes" ] = { "Hunter", "Rogue", "Priest", "Warlock" },
@@ -3983,7 +4104,7 @@ M.loot_table = {
 			[ "name" ] = "Qiraji Ceremonial Ring",
 			[ "quality" ] = 3,
 			[ "itemId" ] = 20888,
-			[ "raidBosses" ] = { 599, 601, 603, 604, 605 }
+			[ "raidBosses" ] = { 599, 601, 604, 605, 603 }
 		}, {
 			[ "id" ] = 6196,
 			[ "classes" ] = { "Paladin", "Hunter", "Shaman", "Warlock", "Druid" },
@@ -3999,7 +4120,7 @@ M.loot_table = {
 			[ "name" ] = "Qiraji Ornate Hilt",
 			[ "quality" ] = 4,
 			[ "itemId" ] = 20890,
-			[ "raidBosses" ] = { 603, 604, 605, 606 }
+			[ "raidBosses" ] = { 604, 605, 603, 606 }
 		}, {
 			[ "id" ] = 6292,
 			[ "classes" ] = { "Mage" },
@@ -4411,7 +4532,7 @@ M.loot_table = {
 			[ "name" ] = "Gauntlets of the Immovable",
 			[ "quality" ] = 4,
 			[ "itemId" ] = 21479,
-			[ "raidBosses" ] = { 603, 605 }
+			[ "raidBosses" ] = { 605, 603 }
 		}, {
 			[ "id" ] = 6240,
 			[ "icon" ] = "inv_gauntlets_10",
@@ -6757,6 +6878,13 @@ M.loot_table = {
 			[ "quality" ] = 3,
 			[ "itemId" ] = 22739,
 			[ "raidBosses" ] = { 630 }
+		}, {
+			[ "id" ] = 7816,
+			[ "icon" ] = "inv_misc_questionmark",
+			[ "name" ] = "Razzashi Hatchling",
+			[ "quality" ] = 2,
+			[ "itemId" ] = 37010,
+			[ "raidBosses" ] = { 637 }
 		}, {
 			[ "id" ] = 7080,
 			[ "icon" ] = "inv_misc_orb_01",

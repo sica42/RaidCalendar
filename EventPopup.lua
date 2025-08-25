@@ -8,7 +8,7 @@ if m.EventPopup then return end
 ---@class EventPopup
 ---@field show fun( event_id: string )
 ---@field hide fun()
----@field toggle fun()
+---@field toggle fun( event_id: string?)
 ---@field is_visible fun(): boolean
 ---@field update fun( event_id: string? )
 ---@field online_status fun( online: boolean )
@@ -507,7 +507,7 @@ function M.new()
 		popup.titlebar.title:SetText( event.title )
 
 		if not event.description then
-			popup.desc:SetRightText( 'Hang on while event data is loaded...' )
+			popup.desc:SetRichText( 'Hang on while event data is loaded...' )
 			m.msg.request_event( event_id )
 			return
 		end
@@ -663,6 +663,7 @@ function M.new()
 			end
 			popup.dd_class:Hide()
 			popup.dd_spec:Hide()
+			return
 		end
 
 		popup.label_noaccess:Hide()
@@ -701,11 +702,11 @@ function M.new()
 		end
 	end
 
-	local function toggle()
-		if popup and popup:IsVisible() then
+	local function toggle( event_id )
+		if popup and popup:IsVisible() and (event_id == event.id or not event_id) then
 			popup:Hide()
-		elseif event and event.id then
-			show( event.id )
+		elseif (event and event.id) or event_id then
+			show( event_id or event.id )
 		end
 	end
 

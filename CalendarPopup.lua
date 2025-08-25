@@ -68,6 +68,12 @@ function M.new()
 
 		frame:SetHighlightTexture( "Interface\\QuestFrame\\UI-QuestTitleHighlight" )
 		frame:SetScript( "OnClick", function()
+			if m.api.IsShiftKeyDown() then
+				local event = m.db.events[ events[ frame.index ].key ]
+				local raid_link = "|cffffffff|Hraidcal:event:" .. events[ frame.index ].key .. "|h[" .. event.title .. "]|h|r"
+				m.api.ChatFrameEditBox:Insert( raid_link )
+				return
+			end
 			if selected == frame.index then
 				selected = nil
 				m.event_popup.hide()
@@ -129,6 +135,11 @@ function M.new()
 		end )
 
 		sr_frame:SetScript( "OnClick", function()
+			if m.api.IsShiftKeyDown() then
+				local raid_link = "|cffffffff|Hraidcal:sr:" .. events[ frame.index ].key .. "|h[SR]|h|r"
+				m.api.ChatFrameEditBox:Insert( raid_link )
+				return
+			end
 			m.sr_popup.toggle( events[ frame.index ].key )
 		end )
 
