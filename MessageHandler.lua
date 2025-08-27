@@ -516,7 +516,7 @@ function M.new()
 			-- SIGNUP_RESULT
 			--
 			data = decode( data, key_map, value_map )
-			if data.success then
+			if data.success and m.db.events[ data.eventId ] then
 				local _, index = m.find( data.signUp.id, m.db.events[ data.eventId ].signUps, "id" )
 
 				m.db.events[ data.eventId ].lastUpdated = tonumber( data.lastUpdated )
