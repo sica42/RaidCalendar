@@ -1,5 +1,5 @@
 # RaidCalendar
-**Version:** 0.9.5
+**Version:** 0.9.7
 **Game Version:** Turtle WoW (Interface 11200)
 
 RaidCalendar lets you view and sign up to raids in game on https://raid-helper.dev/ and register soft reserves on https://raidres.fly.dev
@@ -30,6 +30,7 @@ The overview window shows all upcoming raids.
 * You can access settings from the "S" button in the top right corner.
   * You can choose to use your character name when signing up for events instead of your Discord name.
   * You can switch between 12/24-hour time format.
+* You can shift-click an event or the SR icon to link the event/sr in chat (link will only work for people who have the addon installed)
   
 <img width="669" height="317" alt="calendar_overview" src="https://github.com/user-attachments/assets/f3b6096d-e72c-4df5-ab8c-2b5812d542bd" />
 
@@ -65,6 +66,12 @@ Manual install:
 1. Download or clone the addon into your `Interface\AddOns\` folder.
 2. Make sure the folder is named `RaidCalendar`.
 3. Restart WoW.
+
+---
+
+## 🙏 Credits
+
+Special thanks to everyone in Zero Fox Raiding on Nordanaar for help with bug testing.
 
 ---
 
