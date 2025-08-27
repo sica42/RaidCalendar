@@ -108,17 +108,19 @@ function M.new()
 					quality = quality or 1
 				} )
 			else
-				table.insert( rollfor_data.softreserves, {
-					name = res.character.name,
-					role = res.character.specialization,
-					items = {
-						[ 1 ] = {
-							id = m.find( res.raidItemId, m.loot_table[ raid_id ].raidItems, "id" ).itemId,
-							sr_plus = res.srPlus and res.srPlus > 0 and res.srPlus or nil,
-							quality = quality or 1
+				if res.raidItemId then
+					table.insert( rollfor_data.softreserves, {
+						name = res.character.name,
+						role = res.character.specialization,
+						items = {
+							[ 1 ] = {
+								id = m.find( res.raidItemId, m.loot_table[ raid_id ].raidItems, "id" ).itemId,
+								sr_plus = res.srPlus and res.srPlus > 0 and res.srPlus or nil,
+								quality = quality or 1
+							}
 						}
-					}
-				} )
+					} )
+				end
 			end
 		end
 
@@ -242,6 +244,9 @@ function M.new()
 			if item_name and item_tex then
 				item_label.set( item_name )
 				item_label.set_icon( item_tex )
+			else
+				item_label.set( "Nothing reserved" )
+				item_label.set_icon()
 			end
 
 			local w = item_label.label:GetStringWidth()
@@ -689,7 +694,7 @@ function M.new()
 	--
 	-- Refresh
 	--
-	function refresh( refresh_data )
+	function refresh()
 		popup.sr1:Hide()
 		popup.sr2:Hide()
 		if m.debug_enabled or m.db.events[ event_id ].leaderId == m.db.user_settings.discord_id then popup.btn_refresh:Enable() end
@@ -766,6 +771,7 @@ function M.new()
 			popup.btn_reserve:Hide()
 		end
 
+		popup.scroll_bar:SetValue( offset )
 		refresh_list()
 	end
 
@@ -804,7 +810,6 @@ function M.new()
 			if _event_id and _event_id ~= event_id then
 				return
 			end
-			offset = 0
 			refresh()
 		end
 	end
