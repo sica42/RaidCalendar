@@ -67,7 +67,7 @@ local MessageCommand = {
 ---@field find_discord_id fun( name: string )
 ---@field check_channel_access fun( channel_id: string, renew: boolean? )
 ---@field authorize_user fun( user_id: string )
----@field add_sr fun( raid_id: number, sr_id: string, sr1: number, sr2: number )
+---@field add_sr fun( raid_id: number, sr_id: string, sr1: number, sr2: number, comment: string? )
 ---@field delete_sr fun( id: number )
 ---@field request_sr fun( sr_id: string )
 ---@field request_event fun( event_id: string )
@@ -274,10 +274,11 @@ function M.new()
 		})
 	end
 
-	local function add_sr( raid_id, sr_id, sr1, sr2 )
+	local function add_sr( raid_id, sr_id, sr1, sr2, comment )
 		local data = {
 			raidId = raid_id,
 			reference = sr_id,
+			comment = comment,
 			characterName = m.player,
 			characterClass = m.player_class,
 			specialization = m.player_class .. m.db.user_settings.sr_specName,
@@ -419,15 +420,17 @@ function M.new()
 				end
 
 				if data.addedSRs and type( data.addedSRs ) == "table" then
-					for _, res in pairs( data.addedSRs ) do
-						if m.db.events[ event_id ].sr and m.db.events[ event_id ].sr.reservations then
-							table.insert( m.db.events[ event_id ].sr.reservations, {
-								id = res.id,
-								raidItemId = res.raidItemId,
-								srPlus = res.srPlus,
-								comment = res.comment,
-								character = res.character
-							} )
+					if m.db.events[ event_id ].sr and m.db.events[ event_id ].sr.reservations then
+						for _, res in pairs( data.addedSRs ) do
+							if not m.find( res.id, m.db.events[ event_id ].sr.reservations, "id" ) then
+								table.insert( m.db.events[ event_id ].sr.reservations, {
+									id = res.id,
+									raidItemId = res.raidItemId,
+									srPlus = res.srPlus,
+									comment = res.comment,
+									character = res.character
+								} )
+							end
 						end
 					end
 				end

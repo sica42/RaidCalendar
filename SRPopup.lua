@@ -290,6 +290,9 @@ function M.new()
 		btn_remove:SetHighlightTexture( "Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight" )
 		btn_remove:SetScript( "OnClick", function()
 			btn_remove:Disable()
+			if offset == getn( sr_list ) - 10 then
+				offset = offset - 1
+			end
 			m.msg.delete_sr( frame.id )
 		end )
 
@@ -485,6 +488,7 @@ function M.new()
 		local spec = popup.dd_spec.selected
 		local sr1 = popup.dd_sr1:GetSelected() and popup.dd_sr1:GetSelected().raid_item_id
 		local sr2 = popup.dd_sr2:GetSelected() and popup.dd_sr2:GetSelected().raid_item_id
+		local comment = popup.input_comment:GetText() ~= "" and popup.input_comment:GetText() or nil
 
 		if not spec then
 			m.error( "No specialization selected" )
@@ -497,7 +501,7 @@ function M.new()
 		end
 
 		m.db.user_settings.sr_specName = spec
-		m.msg.add_sr( raid_id, m.db.events[ event_id ].sr.reference, sr1, sr2 )
+		m.msg.add_sr( raid_id, m.db.events[ event_id ].sr.reference, sr1, sr2, comment )
 		this:Disable()
 		popup.label_sr1:Hide()
 		popup.dd_sr1:Hide()
@@ -519,7 +523,7 @@ function M.new()
 				:backdrop_color( 0, 0, 0, 0.9 )
 				:close_button()
 				:width( 530 )
-				:height( 358 )
+				:height( 385 )
 				:movable()
 				:esc()
 				:hidden()
@@ -536,7 +540,7 @@ function M.new()
 		local border_reserve = m.FrameBuilder.new()
 				:parent( frame )
 				:point( "TopLeft", frame, "TopLeft", 10, -32 )
-				:point( "BottomRight", frame, "TopRight", -10, -132 )
+				:point( "BottomRight", frame, "TopRight", -10, -160 )
 				:frame_style( "TOOLTIP" )
 				:backdrop( { bgFile = "Interface/Buttons/WHITE8x8" } )
 				:backdrop_color( 0.08, 0.08, 0.08, 1 )
@@ -621,7 +625,19 @@ function M.new()
 		frame.dd_sr2:SetItems( sr_dropdown_items )
 
 		frame.btn_reserve = gui.create_button( border_reserve, "Reserve", nil, on_reserve_click )
-		frame.btn_reserve:SetPoint( "BottomRight", border_reserve, "BottomRight", -10, 14 )
+		frame.btn_reserve:SetPoint( "BottomRight", border_reserve, "BottomRight", -10, 10 )
+
+		frame.label_comment = border_reserve:CreateFontString( nil, "ARTWORK", "RCFontHighlight" )
+		frame.label_comment:SetPoint( "BottomLeft", border_reserve, "BottomLeft", 10, 16 )
+		frame.label_comment:SetText( "Comment" )
+
+		frame.input_comment = CreateFrame( "EditBox", "RCSRComment", border_reserve, "InputBoxTemplate" )
+		frame.input_comment:SetPoint( "Left", frame.label_comment, "Right", 10, 0 )
+		frame.input_comment:SetWidth( 314 )
+		frame.input_comment:SetHeight( 24 )
+		frame.input_comment:SetAutoFocus( false )
+		frame.input_comment:SetFontObject( gui.font_highlight )
+		frame.input_comment:SetTextInsets( 5, 5, 5, 5 )
 
 		local border_srlist = m.FrameBuilder.new()
 				:parent( frame )
@@ -744,6 +760,9 @@ function M.new()
 			popup.dd_sr1:Show()
 			popup.btn_reserve:Show()
 			popup.btn_reserve:Enable()
+			popup.label_comment:Show()
+			popup.input_comment:Show()
+			popup.input_comment:SetText( "" )
 
 			if sr_limit > 1 and sr_count == 1 or sr_limit == 1 then
 				if sr_limit == 1 then
@@ -769,6 +788,8 @@ function M.new()
 			popup.label_sr2:Hide()
 			popup.dd_sr2:Hide()
 			popup.btn_reserve:Hide()
+			popup.label_comment:Hide()
+			popup.input_comment:Hide()
 		end
 
 		popup.scroll_bar:SetValue( offset )

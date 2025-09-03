@@ -792,12 +792,14 @@ function M.pfui_skin( frame )
 		m.api.pfUI.api.SkinScrollbar( frame.scroll_bar )
 
 		m.api.pfUI.api.SkinButton( frame.btn_reserve )
-		frame.btn_reserve:SetPoint( "BottomRight", frame.border_reserve, "BottomRight", -12, 14 )
 
 		m.api.pfUI.api.StripTextures( frame.sr1, nil, "BACKGROUND" )
 		m.api.pfUI.api.CreateBackdrop( frame.sr1, nil, true )
 		m.api.pfUI.api.StripTextures( frame.sr2, nil, "BACKGROUND" )
 		m.api.pfUI.api.CreateBackdrop( frame.sr2, nil, true )
+
+		m.api.pfUI.api.StripTextures( frame.input_comment, nil, "BACKGROUND" )
+		m.api.pfUI.api.CreateBackdrop( frame.input_comment, nil, true )
 
 		skin_dropdown( frame.dd_spec )
 		skin_dropdown( frame.dd_sr1 )
