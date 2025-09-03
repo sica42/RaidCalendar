@@ -554,7 +554,7 @@ function M.new()
 			if not m.debug_enabled or m.db.events[ event_id ].leaderId == m.db.user_settings.discord_id then
 				m.ace_timer.ScheduleTimer( M, function()
 					frame.btn_refresh:Enable()
-				end, 60 )
+				end, 30 )
 			end
 		end )
 

@@ -414,8 +414,8 @@ function M.new()
 			frame.label_noaccess:SetText( "Checking access..." )
 			m.msg.check_channel_access( event.channelId, true )
 		end )
-		frame.btn_access:SetPoint( "Top", frame.label_noaccess, "Bottom", 0, -10)
-		frame.btn_access:SetPoint( "Right", frame, "TopRight", -10, 0)
+		frame.btn_access:SetPoint( "Top", frame.label_noaccess, "Bottom", 0, -10 )
+		frame.btn_access:SetPoint( "Right", frame, "TopRight", -10, 0 )
 		frame.btn_access:Hide()
 
 		frame.cs_change = gui.create_button( frame, "Change", 100, change_spec )
@@ -496,6 +496,16 @@ function M.new()
 			end
 		end
 
+		-- Check if event exists and has description
+		if not event or not event.description then
+			popup.titlebar.title:SetText( event and event.title or "Loading..." )
+			popup.desc:SetRichText( 'Hang on while event data is loaded...' )
+			popup.dd_class:Hide()
+			popup.dd_spec:Hide()
+			m.msg.request_event( event_id )
+			return
+		end
+
 		local show_invite = event.leaderId == m.db.user_settings.discord_id or m.debug_enabled
 		if show_invite then
 			popup.btn_invite:Enable()
@@ -503,15 +513,7 @@ function M.new()
 			popup.btn_invite:Disable()
 		end
 
-		-- Event details
 		popup.titlebar.title:SetText( event.title )
-
-		if not event.description then
-			popup.desc:SetRichText( 'Hang on while event data is loaded...' )
-			m.msg.request_event( event_id )
-			return
-		end
-
 		popup.desc:SetRichText( event.description )
 		popup.scroll_bar:SetMinMaxValues( 0, math.max( 0, popup.desc:GetHeight() - 65 ) )
 		popup.scroll_bar:SetValue( 0 )
@@ -528,9 +530,9 @@ function M.new()
 		--
 		table.sort( event.signUps, function( a, b )
 			if a.specName == nil and b.specName ~= nil then
-				return true -- nil comes before non-nil
+				return true
 			elseif a.specName ~= nil and b.specName == nil then
-				return false -- non-nil comes after nil
+				return false
 			elseif a.specName == b.specName then
 				return a.position < b.position
 			else

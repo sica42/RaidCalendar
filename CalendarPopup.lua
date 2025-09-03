@@ -259,7 +259,7 @@ function M.new()
 			if not m.debug_enabled then
 				m.ace_timer.ScheduleTimer( M, function()
 					frame.btn_refresh:Enable()
-				end, 60 * 5 )
+				end, 30 )
 			end
 		end )
 
@@ -358,11 +358,11 @@ function M.new()
 		label_timeformat:SetPoint( "Right", dd_timeformat, "Left", -10, 0 )
 		label_timeformat:SetText( "Time format" )
 
-		local btn_save = gui.create_button( frame.settings, "Save", 100, on_save_settings )
+		local btn_save = gui.create_button( frame.settings, "Save", 110, on_save_settings )
 		btn_save:SetPoint( "BottomRight", frame.settings, "BottomRight", -10, 15 )
 		frame.settings.btn_save = btn_save
 
-		local btn_welcome = gui.create_button( frame.settings, "Welcome poup", 100, function()
+		local btn_welcome = gui.create_button( frame.settings, "Welcome popup", 110, function()
 			m.welcome_popup.show()
 			popup:Hide()
 		end )
