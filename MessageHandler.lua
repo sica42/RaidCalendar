@@ -469,9 +469,13 @@ function M.new()
 			data = decode( data, key_map, value_map )
 			m.debug( "Got event id: " .. data.id )
 
-			local sr = m.db.events[ data.id ].sr
-			m.db.events[ data.id ] = data
-			m.db.events[ data.id ].sr = sr
+			if m.db.events[ data.id ] and m.db.events[ data.id ].sr then
+				local sr = m.db.events[ data.id ].sr
+				m.db.events[ data.id ] = data
+				m.db.events[ data.id ].sr = sr
+			else
+				m.db.events[ data.id ] = data
+			end
 
 			local sr_ref = string.match( m.db.events[ data.id ].description, "https://raidres.fly.dev/res/(%w+)%s?" )
 			m.db.events[ data.id ].srId = sr_ref
