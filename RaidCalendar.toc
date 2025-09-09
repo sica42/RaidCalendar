@@ -1,7 +1,7 @@
 ## Interface: 11200
 ## Title: RaidCalendar
 ## Author: Sica
-## Version: 0.9.8
+## Version: 0.9.9
 ## Notes: Shows raids from raid-helper.dev
 ## SavedVariablesPerCharacter: RaidCalendarDB
 
