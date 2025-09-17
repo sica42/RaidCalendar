@@ -3940,6 +3940,13 @@ M.loot_table = {
 			[ "quality" ] = 1,
 			[ "itemId" ] = 21110,
 			[ "raidBosses" ] = { 598 }
+		}, {
+			[ "id" ] = 7825,
+			[ "icon" ] = "inv_misc_head_dragon_01",
+			[ "name" ] = "Onyxian Drake",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 30017,
+			[ "raidBosses" ] = { 598 }
 		} }
 	},
 	[ 98 ] = {
@@ -7639,6 +7646,13 @@ M.loot_table = {
 			[ "quality" ] = 2,
 			[ "itemId" ] = 20381,
 			[ "raidBosses" ] = { 646, 647, 650 }
+		}, {
+			[ "id" ] = 7826,
+			[ "icon" ] = "inv_misc_head_dragon_green",
+			[ "name" ] = "Emerald Drake",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 30018,
+			[ "raidBosses" ] = { 647 }
 		}, {
 			[ "id" ] = 6823,
 			[ "icon" ] = "inv_mace_09",
