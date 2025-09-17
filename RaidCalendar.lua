@@ -92,7 +92,12 @@ function RaidCalendar.events:ADDON_LOADED()
 			if type == "event" then
 				m.event_popup.toggle( id )
 			elseif type == "sr" then
-				m.sr_popup.toggle( id )
+				if tonumber(id ) == nil then
+					_, id = m.find( id, m.db.events, "srId" )
+				end
+				if tonumber( id ) then
+					m.sr_popup.toggle( id )
+				end
 			end
 			return
 		end
