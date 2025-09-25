@@ -705,7 +705,7 @@ function M.new()
 	end
 
 	local function toggle( event_id )
-		if popup and popup:IsVisible() and (event_id == event.id or not event_id) then
+		if popup and popup:IsVisible() and (event.id and event_id == event.id or not event_id) then
 			popup:Hide()
 		elseif (event and event.id) or event_id then
 			show( event_id or event.id )
@@ -718,10 +718,10 @@ function M.new()
 
 	local function update( event_id )
 		if popup and popup:IsVisible() then
-			if event_id and event.id ~= event_id then
+			if event_id and event and event.id ~= event_id then
 				return
 			end
-			refresh( event.id )
+			refresh( event_id or event.id )
 		end
 	end
 
