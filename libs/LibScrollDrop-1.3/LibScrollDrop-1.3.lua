@@ -671,5 +671,16 @@ function lib:New( parent, options )
 		return self.items[ self.selected_index ]
 	end
 
+	function dropdown:Disable()
+		dropdown.edit_box:EnableMouse(false)
+		dropdown.dropdown_button:Disable()
+		dropdown.edit_box:ClearFocus()
+	end
+
+	function dropdown:Enable()
+		dropdown.edit_box:EnableMouse(true)
+		dropdown.dropdown_button:Enable()
+	end
+
 	return dropdown
 end
