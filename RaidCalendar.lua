@@ -74,6 +74,10 @@ function RaidCalendar.events:ADDON_LOADED()
 	---@type MinimapIcon
 	m.minimap_icon = m.MinimapIcon.new()
 
+	if m.db.user_settings.sr_admins == nil then
+		m.msg.bot_status()
+	end
+
 	if m.api.IsAddOnLoaded( "pfUI" ) and m.api.pfUI and m.api.pfUI.api and m.api.pfUI.env and m.api.pfUI.env.C then
 		m.pfui_skin_enabled = true
 		m.api.pfUI:RegisterSkin( "RaidCalendar", "vanilla", function()
@@ -184,6 +188,7 @@ end
 
 function RaidCalendar.check_new_version()
 	if not m.db.user_settings.last_versioncheck or time() - m.db.user_settings.last_versioncheck > 3600 * 24 then
+		m.msg.bot_status()
 		m.msg.version_check()
 	end
 end

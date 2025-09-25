@@ -787,6 +787,10 @@ function M.pfui_skin( frame )
 		m.api.pfUI.api.StripTextures( frame.border_reserve, nil, "BACKGROUND" )
 		m.api.pfUI.api.CreateBackdrop( frame.border_reserve, nil, true )
 
+		m.api.pfUI.api.StripTextures( frame.border_admin, nil, "BACKGROUND" )
+		m.api.pfUI.api.CreateBackdrop( frame.border_admin, nil, true )
+		m.api.pfUI.api.SkinButton( frame.btn_lock )
+
 		m.api.pfUI.api.StripTextures( frame.border_srlist, nil, "BACKGROUND" )
 		m.api.pfUI.api.CreateBackdrop( frame.border_srlist, nil, true )
 		m.api.pfUI.api.SkinScrollbar( frame.scroll_bar )

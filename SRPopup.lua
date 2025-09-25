@@ -24,11 +24,13 @@ function M.new()
 	local offset = 0
 	local event_id
 	local raid_id
+	local sr_id
 	local sr_list
 	local sr_items
 	local frame_items = {}
 	local rows = 10
 	local gui = m.GuiElements
+	local is_admin
 
 	local specs = {
 		Druid = { "Balance", "Feral", "Restoration", "Bear" },
@@ -147,6 +149,19 @@ function M.new()
 				:height( 20 )
 				:build()
 
+		local btn_remove = CreateFrame( "Button", nil, frame )
+		btn_remove:SetPoint( "Right", frame, "Right", -1, 0 )
+		btn_remove:SetWidth( 16 )
+		btn_remove:SetHeight( 16 )
+		btn_remove:SetNormalTexture( "Interface\\Buttons\\UI-Panel-MinimizeButton-Up" )
+		btn_remove:SetPushedTexture( "Interface\\Buttons\\UI-Panel-MinimizeButton-Down" )
+		btn_remove:SetDisabledTexture( "Interface\\Buttons\\UI-Panel-MinimizeButton-Disabled" )
+		btn_remove:SetHighlightTexture( "Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight" )
+		btn_remove:SetScript( "OnClick", function()
+			this:Disable()
+			m.msg.delete_sr( sr_id, frame.id )
+		end )
+
 		local player_label = frame:CreateFontString( nil, "ARTWORK", "RCFontHighlight" )
 		player_label:SetPoint( "TopLeft", frame, "TopLeft", 3, -2 )
 		player_label:SetHeight( 16 )
@@ -209,6 +224,7 @@ function M.new()
 			local item = sr_list[ index ]
 			frame.index = index
 			frame.raid_item_id = item.raidItemId
+			frame.id = item.id
 
 			if mod( index, 2 ) == 0 then
 				frame:SetBackdropColor( 0.15, 0.15, 0.15, 1 )
@@ -252,6 +268,19 @@ function M.new()
 			local w = item_label.label:GetStringWidth()
 			item_label:SetWidth( w + 22 )
 
+			if is_admin then
+				btn_remove:Show()
+				sr_label:SetPoint( "Right", frame, "Right", -20, 0 )
+				if m.db.events[ event_id ].sr.locked then
+					btn_remove:Disable()
+				else
+					btn_remove:Enable()
+				end
+			else
+				btn_remove:Hide()
+				sr_label:SetPoint( "Right", frame, "Right", -5, 0 )
+			end
+
 			frame:Show()
 		end
 
@@ -287,14 +316,16 @@ function M.new()
 		btn_remove:SetHeight( 16 )
 		btn_remove:SetNormalTexture( "Interface\\Buttons\\UI-Panel-MinimizeButton-Up" )
 		btn_remove:SetPushedTexture( "Interface\\Buttons\\UI-Panel-MinimizeButton-Down" )
+		btn_remove:SetDisabledTexture( "Interface\\Buttons\\UI-Panel-MinimizeButton-Disabled" )
 		btn_remove:SetHighlightTexture( "Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight" )
 		btn_remove:SetScript( "OnClick", function()
 			btn_remove:Disable()
 			if offset == getn( sr_list ) - 10 then
 				offset = offset - 1
 			end
-			m.msg.delete_sr( frame.id )
+			m.msg.delete_sr( sr_id, frame.id )
 		end )
+		frame.btn_remove = btn_remove
 
 		frame:SetScript( "OnMouseDown", function()
 			if m.api.IsShiftKeyDown() then
@@ -509,6 +540,11 @@ function M.new()
 		popup.dd_sr2:Hide()
 	end
 
+	local function on_lock_click()
+		m.msg.lock_sr( m.db.events[ event_id ].sr.reference, this:GetText() == "Lock raid" )
+		this:Disable()
+	end
+
 	--
 	-- Create main frame
 	--
@@ -536,17 +572,6 @@ function M.new()
 			frame:SetPoint( p.point, UIParent, p.relative_point, p.x, p.y )
 		end
 
-		---@type Frame
-		local border_reserve = m.FrameBuilder.new()
-				:parent( frame )
-				:point( "TopLeft", frame, "TopLeft", 10, -32 )
-				:point( "BottomRight", frame, "TopRight", -10, -160 )
-				:frame_style( "TOOLTIP" )
-				:backdrop( { bgFile = "Interface/Buttons/WHITE8x8" } )
-				:backdrop_color( 0.08, 0.08, 0.08, 1 )
-				:build()
-		frame.border_reserve = border_reserve
-
 		--
 		-- Titlebar buttons
 		--
@@ -572,6 +597,31 @@ function M.new()
 		--
 		-- Main content
 		--
+		---@type Frame
+		local border_reserve = m.FrameBuilder.new()
+				:parent( frame )
+				:point( "TopLeft", frame, "TopLeft", 10, -32 )
+				:point( "BottomRight", frame, "TopRight", -10, -160 )
+				:frame_style( "TOOLTIP" )
+				:backdrop( { bgFile = "Interface/Buttons/WHITE8x8" } )
+				:backdrop_color( 0.08, 0.08, 0.08, 1 )
+				:build()
+		frame.border_reserve = border_reserve
+
+		frame.locked = m.FrameBuilder.new()
+			:parent( border_reserve )
+			:point( "TopLeft", border_reserve, "TopLeft", 1, -80 )
+			:point( "BottomRight", border_reserve, "BottomRight", -1, 1)
+			:frame_style( "NONE" )
+			:frame_level( 200 )
+			:backdrop( { bgFile = "Interface/Buttons/WHITE8x8" } )
+			:backdrop_color( 0.08, 0.08, 0.08, 0.9 )
+			:hidden()
+			:build()
+		local label_locked = frame.locked:CreateFontString( nil, "ARTWORK", "RCFontHighlightBig" )
+		label_locked:SetPoint( "Center", frame.locked, "Center", 0, 0)
+		label_locked:SetText( "Raid is locked" )
+
 		local label_yoursr = border_reserve:CreateFontString( nil, "ARTWORK", "RCFontHighlight" )
 		label_yoursr:SetPoint( "TopLeft", border_reserve, "TopLeft", 10, -10 )
 		label_yoursr:SetText( "Your reservations (0/0)" )
@@ -638,6 +688,20 @@ function M.new()
 		frame.input_comment:SetAutoFocus( false )
 		frame.input_comment:SetFontObject( gui.font_highlight )
 		frame.input_comment:SetTextInsets( 5, 5, 5, 5 )
+
+		local border_admin = m.FrameBuilder.new()
+				:parent( frame )
+				:point( "TopLeft", border_reserve, "BottomLeft", 0, -7 )
+				:point( "BottomRight", border_reserve, "BottomRight", 0, -42 )
+				:frame_style( "TOOLTIP" )
+				:backdrop( { bgFile = "Interface/Buttons/WHITE8x8" } )
+				:backdrop_color( 0, 0, 0, 0.5 )
+				:hidden()
+				:build()
+		frame.border_admin = border_admin
+
+		frame.btn_lock = gui.create_button( border_admin, "Lock raid", nil, on_lock_click )
+		frame.btn_lock:SetPoint( "TopRight", border_admin, "TopRight", -5, -5 )
 
 		local border_srlist = m.FrameBuilder.new()
 				:parent( frame )
@@ -728,11 +792,36 @@ function M.new()
 			return
 		end
 
-		sr_list = m.db.events[ event_id ].sr.reservations
-		raid_id = m.db.events[ event_id ].sr.raidId
+		local sr = m.db.events[ event_id ].sr
+		sr_list = sr.reservations
+		sr_id = sr.reference
+		raid_id = sr.raidId
 		sr_items = nil
 
 		popup.titlebar.title:SetText( string.format( "SR for %s (%s)", m.db.events[ event_id ].title, m.loot_table[ raid_id ].name ) )
+
+		--
+		-- Admin bar
+		--
+		if sr.adminAccess and m.find( m.player, m.db.user_settings.sr_admins ) then
+			is_admin = true
+			popup.border_admin:Show()
+			popup.border_srlist:SetPoint( "TopLeft", popup.border_admin, "BottomLeft", 0, -7 )
+			popup:SetHeight( 385 + 49 )
+
+			popup.btn_lock:Enable()
+			if sr.locked then
+				popup.btn_lock:SetText( "Unlock raid" )
+			else
+				popup.btn_lock:SetText( "Lock raid" )
+			end
+		else
+			is_admin = false
+			popup.border_admin:Hide()
+			popup.border_srlist:SetPoint( "TopLeft", popup.border_reserve, "BottomLeft", 0, -7 )
+			popup:SetHeight( 385 )
+		end
+
 		--
 		-- Get personal reservations
 		--
@@ -790,6 +879,26 @@ function M.new()
 			popup.btn_reserve:Hide()
 			popup.label_comment:Hide()
 			popup.input_comment:Hide()
+		end
+
+		--
+		-- Locked status
+		--
+		if sr.locked then
+			if sr_count == 0 then
+				popup.locked:SetPoint( "TopLeft", popup.border_reserve, "TopLeft", 1, -1)
+			else
+				popup.locked:SetPoint( "TopLeft", popup.border_reserve, "TopLeft", 1, -80 )
+				popup.sr1.btn_remove:Disable()
+				popup.sr2.btn_remove:Disable()
+				popup.dd_sr1:Disable()
+			end
+			popup.locked:Show()
+		else
+			popup.sr1.btn_remove:Enable()
+			popup.sr2.btn_remove:Enable()
+			popup.dd_sr1:Enable()
+			popup.locked:Hide()
 		end
 
 		popup.scroll_bar:SetValue( offset )

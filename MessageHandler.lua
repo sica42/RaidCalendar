@@ -19,9 +19,10 @@ local MessageCommand = {
 	RequestSR = "RSR",
 	AddSR = "SRADD",
 	DeleteSR = "SRDELETE",
+	LockSR = "SRLOCK",
 	VersionCheck = "VERC",
 	-- Incoming
-	BotStauts = "BSTATUS",
+	BotStatus = "BSTATUS",
 	DiscordId = "DID",
 	DiscordAuth = "DAUTH",
 	ChannelCheckResult = "CHCHECK_RESULT",
@@ -31,6 +32,7 @@ local MessageCommand = {
 	SR = "SR",
 	AddSRResult = "SRADD_RESULT",
 	DeleteSRResult = "SRDELETE_RESULT",
+	LockSRResult = "SRLOCK_RESULT",
 	Version = "VER"
 }
 
@@ -49,6 +51,8 @@ local MessageCommand = {
 ---| "SRADD_RESULT"
 ---| "SRDELETE"
 ---| "SRDELETE_RESULT"
+---| "SRLOCK"
+---| "SRLOCK_RESULT"
 ---| "REVENT"
 ---| "REVENTS"
 ---| "EVENT"
@@ -68,8 +72,9 @@ local MessageCommand = {
 ---@field check_channel_access fun( channel_id: string, renew: boolean? )
 ---@field authorize_user fun( user_id: string )
 ---@field add_sr fun( raid_id: number, sr_id: string, sr1: number, sr2: number, comment: string? )
----@field delete_sr fun( id: number )
+---@field delete_sr fun( sr_id: string, id: number )
 ---@field request_sr fun( sr_id: string )
+---@field lock_sr fun( sr_id: string, lock: boolean )
 ---@field request_event fun( event_id: string )
 ---@field request_events fun()
 ---@field signup fun( event_id: string, user_id: string )
@@ -269,9 +274,9 @@ function M.new()
 	end
 
 	local function authorize_user( user_id )
-		broadcast(MessageCommand.RequestDiscordAuth, {
+		broadcast( MessageCommand.RequestDiscordAuth, {
 			userId = user_id
-		})
+		} )
 	end
 
 	local function add_sr( raid_id, sr_id, sr1, sr2, comment )
@@ -290,8 +295,9 @@ function M.new()
 		broadcast( MessageCommand.AddSR, data )
 	end
 
-	local function delete_sr( id )
+	local function delete_sr( sr_id, id )
 		broadcast( MessageCommand.DeleteSR, {
+			reference = sr_id,
 			id = id
 		} )
 	end
@@ -299,6 +305,13 @@ function M.new()
 	local function request_sr( sr_id )
 		broadcast( MessageCommand.RequestSR, {
 			id = sr_id
+		} )
+	end
+
+	local function lock_sr( sr_id, locked )
+		broadcast( MessageCommand.LockSR, {
+			id = sr_id,
+			locked = locked
 		} )
 	end
 
@@ -462,6 +475,21 @@ function M.new()
 			elseif data.player == m.player then
 				m.error( "Delete SR failed: " .. (data.status or "Unknown error") )
 			end
+		elseif command == MessageCommand.LockSRResult then
+			--
+			-- SRLOCK_RESULT
+			--
+			data = decode( data, key_map, value_map )
+			if data.success == true then
+				local _, eventId = m.find( data.srId, m.db.events, "srId")
+				if m.db.events[ eventId ] and m.db.events[ eventId ].sr then
+					m.db.events[ eventId ].sr.locked = data.locked
+				end
+
+				m.sr_popup.update()
+			elseif data.player == m.player then
+				m.error( "Lock SR failed: " .. (data.status or "Unknown error") )
+			end
 		elseif command == MessageCommand.Event then
 			--
 			-- EVENT
@@ -493,18 +521,20 @@ function M.new()
 				return
 			end
 
-			m.debug( "Receiving events requested by " .. (data.player or "UNKNOWN") )
-			for _, event in data.events do
-				if m.db.events[ event.id ] then
-					-- Only send event update request from player who requested it if needed
-					if event.lastUpdated > m.db.events[ event.id ].lastUpdated and data.player == m.player then
-						m.debug( "Update event: " .. event.title )
-						request_event( event.id )
+			if data.events then
+				m.debug( "Receiving events requested by " .. (data.player or "UNKNOWN") )
+				for _, event in data.events do
+					if m.db.events[ event.id ] then
+						-- Only send event update request from player who requested it if needed
+						if event.lastUpdated > m.db.events[ event.id ].lastUpdated and data.player == m.player then
+							m.debug( "Update event: " .. event.title )
+							request_event( event.id )
+						end
+					else
+						m.debug( "New event: " .. event.title )
+						event.title = string.gsub( event.title, "<:.*>", "" )
+						m.db.events[ event.id ] = event
 					end
-				else
-					m.debug( "New event: " .. event.title )
-					event.title = string.gsub( event.title, "<:.*>", "" )
-					m.db.events[ event.id ] = event
 				end
 			end
 
@@ -538,13 +568,14 @@ function M.new()
 			elseif data.player == m.player then
 				m.error( "Signup failed: " .. data.status )
 			end
-		elseif command == MessageCommand.BotStauts then
+		elseif command == MessageCommand.BotStatus then
 			--
 			-- Receive bot status
 			--
 			if data.player == m.player then
 				m.db.user_settings.bot_name = data.botName
 				m.db.user_settings.discord_bot = data.discordBot
+				m.db.user_settings.sr_admins = data.srAdmins
 				m.welcome_popup.bot_response( data.botName )
 			end
 		elseif command == MessageCommand.VersionCheck then
@@ -606,7 +637,7 @@ function M.new()
 				end
 			end
 		else
-			m.debug( "No command, wtf?")
+			m.debug( "No command, wtf?" )
 		end
 	end
 
@@ -619,6 +650,7 @@ function M.new()
 		authorize_user = authorize_user,
 		add_sr = add_sr,
 		delete_sr = delete_sr,
+		lock_sr = lock_sr,
 		request_sr = request_sr,
 		request_event = request_event,
 		request_events = request_events,
