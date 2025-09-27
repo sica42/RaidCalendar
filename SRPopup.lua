@@ -31,6 +31,7 @@ function M.new()
 	local rows = 10
 	local gui = m.GuiElements
 	local is_admin
+	local is_deleting
 
 	local specs = {
 		Druid = { "Balance", "Feral", "Restoration", "Bear" },
@@ -545,6 +546,55 @@ function M.new()
 		this:Disable()
 	end
 
+	local function on_check_absentees()
+		if this:GetText() == "Show All" then
+			sr_list = m.db.events[ event_id ].sr.reservations
+			popup.admin_status:SetText( "" )
+			refresh_list()
+			this:SetText( "Check Absentees" )
+			popup.btn_admin_remove:Hide()
+			is_deleting = false
+			return
+		end
+
+		local raid_members = m.get_raid_members()
+		local missing = {}
+
+		if getn( raid_members ) == 0 then
+			m.error( "You are not in a raid group" )
+			return
+		end
+
+		for _, res in ipairs( sr_list ) do
+			if not m.find( string.upper( res.character.name ), raid_members ) then
+				table.insert( missing, res )
+			end
+		end
+
+		if getn( missing ) == 0 then
+			m.info( "No absentees found" )
+			return
+		end
+
+		popup.admin_status:SetText( string.format( "Showing %d absentees", getn( missing ) ) )
+		sr_list = missing
+		is_deleting = true
+		refresh_list()
+		this:SetText( "Show All" )
+		popup.btn_admin_remove:Show()
+	end
+
+	local function on_remove_absentees()
+		is_deleting = true
+		popup.btn_admin_remove:Disable()
+		popup.btn_check_absentees:Disable()
+		popup.admin_status:SetText( string.format( "Deleting SRs, %d left...", getn( sr_list ) ) )
+
+		local res = table.remove( sr_list, 1 )
+		m.msg.delete_sr( sr_id, res.id )
+		refresh_list()
+	end
+
 	--
 	-- Create main frame
 	--
@@ -579,6 +629,7 @@ function M.new()
 		frame.btn_refresh:SetPoint( "Right", frame.titlebar.btn_close, "Left", 2, 0 )
 		frame.btn_refresh:SetScript( "OnClick", function()
 			frame.btn_refresh:Disable()
+			is_deleting = false
 			m.msg.request_sr( m.db.events[ event_id ].srId )
 			if not m.debug_enabled or m.db.events[ event_id ].leaderId == m.db.user_settings.discord_id then
 				m.ace_timer.ScheduleTimer( M, function()
@@ -609,17 +660,17 @@ function M.new()
 		frame.border_reserve = border_reserve
 
 		frame.locked = m.FrameBuilder.new()
-			:parent( border_reserve )
-			:point( "TopLeft", border_reserve, "TopLeft", 1, -80 )
-			:point( "BottomRight", border_reserve, "BottomRight", -1, 1)
-			:frame_style( "NONE" )
-			:frame_level( 200 )
-			:backdrop( { bgFile = "Interface/Buttons/WHITE8x8" } )
-			:backdrop_color( 0.08, 0.08, 0.08, 0.9 )
-			:hidden()
-			:build()
+				:parent( border_reserve )
+				:point( "TopLeft", border_reserve, "TopLeft", 1, -80 )
+				:point( "BottomRight", border_reserve, "BottomRight", -1, 1 )
+				:frame_style( "NONE" )
+				:frame_level( 200 )
+				:backdrop( { bgFile = "Interface/Buttons/WHITE8x8" } )
+				:backdrop_color( 0.08, 0.08, 0.08, 0.9 )
+				:hidden()
+				:build()
 		local label_locked = frame.locked:CreateFontString( nil, "ARTWORK", "RCFontHighlightBig" )
-		label_locked:SetPoint( "Center", frame.locked, "Center", 0, 0)
+		label_locked:SetPoint( "Center", frame.locked, "Center", 0, 0 )
 		label_locked:SetText( "Raid is locked" )
 
 		local label_yoursr = border_reserve:CreateFontString( nil, "ARTWORK", "RCFontHighlight" )
@@ -703,6 +754,16 @@ function M.new()
 		frame.btn_lock = gui.create_button( border_admin, "Lock raid", nil, on_lock_click )
 		frame.btn_lock:SetPoint( "TopRight", border_admin, "TopRight", -5, -5 )
 
+		frame.btn_check_absentees = gui.create_button( border_admin, "Check absentees", 110, on_check_absentees )
+		frame.btn_check_absentees:SetPoint( "TopLeft", border_admin, "TopLeft", 5, -5 )
+
+		frame.admin_status = border_admin:CreateFontString( nil, "ARTWORK", "RCFontHighlight" )
+		frame.admin_status:SetPoint( "Left", frame.btn_check_absentees, "Right", 10, 0 )
+
+		frame.btn_admin_remove = gui.create_button( border_admin, "Remove absentees", 125, on_remove_absentees )
+		frame.btn_admin_remove:SetPoint( "Left", frame.admin_status, "Right", 10, 0 )
+		frame.btn_admin_remove:Hide()
+
 		local border_srlist = m.FrameBuilder.new()
 				:parent( frame )
 				:point( "TopLeft", border_reserve, "BottomLeft", 0, -7 )
@@ -775,9 +836,31 @@ function M.new()
 	-- Refresh
 	--
 	function refresh()
+		if is_deleting then
+			if getn( sr_list ) == 0 then
+				is_deleting = false
+				popup.admin_status:SetText( "" )
+				popup.btn_check_absentees:SetText( "Check Absentees" )
+				popup.btn_check_absentees:Enable()
+				popup.btn_admin_remove:Enable()
+				popup.btn_admin_remove:Hide()
+			else
+				popup.admin_status:SetText( string.format( "Deleting SRs, %d left...", getn( sr_list ) ) )
+				local res = table.remove( sr_list, 1 )
+				m.msg.delete_sr( sr_id, res.id )
+				refresh_list()
+				return
+			end
+		end
+
+		popup.admin_status:SetText( "" )
+		popup.btn_check_absentees:SetText( "Check Absentees" )
+		popup.btn_admin_remove:Hide()
+
 		popup.sr1:Hide()
 		popup.sr2:Hide()
-		if m.debug_enabled or m.db.events[ event_id ].leaderId == m.db.user_settings.discord_id then popup.btn_refresh:Enable() end
+		-- Ignore refresh timeout if user is admin or event leader
+		if m.db.events[ event_id ].leaderId == m.db.user_settings.discord_id or m.find( m.player, m.db.user_settings.sr_admins ) then popup.btn_refresh:Enable() end
 
 		if not m.db.events[ event_id ].sr then
 			popup.yoursr:SetText( "Please wait while SR data is loading..." )
@@ -886,7 +969,7 @@ function M.new()
 		--
 		if sr.locked then
 			if sr_count == 0 then
-				popup.locked:SetPoint( "TopLeft", popup.border_reserve, "TopLeft", 1, -1)
+				popup.locked:SetPoint( "TopLeft", popup.border_reserve, "TopLeft", 1, -1 )
 			else
 				popup.locked:SetPoint( "TopLeft", popup.border_reserve, "TopLeft", 1, -80 )
 				popup.sr1.btn_remove:Disable()
@@ -913,6 +996,7 @@ function M.new()
 			end
 			popup:Show()
 			offset = 0
+			is_deleting = false
 			refresh()
 		end
 	end

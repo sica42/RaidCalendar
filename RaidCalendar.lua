@@ -96,7 +96,7 @@ function RaidCalendar.events:ADDON_LOADED()
 			if type == "event" then
 				m.event_popup.toggle( id )
 			elseif type == "sr" then
-				if tonumber(id ) == nil then
+				if tonumber( id ) == nil then
 					_, id = m.find( id, m.db.events, "srId" )
 				end
 				if tonumber( id ) then
@@ -184,6 +184,18 @@ function RaidCalendar.wrap_chat_frame( frame )
 
 		return original_add_message( self, msg, unpack( arg ) )
 	end
+end
+
+function RaidCalendar.get_raid_members()
+	local members = {}
+	local num = GetNumRaidMembers()
+	for i = 1, num do
+		local name = GetRaidRosterInfo( i )
+		if name then
+			table.insert( members, string.upper( name ) )
+		end
+	end
+	return members
 end
 
 function RaidCalendar.check_new_version()
