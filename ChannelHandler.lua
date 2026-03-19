@@ -96,11 +96,11 @@ function M.new()
 					local msg = m.explode( text )
 					local bot_name = player_name
 					if getn( msg ) > 1 and msg[ 1 ] == "RAIDCAL" then
-						m.info( "got raidcal " )
+						--m.info( "got raidcal " )
 						local command = msg[ 2 ]
 
 						if command == "GUILD" and getn( msg ) == 3 then
-							m.info( "got guild " )
+						--	m.info( "got guild " )
 							m.welcome_popup.add_bot( bot_name, msg[ 3 ] )
 						elseif command == "PONG" then
 							if m.db.bots[ bot_name ] then
