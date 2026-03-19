@@ -42,13 +42,17 @@ function RaidCalendar.events:ADDON_LOADED()
 
 	m.player = UnitName( "player" )
 	m.player_class = UnitClass( "player" )
+	m.player_guild = GetGuildInfo( "player" )
+	m.bot_online = false
 
 	RaidCalendarDB = RaidCalendarDB or {}
 	m.db = RaidCalendarDB
 	m.db.events = m.db.events or {}
 	m.db.user_settings = m.db.user_settings or {}
+	if m.db.user_settings.show_welcome_popup == nil then m.db.user_settings.show_welcome_popup = true end
 	m.db.user_settings.time_format = m.db.user_settings.time_format or "24"
 	m.db.user_settings.channel_access = m.db.user_settings.channel_access or {}
+	m.db.bots = m.db.bots or {}
 	m.db.popup_sr = m.db.popup_sr or {}
 	m.db.popup_event = m.db.popup_event or {}
 	m.db.popup_calendar = m.db.popup_calendar or {}
@@ -58,6 +62,9 @@ function RaidCalendar.events:ADDON_LOADED()
 
 	---@type MessageHandler
 	m.msg = m.MessageHandler.new()
+
+	---@type ChannelHandler
+	m.msg_channel = m.ChannelHandler.new()
 
 	---@type EventPopup
 	m.event_popup = m.EventPopup.new()
@@ -148,30 +155,37 @@ function RaidCalendar.events:ADDON_LOADED()
 		m.calendar_popup.show()
 	end
 
+	m.msg_channel.join_channel()
+
 	m.version = GetAddOnMetadata( m.name, "Version" )
 	self.info( string.format( "(v%s) Loaded", m.version ) )
 
-	if m.db.user_settings.bot_name and m.db.user_settings.bot_name ~= "" and m.db.user_settings.discord_id then
+	if m.db.user_settings.bot_name and m.db.user_settings.bot_name ~= "" or m.table_size( m.db.bots ) > 0 then
 		-- Refresh events if last update is older then 6h
 		if not m.db.user_settings.last_updated or time() - m.db.user_settings.last_updated > 3600 * 6 then
 			m.debug( "Fetching events..." )
-			m.msg.request_events()
+			m.get_events()
 		end
-	elseif m.db.user_settings.show_welcome_popup ~= false then
+	elseif m.db.user_settings.show_welcome_popup == true then
 		m.welcome_popup.show()
 	end
 
 	self.check_new_version()
 end
 
+function RaidCalendar.events.CHAT_MSG_CHANNEL()
+	m.msg_channel.on_msg( arg1, arg2, arg4 )
+end
+
 ---@param frame Frame
 function RaidCalendar.wrap_chat_frame( frame )
 	local original_add_message = frame[ "AddMessage" ]
+	local pattern = "(%d%d%d%d)%-(%d%d)%-(%d%d)T(%d%d):(%d%d):(%d%d)Z"
+	local bot_pattern = "player:" .. (m.db.user_settings.bot_name or "") .. ".*:%s(.*)"
 
 	frame[ "AddMessage" ] = function( self, msg, ... )
 		if msg then
-			local pattern = "(%d%d%d%d)%-(%d%d)%-(%d%d)T(%d%d):(%d%d):(%d%d)Z"
-
+			-- Check for timestamp pattern
 			if string.find( msg, pattern ) then
 				local year, month, day, hour, minute, second = string.match( msg, pattern )
 				local timestamp = time( { year = year, month = month, day = day, hour = hour, min = minute, sec = second } )
@@ -179,6 +193,15 @@ function RaidCalendar.wrap_chat_frame( frame )
 				local date_formatted = date( "%A", timestamp ) .. " " .. tonumber( date( "%d", timestamp ) ) .. ". " .. date( "%B", timestamp )
 				local time_formatted = date( m.time_format, timestamp )
 				msg = string.gsub( msg, pattern, date_formatted )
+			end
+
+			-- Check for bot commands
+			if string.find( msg, bot_pattern ) then
+				local command = string.match( msg, bot_pattern )
+
+				if command == "inv" then
+					return
+				end
 			end
 		end
 
@@ -196,6 +219,15 @@ function RaidCalendar.get_raid_members()
 		end
 	end
 	return members
+end
+
+function RaidCalendar.get_events()
+	if m.db.user_settings.bot_name and m.db.user_settings.bot_name ~= "" then
+		m.msg.request_events()
+	end
+	if m.table_size( m.db.bots ) > 0 then
+		m.msg_channel.request_events( m.db.bots )
+	end
 end
 
 function RaidCalendar.check_new_version()

@@ -14,6 +14,7 @@ local MessageCommand = {
 	RequestChannelCheck = "CHCHECK",
 	RequestEvent = "REVENT",
 	RequestEvents = "REVENTS",
+	EditEvent = "EDITEVENT",
 	Signup = "SIGNUP",
 	SignupEdit = "SIGNUP_EDIT",
 	RequestSR = "RSR",
@@ -21,6 +22,8 @@ local MessageCommand = {
 	DeleteSR = "SRDELETE",
 	LockSR = "SRLOCK",
 	VersionCheck = "VERC",
+	Ping = "PING",
+	Who = "WHO",
 	-- Incoming
 	BotStatus = "BSTATUS",
 	DiscordId = "DID",
@@ -28,13 +31,17 @@ local MessageCommand = {
 	ChannelCheckResult = "CHCHECK_RESULT",
 	Event = "EVENT",
 	Events = "EVENTS",
+	EditEventResult = "EDITEVENT_RESULT",
 	SignupResult = "SIGNUP_RESULT",
 	SR = "SR",
 	AddSRResult = "SRADD_RESULT",
 	DeleteSRResult = "SRDELETE_RESULT",
 	LockSRResult = "SRLOCK_RESULT",
-	Version = "VER"
+	Version = "VER",
+	Pong = "PONG"
 }
+
+m.MessageCommand = MessageCommand
 
 ---@alias MessageCommand
 ---| "RDAUTH"
@@ -57,11 +64,16 @@ local MessageCommand = {
 ---| "REVENTS"
 ---| "EVENT"
 ---| "EVENTS"
+---| "EDITEVENT"
+---| "EDITEVENT_RESULT"
 ---| "SIGNUP"
 ---| "SIGNUP_EDIT"
 ---| "SIGNUP_RESULT"
 ---| "VERC"
 ---| "VER"
+---| "WHO"
+---| "PING"
+---| "PONG"
 
 ---@class AceComm
 ---@field RegisterComm fun( self: any, prefix: string, method: function? )
@@ -79,6 +91,7 @@ local MessageCommand = {
 ---@field request_events fun()
 ---@field signup fun( event_id: string, user_id: string )
 ---@field signup_edit fun( event_id: string, signup_id: string, role: string? )
+---@field set_event_public fun( event_id: string, public: boolean )
 ---@field bot_status fun()
 ---@field version_check fun( show_all: boolean?)
 
@@ -257,8 +270,9 @@ function M.new()
 	---@param data table?
 	local function broadcast( command, data )
 		m.debug( string.format( "Broadcasting %s", command ) )
+		local channel = m.db.user_settings.bot_name and "GUILD" or "RAID"
 		local _data = data and m.flatten( data ) or ""
-		ace_comm:SendCommMessage( m.prefix, command .. "::" .. _data, "GUILD", nil, "NORMAL" )
+		ace_comm:SendCommMessage( m.prefix, command .. "::" .. _data, channel, nil, "NORMAL" )
 	end
 
 	local function find_discord_id( name )
@@ -357,6 +371,13 @@ function M.new()
 		} )
 	end
 
+	local function set_event_public( event_id, public )
+		broadcast( MessageCommand.EditEvent, {
+			eventId = event_id,
+			isPublic = public
+		} )
+	end
+
 	local function bot_status()
 		-- Send directly to avoid ChatThrottle's startup delay
 		SendAddonMessage( m.prefix, MessageCommand.RequestBotStatus .. "::", "GUILD" )
@@ -376,11 +397,6 @@ function M.new()
 			-- Discord ID response
 			--
 			if data.player == m.player then
-				if data.success then
-					m.debug( "Saving Discord ID: " .. data.userId )
-					m.db.user_settings.discord_id = data.userId
-				end
-				m.calendar_popup.discord_response( data.success, data.userId )
 				m.welcome_popup.discord_response( data.success, data.userId )
 			end
 		elseif command == MessageCommand.ChannelCheckResult then
@@ -396,8 +412,9 @@ function M.new()
 			-- Discord authentication response
 			--
 			if data.player == m.player then
-				m.debug( "Saving Discord ID: " .. data.userId )
-				m.db.user_settings.discord_id = data.userId
+				if data.success then
+					m.db.user_settings.discord_id = data.userId
+				end
 				m.welcome_popup.auth_response( data.userId, data.success )
 			end
 		elseif command == MessageCommand.SR then
@@ -411,12 +428,13 @@ function M.new()
 				return
 			end
 
-			local _, event_id = m.find( data.reference, m.db.events, "srId" )
-			if event_id then
-				m.db.events[ event_id ].sr = data
-				m.db.events[ event_id ].sr.lastUpdated = time()
-				m.sr_popup.update( event_id )
-				m.calendar_popup.update()
+			for event_id, event in pairs( m.db.events ) do
+				if event.srId == data.reference then
+					m.db.events[ event_id ].sr = data
+					m.db.events[ event_id ].sr.lastUpdated = time()
+					m.sr_popup.update( event_id )
+					m.calendar_popup.update()
+				end
 			end
 		elseif command == MessageCommand.AddSRResult then
 			--
@@ -426,32 +444,38 @@ function M.new()
 
 			if data.success then
 				m.debug( "SR Added" )
-				local _, event_id = m.find( data.srId, m.db.events, "srId" )
-				if not event_id then
-					m.debug( "SR added but no event found for it!" )
-					return
-				end
-
 				if data.addedSRs and type( data.addedSRs ) == "table" then
-					if m.db.events[ event_id ].sr and m.db.events[ event_id ].sr.reservations then
-						for _, res in pairs( data.addedSRs ) do
-							if not m.find( res.id, m.db.events[ event_id ].sr.reservations, "id" ) then
-								table.insert( m.db.events[ event_id ].sr.reservations, {
-									id = res.id,
-									raidItemId = res.raidItemId,
-									srPlus = res.srPlus,
-									comment = res.comment,
-									character = res.character
-								} )
+					for event_id, event in pairs( m.db.events ) do
+						if event.srId == data.srId then
+
+					--		local _, event_id = m.find( data.srId, m.db.events, "srId" )
+							--if not event_id then
+--								m.debug( "SR added but no event found for it!" )
+								--return
+							--end
+
+							--if data.addedSRs and type( data.addedSRs ) == "table" then
+							if m.db.events[ event_id ].sr and m.db.events[ event_id ].sr.reservations then
+								for _, res in pairs( data.addedSRs ) do
+									if not m.find( res.id, m.db.events[ event_id ].sr.reservations, "id" ) then
+										table.insert( m.db.events[ event_id ].sr.reservations, {
+											id = res.id,
+											raidItemId = res.raidItemId,
+											srPlus = res.srPlus,
+											comment = res.comment,
+											character = res.character
+										} )
+										m.sr_popup.update( event_id )
+										m.calendar_popup.update()
+									end
+								end
 							end
 						end
 					end
 				end
-
-				m.sr_popup.update( event_id )
-				m.calendar_popup.update()
 			elseif data.player == m.player then
 				m.error( "Adding SR failed: " .. (data.status or "Unknown error") )
+				m.sr_popup.update()
 			end
 		elseif command == MessageCommand.DeleteSRResult then
 			--
@@ -468,7 +492,6 @@ function M.new()
 							table.remove( event.sr.reservations, k )
 							m.sr_popup.update()
 							m.calendar_popup.update()
-							return
 						end
 					end
 				end
@@ -481,7 +504,7 @@ function M.new()
 			--
 			data = decode( data, key_map, value_map )
 			if data.success == true then
-				local _, eventId = m.find( data.srId, m.db.events, "srId")
+				local _, eventId = m.find( data.srId, m.db.events, "srId" )
 				if m.db.events[ eventId ] and m.db.events[ eventId ].sr then
 					m.db.events[ eventId ].sr.locked = data.locked
 				end
@@ -505,7 +528,7 @@ function M.new()
 				m.db.events[ data.id ] = data
 			end
 
-			local sr_ref = string.match( m.db.events[ data.id ].description, "https://raidres.fly.dev/res/(%w+)%s?" )
+			local sr_ref = string.match( m.db.events[ data.id ].description, "https://raidres.top/res/(%w+)%s?" )
 			m.db.events[ data.id ].srId = sr_ref
 			m.db.events[ data.id ].title = string.gsub( m.db.events[ data.id ].title, "<:.*>", "" )
 
@@ -525,6 +548,7 @@ function M.new()
 				m.debug( "Receiving events requested by " .. (data.player or "UNKNOWN") )
 				for _, event in data.events do
 					if m.db.events[ event.id ] then
+						m.db.events[ event.id ].isPublic = event.isPublic
 						-- Only send event update request from player who requested it if needed
 						if event.lastUpdated > m.db.events[ event.id ].lastUpdated and data.player == m.player then
 							m.debug( "Update event: " .. event.title )
@@ -548,6 +572,18 @@ function M.new()
 
 			m.db.user_settings.last_updated = time()
 			m.calendar_popup.update()
+		elseif command == MessageCommand.EditEventResult then
+			--
+			-- EDITEVENT_RESULT
+			--
+			data = decode( data, key_map, value_map )
+			if data.success and m.db.events[ data.eventId ] then
+				m.db.events[ data.eventId ].isPublic = data.isPublic
+				m.event_popup.update( data.eventId )
+				m.calendar_popup.update()
+			elseif data.player == m.player then
+				m.error( "Edit event failed: " .. (data.status or "Unknown error") )
+			end
 		elseif command == MessageCommand.SignupResult then
 			--
 			-- SIGNUP_RESULT
@@ -656,6 +692,7 @@ function M.new()
 		request_events = request_events,
 		signup = signup,
 		signup_edit = signup_edit,
+		set_event_public = set_event_public,
 		bot_status = bot_status,
 		version_check = version_check
 	}

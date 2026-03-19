@@ -11,8 +11,8 @@ if m.CalendarPopup then return end
 ---@field toggle fun()
 ---@field is_visible fun(): boolean
 ---@field unselect fun()
----@field discord_response fun( success: boolean, user_id: string )
 ---@field update fun()
+---@field set_online fun( bot_name: string )
 
 local M = {}
 
@@ -102,11 +102,15 @@ function M.new()
 		local title = frame:CreateFontString( nil, "ARTWORK", "RCFontNormal" )
 		title:SetPoint( "TopLeft", frame, "TopLeft", 5, -2 )
 		title:SetWidth( 260 )
-		title:SetHeight( 35 )
+		title:SetHeight( 27 )
 		title:SetTextColor( NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b )
 		title:SetFont( "Interface\\AddOns\\RaidCalendar\\assets\\Myriad-Pro.ttf", 13, "OUTLINE" )
 		title:SetJustifyH( "Left" )
 		title:SetJustifyV( "Middle" )
+
+		local guild = frame:CreateFontString( nil, "ARTWORK", "RCFontNormalSmall" )
+		guild:SetPoint( "TopLeft", title, "BottomLeft", 0, 0 )
+
 
 		local date_label = gui.create_icon_label( frame, "Interface\\AddOns\\RaidCalendar\\assets\\icon_date.tga", 85, 14 )
 		date_label:SetPoint( "TopRight", frame, "TopRight", 0, -3 )
@@ -165,6 +169,13 @@ function M.new()
 			color_bar:SetVertexColor( (tonumber( color[ 1 ] ) or 0) / 255, (tonumber( color[ 2 ] ) or 0) / 255, (tonumber( color[ 3 ] ) or 0) / 255, color[ 4 ] )
 
 			title:SetText( event.title )
+			if event.bot then
+				title:SetPoint( "TopLeft", frame, "TopLeft", 5, 0 )
+				guild:SetText( m.db.bots[ event.bot ].guild )
+			else
+				title:SetPoint( "TopLeft", frame, "TopLeft", 5, -7 )
+				guild:SetText( "" )
+			end
 			date_label.set( date( "%d. %b %Y", event.startTime ) )
 			time_label.set( date( m.time_format, event.startTime ) )
 
@@ -255,7 +266,7 @@ function M.new()
 		frame.btn_refresh:SetPoint( "Right", frame.titlebar.btn_close, "Left", 2, 0 )
 		frame.btn_refresh:SetScript( "OnClick", function()
 			frame.btn_refresh:Disable()
-			m.msg.request_events()
+			m.get_events()
 			if not m.debug_enabled then
 				m.ace_timer.ScheduleTimer( M, function()
 					frame.btn_refresh:Enable()
@@ -391,12 +402,9 @@ function M.new()
 				return a.value < b.value
 			end )
 
-			local max = math.max( 0, getn( events ) - rows )
-			popup.scroll_bar:SetMinMaxValues( 0, max )
-
 			if getn( events ) == 0 then
 				m.info( "Loading events, hang on..." )
-				m.msg.request_events()
+				m.get_events()
 			end
 		end
 
@@ -410,20 +418,7 @@ function M.new()
 		end
 
 		local max = math.max( 0, getn( events ) - rows )
-		local value = math.min( max, popup.scroll_bar:GetValue() )
-
-		popup.scroll_bar:SetValue( value )
-		if value == 0 then
-			m.api[ "RaidCalendarScrollBarScrollUpButton" ]:Disable()
-		else
-			m.api[ "RaidCalendarScrollBarScrollUpButton" ]:Enable()
-		end
-
-		if value == max then
-			m.api[ "RaidCalendarScrollBarScrollDownButton" ]:Disable()
-		else
-			m.api[ "RaidCalendarScrollBarScrollDownButton" ]:Enable()
-		end
+		m.update_scrollbar_buttons( "RaidCalendarScrollBar", max )
 	end
 
 	local function show()
@@ -461,23 +456,14 @@ function M.new()
 		end
 	end
 
-	local function discord_response( success, user_id )
-		if popup and popup:IsVisible() then
-			popup.settings.btn_loopup:Enable()
-			if success then
-				local name = popup.settings.discord:GetText()
-				popup.settings.discord_response:SetText( "UserID for \"" .. name .. "\" found" )
-				popup.settings.discord:SetText( user_id )
-			else
-				popup.settings.discord_response:SetText( "Name not found." )
-			end
-		end
-	end
-
 	local function update()
 		if popup and popup:IsVisible() then
 			refresh( true )
 		end
+	end
+
+	local function set_online( online )
+		popup.online_indicator.set_online( online )
 	end
 
 	---@type CalendarPopup
@@ -487,8 +473,8 @@ function M.new()
 		toggle = toggle,
 		is_visible = is_visible,
 		unselect = unselect,
-		discord_response = discord_response,
-		update = update
+		update = update,
+		set_online = set_online,
 	}
 end
 

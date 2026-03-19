@@ -391,6 +391,7 @@ function M.create_online_indicator( parent, relative_region )
 	frame:SetWidth( 15 )
 	frame:SetHeight( 15 )
 	frame.is_online = false
+	frame.bots = {}
 
 	frame.texture = frame:CreateTexture( nil, "ARTWORK" )
 	frame.texture:SetAllPoints( frame )
@@ -399,9 +400,20 @@ function M.create_online_indicator( parent, relative_region )
 
 	frame:EnableMouse( true )
 	frame:SetScript( "OnEnter", function()
+		GameTooltip:ClearLines()
 		GameTooltip:SetOwner( frame, "ANCHOR_RIGHT" )
-		GameTooltip:SetText( string.format( "%s is %s", m.db.user_settings.bot_name or "Bot", frame.is_online and "online" or "offline" ) )
 		GameTooltip:SetScale( 0.8 )
+
+		if m.db.user_settings.bot_name and m.db.user_settings.bot_name ~= "" then
+			GameTooltip:AddLine( string.format( "%s is %s", m.db.user_settings.bot_name, frame.is_online and "online" or "offline" ) )
+		end
+
+		if m.table_size( frame.bots ) > 0 then
+			for bot, is_online in pairs( frame.bots ) do
+				GameTooltip:AddLine( string.format( "%s is %s", bot, is_online and "online" or "offline" ) )
+			end
+		end
+
 		GameTooltip:Show()
 	end )
 
@@ -416,6 +428,11 @@ function M.create_online_indicator( parent, relative_region )
 		frame.is_online = r == 0
 	end
 
+	frame.set_online = function( bot_name )
+		local r, g, b, a = m.bot_online_status( true )
+		frame.texture:SetVertexColor( r, g, b, a )
+		frame.bots[ bot_name ] = true
+	end
 
 	return frame
 end
@@ -509,7 +526,7 @@ function M.create_rich_text_frame( parent, frame_width )
 		local line = get_from_cache( "line" )
 		if not line then
 			line = frame:CreateTexture( nil, "ARTWORK" )
-			line:SetTexture("Interface\\Buttons\\WHITE8x8")
+			line:SetTexture( "Interface\\Buttons\\WHITE8x8" )
 		end
 
 		line.is_used = true
@@ -598,7 +615,7 @@ function M.create_rich_text_frame( parent, frame_width )
 				local beforeBold, afterBold, bold = string.find( remaining, "%*%*(.-)%*%*" )
 				local beforeUnderline, afterUnderline, underline = string.find( remaining, "__(.-)__" )
 				local beforeItalic, afterItalic, italic = string.find( remaining, "%*(.-)%*" )
-				local url_s, url_e, url_full, url_id = string.find( remaining, "(https://raidres%.fly%.dev/res/([A-Za-z0-9]+))" )
+				local url_s, url_e, url_full, url_id = string.find( remaining, "(https://raidres%.top/res/([A-Za-z0-9]+))" )
 
 				-- Pick earliest match
 				local candidates = {
@@ -762,6 +779,11 @@ function M.pfui_skin( frame )
 		m.api.pfUI.api.SkinButton( frame.cs_change )
 		m.api.pfUI.api.SkinButton( frame.cs_cancel )
 
+		m.api.pfUI.api.StripTextures( frame.border_admin, nil, "BACKGROUND" )
+		m.api.pfUI.api.CreateBackdrop( frame.border_admin, nil, true )
+		m.api.pfUI.api.SkinButton( frame.btn_public )
+		m.api.pfUI.api.SkinButton( frame.btn_invite )
+
 		m.api.pfUI.api.StripTextures( frame.border_desc, nil, "BACKGROUND" )
 		m.api.pfUI.api.CreateBackdrop( frame.border_desc, nil, true )
 		m.api.pfUI.api.SkinScrollbar( frame.scroll_bar )
@@ -771,6 +793,8 @@ function M.pfui_skin( frame )
 		m.api.pfUI.api.StripTextures( frame.missing, nil, "BACKGROUND" )
 		m.api.pfUI.api.CreateBackdrop( frame.missing, nil, true )
 
+		frame.dd_spec:SetWidth( 100 )
+		frame.dd_class:SetWidth( 100 )
 		skin_dropdown( frame.dd_spec )
 		skin_dropdown( frame.dd_class )
 	end
@@ -815,6 +839,10 @@ function M.pfui_skin( frame )
 	if name == "RaidCalendarWelcomePopup" then
 		---@class WelcomeFrame
 		frame = frame
+
+		m.api.pfUI.api.StripTextures( frame.border_bots, nil, "BACKGROUND" )
+		m.api.pfUI.api.CreateBackdrop( frame.border_bots, nil, true )
+		m.api.pfUI.api.SkinScrollbar( frame.scroll_bar )
 
 		m.api.pfUI.api.SkinButton( frame.btn_verify )
 		frame.btn_verify:SetHeight( 22 )

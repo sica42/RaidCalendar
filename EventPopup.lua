@@ -11,7 +11,6 @@ if m.EventPopup then return end
 ---@field toggle fun( event_id: string?)
 ---@field is_visible fun(): boolean
 ---@field update fun( event_id: string? )
----@field online_status fun( online: boolean )
 
 ---@class Signup
 ---@field id number
@@ -24,18 +23,23 @@ if m.EventPopup then return end
 ---@field className string
 ---@field roleName string
 
+---@class EventFrame
+---@field btn_signup Button
+
 local M = {}
 
 ---@type ScrollDropdown
 local scroll_drop = LibStub:GetLibrary( "LibScrollDrop-1.3" )
 
 function M.new()
+	---@type EventFrame
 	local popup
 	local event
 	local signup_id
 	local frame_cache = {}
 	local guild_online_cache = {}
 	local refresh
+	local is_admin = false
 	local gui = m.GuiElements
 
 	local buttons = { "Signup", "Bench", "Late", "Tentative", "Absence", "Change Spec" }
@@ -133,6 +137,14 @@ function M.new()
 			invite_next()
 		else
 			m.error( "No players to invite" )
+		end
+	end
+
+	local function on_public_click()
+		if event.isPublic then
+			m.msg.set_event_public( event.id, false )
+		else
+			m.msg.set_event_public( event.id, true )
 		end
 	end
 
@@ -251,7 +263,6 @@ function M.new()
 	local function create_player_frame( parent, signup )
 		local frame = get_from_cache( "player" )
 
-
 		if not frame then
 			---@class PlayerFrame: Frame
 			frame = CreateFrame( "Frame", nil, parent )
@@ -305,14 +316,22 @@ function M.new()
 			frame:SetPoint( p.point, UIParent, p.relative_point, p.x, p.y )
 		end
 
-		---
-		--- Titlebar buttons
-		---
-		frame.btn_invite = m.GuiElements.tiny_button( frame, "I", "Invite to raid", "#7b1fa2" )
-		frame.btn_invite:SetPoint( "Right", frame.titlebar.btn_close, "Left", 2, 0 )
-		frame.btn_invite:SetScript( "OnClick", on_invite_click )
+		local border_admin = m.FrameBuilder.new()
+				:parent( frame )
+				:point( "TopLeft", frame, "TopLeft", 10, -32 )
+				:point( "BottomRight", frame, "TopRight", -10, -67 )
+				:frame_style( "TOOLTIP" )
+				:backdrop( { bgFile = "Interface/Buttons/WHITE8x8" } )
+				:backdrop_color( 0.08, 0.08, 0.08, 1 )
+				:hidden()
+				:build()
+		frame.border_admin = border_admin
 
-		frame.online_indicator = gui.create_online_indicator( frame, frame.btn_invite )
+		frame.btn_public = gui.create_button( border_admin, "Make public", nil, on_public_click )
+		frame.btn_public:SetPoint( "TopLeft", border_admin, "TopLeft", 5, -5 )
+
+		frame.btn_invite = gui.create_button( border_admin, "Send invites", nil, on_invite_click )
+		frame.btn_invite:SetPoint( "TopRight", border_admin, "TopRight", -5, -5 )
 
 		local border_desc = m.FrameBuilder.new()
 				:parent( frame )
@@ -328,6 +347,7 @@ function M.new()
 			local value = frame.scroll_bar:GetValue() - arg1 * 11.851852176058
 			frame.scroll_bar:SetValue( value )
 		end )
+		---@type Frame
 		frame.border_desc = border_desc
 
 		local scroll_bar = CreateFrame( "Slider", "RaidCalendarDescScrollBar", border_desc, "UIPanelScrollBarTemplate" )
@@ -338,6 +358,8 @@ function M.new()
 		scroll_bar:SetValueStep( 1 )
 		scroll_bar:SetScript( "OnValueChanged", function()
 			frame.desc:SetPoint( "Top", border_desc, "Top", 0, arg1 - 10 )
+			local max = math.max( 0, popup.desc:GetHeight() - 65 )
+			m.update_scrollbar_buttons( "RaidCalendarDescScrollBar", max)
 		end )
 
 		frame.desc_scroll = CreateFrame( "ScrollFrame", nil, border_desc )
@@ -354,7 +376,7 @@ function M.new()
 		frame.desc:SetPoint( "Left", frame.desc_frame, "Left", 0, 0 )
 
 		frame.leader = gui.create_icon_label( frame, "Interface\\AddOns\\RaidCalendar\\assets\\icon_leader.tga", 140 )
-		frame.leader:SetPoint( "TopLeft", frame, "TopLeft", 20, -140 )
+		frame.leader:SetPoint( "TopLeft", frame.border_desc, "BottomLeft", 20, -8 )
 
 		frame.signups = gui.create_icon_label( frame, "Interface\\AddOns\\RaidCalendar\\assets\\icon_signups.tga", 80 )
 		frame.signups:SetPoint( "TopLeft", frame.leader, "TopRight", 5, 0 )
@@ -419,7 +441,7 @@ function M.new()
 		frame.btn_access:Hide()
 
 		frame.cs_change = gui.create_button( frame, "Change", 100, change_spec )
-		frame.cs_change:SetPoint( "TopRight", frame, "TopRight", -10, -230 )
+		frame.cs_change:SetPoint( "TopRight", frame, "TopRight", -10, -265 )
 		frame.cs_change:Hide()
 
 		frame.cs_cancel = gui.create_button( frame, "Cancel", 100, function() refresh( event.id ) end )
@@ -434,7 +456,7 @@ function M.new()
 			width = 95
 		} )
 
-		frame.dd_class:SetPoint( "TopRight", frame, "TopRight", -12, -360 )
+		frame.dd_class:SetPoint( "TopRight", frame.btn_signup, "BottomRight", 0, -5 )
 		frame.dd_class:SetItems( function()
 			local list = {}
 
@@ -485,7 +507,7 @@ function M.new()
 		local now = time( date( "*t" ) )
 		local signup_class
 		event = m.db.events[ event_id ]
-		popup.online_indicator.update()
+
 		update_guild_online_cache()
 
 		-- Reset cached elements
@@ -502,21 +524,39 @@ function M.new()
 			popup.desc:SetRichText( 'Hang on while event data is loaded...' )
 			popup.dd_class:Hide()
 			popup.dd_spec:Hide()
+
+			for _, v in buttons do
+				local btn = "btn_" .. string.gsub( string.lower( v ), "%s", "_" )
+				popup[ btn ]:Disable()
+			end
+
+			if event and event.bot then
+				if not is_in_group(event.bot) then
+					popup.desc:SetRichText( 'You need to be grouped with ' .. event.bot .. " to be able to receive event information and signup.\nClick button below to automatically join group." )
+					return
+				end
+			end
 			m.msg.request_event( event_id )
 			return
 		end
 
-		local show_invite = event.leaderId == m.db.user_settings.discord_id or m.debug_enabled
-		if show_invite then
-			popup.btn_invite:Enable()
+		is_admin = (m.db.user_settings.discord_id == event.leaderId) or
+				(m.db.user_settings.sr_admins and m.find( m.player, m.db.user_settings.sr_admins ) and true or false)
+
+		if is_admin then
+			popup.border_admin:Show()
+			popup.border_desc:SetPoint( "TopLeft", popup.border_admin, "BottomLeft", 0, -7 )
+			popup.border_desc:SetPoint( "BottomRight", popup, "TopRight", -10, -174 )
+			popup.btn_public:SetText( event.isPublic and "Make private" or "Make public" )
 		else
-			popup.btn_invite:Disable()
+			popup.border_admin:Hide()
 		end
 
 		popup.titlebar.title:SetText( event.title )
 		popup.desc:SetRichText( event.description )
-		popup.scroll_bar:SetMinMaxValues( 0, math.max( 0, popup.desc:GetHeight() - 65 ) )
-		popup.scroll_bar:SetValue( 0 )
+
+		local max = math.max( 0, popup.desc:GetHeight() - 65 )
+		m.update_scrollbar_buttons( "RaidCalendarDescScrollBar", max)
 
 		popup.leader.set( event.leaderName )
 		popup.date.set( date( "%d. %B %Y", event.startTime ) )
@@ -615,7 +655,8 @@ function M.new()
 			popup.missing:Show()
 		end
 
-		popup:SetHeight( math.max( 345, 196 + data[ "attending" ].total_y + data[ "attending" ].max_y + data[ "missing" ].total_y + data[ "missing" ].max_y ) )
+		popup:SetHeight( math.max( 345 + (is_admin and 42 or 0),
+		196 + (is_admin and 42 or 0) + data[ "attending" ].total_y + data[ "attending" ].max_y + data[ "missing" ].total_y + data[ "missing" ].max_y ) )
 
 		--
 		-- Buttons
@@ -646,7 +687,7 @@ function M.new()
 		else
 			popup.btn_signup:Show()
 			popup.btn_signup:Enable()
-			popup.dd_class:SetPoint( "Top", popup, "Top", 0, -220 )
+			popup.dd_class:SetPoint( "Top", popup.btn_signup, "Bottom", 0, -5 )
 			popup.dd_class:Show()
 			popup.dd_spec:Show()
 			for _, v in buttons do
@@ -725,16 +766,6 @@ function M.new()
 		end
 	end
 
-	local function online_status( online )
-		if popup then
-			if online then
-				popup.indicator_tex:SetVertexColor( 0, 1, 0, .9 )
-			else
-				popup.indicator_tex:SetVertexColor( 1, 0, 0, .9 )
-			end
-		end
-	end
-
 	---@type EventPopup
 	return {
 		show = show,
@@ -742,7 +773,6 @@ function M.new()
 		toggle = toggle,
 		is_visible = is_visible,
 		update = update,
-		online_status = online_status,
 	}
 end
 

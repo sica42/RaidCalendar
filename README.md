@@ -2,7 +2,7 @@
 **Version:** 0.9.7
 **Game Version:** Turtle WoW (Interface 11200)
 
-RaidCalendar lets you view and sign up to raids in game on https://raid-helper.dev/ and register soft reserves on https://raidres.fly.dev
+RaidCalendar lets you view and sign up to raids in game on https://raid-helper.dev/ and register soft reserves on https://raidres.top
 
 > [!IMPORTANT]
 > RaidCalendar requires someone in your guild to be running [RaidCalendarBot](https://github.com/sica42/RaidCalendarBot).

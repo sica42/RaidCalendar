@@ -649,7 +649,7 @@ function lib:New( parent, options )
 		dropdown.selected_index = nil
 	end
 
-	---@param value string
+	---@param value string?
 	function dropdown:SetSelected( value )
 		if self.on_open or next(self.items) then
 			self.items = self.on_open and self.on_open( self ) or self.items

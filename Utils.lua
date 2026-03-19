@@ -3,7 +3,7 @@ RaidCalendar = RaidCalendar or {}
 ---@class RaidCalendar
 local M = RaidCalendar
 
-local bot_online
+local bot_online = false
 local bot_check_time = 0
 
 --- @param hex string
@@ -65,17 +65,25 @@ end
 ---@return number b
 ---@return number a
 ---@nodiscard
-function M.bot_online_status()
-	if time() - bot_check_time > 600 or not bot_online then
+function M.bot_online_status( is_online )
+	if is_online then
+		bot_online = true
+	elseif time() - bot_check_time > 3600 or (time() - bot_check_time > 30 and not bot_online) then
 		M.debug( "Checking bot online status" )
 		bot_check_time = time()
-		bot_online = false
-		for i = 1, GetNumGuildMembers() do
-			local name, _, _, _, _, _, _, _, online = GetGuildRosterInfo( i )
-			if name == M.db.user_settings.bot_name and online == 1 then
-				bot_online = true
-				break
+
+		if M.db.user_settings.bot_name and M.db.user_settings.bot_name ~= "" then
+			M.debug( "Checking guild bot online status" )
+			for i = 1, GetNumGuildMembers() do
+				local name, _, _, _, _, _, _, _, online = GetGuildRosterInfo( i )
+				if name == M.db.user_settings.bot_name and online == 1 then
+					bot_online = true
+					break
+				end
 			end
+		elseif M.table_size( M.db.bots ) > 0 then
+			M.debug( "Checking channel bot online status" )
+			M.msg_channel.ping( M.db.bots )
 		end
 	end
 
@@ -136,31 +144,53 @@ function M.capitalize_words( str )
 end
 
 function M.is_new_version( mine, theirs )
-  local function parse_version( v )
-    local parts = {}
+	local function parse_version( v )
+		local parts = {}
 
-    for part in string.gmatch( v, "%d+" ) do
-      table.insert( parts, tonumber( part ) )
-    end
+		for part in string.gmatch( v, "%d+" ) do
+			table.insert( parts, tonumber( part ) )
+		end
 
-    return parts
-  end
+		return parts
+	end
 
-  local my_version = parse_version( mine )
-  local their_version = parse_version( theirs )
+	local my_version = parse_version( mine )
+	local their_version = parse_version( theirs )
 
-  for i = 1, math.max( getn( my_version ), getn( their_version ) ) do
-    local my_part = my_version[ i ] or 0
-    local their_part = their_version[ i ] or 0
+	for i = 1, math.max( getn( my_version ), getn( their_version ) ) do
+		local my_part = my_version[ i ] or 0
+		local their_part = their_version[ i ] or 0
 
-    if their_part > my_part then
-      return true
-    elseif their_part < my_part then
-      return false
-    end
-  end
+		if their_part > my_part then
+			return true
+		elseif their_part < my_part then
+			return false
+		end
+	end
 
-  return false
+	return false
+end
+
+---@param scrollbar string
+---@param max number
+function M.update_scrollbar_buttons( scrollbar, max )
+	local slider = M.api[ scrollbar ]
+	local value = math.min( max, slider:GetValue() )
+
+	slider:SetMinMaxValues( 0, max )
+	slider:SetValue( value )
+
+	if value == 0 then
+		M.api[ scrollbar .. "ScrollUpButton" ]:Disable()
+	else
+		M.api[ scrollbar .. "ScrollUpButton" ]:Enable()
+	end
+
+	if value == max then
+		M.api[ scrollbar .. "ScrollDownButton" ]:Disable()
+	else
+		M.api[ scrollbar .. "ScrollDownButton" ]:Enable()
+	end
 end
 
 ---@param message string
@@ -226,7 +256,7 @@ function M.flatten( value )
 		if M.is_array( value ) then
 			-- JSON array
 			local items = {}
-			for i = 1, getn(value) do
+			for i = 1, getn( value ) do
 				table.insert( items, M.flatten( value[ i ] ) )
 			end
 			return "{" .. table.concat( items, ",	" ) .. "}"
@@ -239,7 +269,7 @@ function M.flatten( value )
 			return "{" .. table.concat( items, "," ) .. "}"
 		end
 	elseif value_type == "string" then
-		return '"' .. string.gsub(value, '"', '\\"' ) .. '"'
+		return '"' .. string.gsub( value, '"', '\\"' ) .. '"'
 	elseif value_type == "number" or value_type == "boolean" then
 		return tostring( value )
 	elseif value_type == "nil" then
@@ -247,6 +277,30 @@ function M.flatten( value )
 	end
 
 	error( "Unsupported type: " .. value_type )
+end
+
+---@param table table
+---@return integer size
+function M.table_size( table )
+	local size = 0
+	for _ in table do
+		size = size + 1
+	end
+	return size
+end
+
+function M.explode( str, delimiter )
+	delimiter = delimiter or ":"
+	local result = {}
+	local from = 1
+	local delim_from, delim_to = string.find( str, delimiter, from, true )
+	while delim_from do
+		table.insert( result, string.sub( str, from, delim_from - 1 ) )
+		from = delim_to + 1
+		delim_from, delim_to = string.find( str, delimiter, from, true )
+	end
+	table.insert( result, string.sub( str, from ) )
+	return result
 end
 
 ---@diagnostic disable-next-line: undefined-field

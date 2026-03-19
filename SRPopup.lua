@@ -159,6 +159,7 @@ function M.new()
 		btn_remove:SetDisabledTexture( "Interface\\Buttons\\UI-Panel-MinimizeButton-Disabled" )
 		btn_remove:SetHighlightTexture( "Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight" )
 		btn_remove:SetScript( "OnClick", function()
+			is_deleting = false
 			this:Disable()
 			m.msg.delete_sr( sr_id, frame.id )
 		end )
@@ -542,6 +543,7 @@ function M.new()
 	end
 
 	local function on_lock_click()
+		is_deleting = false
 		m.msg.lock_sr( m.db.events[ event_id ].sr.reference, this:GetText() == "Lock raid" )
 		this:Disable()
 	end
@@ -579,6 +581,7 @@ function M.new()
 		popup.admin_status:SetText( string.format( "Showing %d absentees", getn( missing ) ) )
 		sr_list = missing
 		is_deleting = true
+		offset = 0
 		refresh_list()
 		this:SetText( "Show All" )
 		popup.btn_admin_remove:Show()
@@ -632,9 +635,11 @@ function M.new()
 			is_deleting = false
 			m.msg.request_sr( m.db.events[ event_id ].srId )
 			if not m.debug_enabled or m.db.events[ event_id ].leaderId == m.db.user_settings.discord_id then
+				m.info("start refresh button timer")
 				m.ace_timer.ScheduleTimer( M, function()
+					m.info("enable refresh button")
 					frame.btn_refresh:Enable()
-				end, 30 )
+				end, 7 )
 			end
 		end )
 
@@ -815,21 +820,7 @@ function M.new()
 		end
 
 		local max = math.max( 0, getn( sr_list ) - rows )
-		local value = math.min( max, popup.scroll_bar:GetValue() )
-
-		popup.scroll_bar:SetMinMaxValues( 0, max )
-		popup.scroll_bar:SetValue( value )
-		if value == 0 then
-			m.api[ "RaidCalendarSRScrollBarScrollUpButton" ]:Disable()
-		else
-			m.api[ "RaidCalendarSRScrollBarScrollUpButton" ]:Enable()
-		end
-
-		if value == max then
-			m.api[ "RaidCalendarSRScrollBarScrollDownButton" ]:Disable()
-		else
-			m.api[ "RaidCalendarSRScrollBarScrollDownButton" ]:Enable()
-		end
+		m.update_scrollbar_buttons( "RaidCalendarSRScrollBar", max )
 	end
 
 	--
@@ -860,7 +851,7 @@ function M.new()
 		popup.sr1:Hide()
 		popup.sr2:Hide()
 		-- Ignore refresh timeout if user is admin or event leader
-		if m.db.events[ event_id ].leaderId == m.db.user_settings.discord_id or m.find( m.player, m.db.user_settings.sr_admins ) then popup.btn_refresh:Enable() end
+		if m.debug_enabled or m.db.events[ event_id ].leaderId == m.db.user_settings.discord_id or m.find( m.player, m.db.user_settings.sr_admins ) then popup.btn_refresh:Enable() end
 
 		if not m.db.events[ event_id ].sr then
 			popup.yoursr:SetText( "Please wait while SR data is loading..." )
@@ -886,7 +877,7 @@ function M.new()
 		--
 		-- Admin bar
 		--
-		if sr.adminAccess and m.find( m.player, m.db.user_settings.sr_admins ) then
+		if sr.adminAccess and (m.find( m.player, m.db.user_settings.sr_admins ) or m.db.user_settings.discord_id == m.db.events[ event_id ].leaderId) then
 			is_admin = true
 			popup.border_admin:Show()
 			popup.border_srlist:SetPoint( "TopLeft", popup.border_admin, "BottomLeft", 0, -7 )
