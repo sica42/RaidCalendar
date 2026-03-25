@@ -51,11 +51,11 @@ function M.new()
 	end
 
 	local function find_discord_id( name, bot )
-		broadcast( M.CommandHandler.RequestDiscordId, bot, { name = name } )
+		broadcast( m.MessageCommand.RequestDiscordId, bot, { name = name } )
 	end
 
 	local function authorize_user( user_id, bot )
-		broadcast( M.MessageCommand.RequestDiscordAuth, bot, {
+		broadcast( m.MessageCommand.RequestDiscordAuth, bot, {
 			userId = user_id
 		} )
 	end

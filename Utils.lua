@@ -12,10 +12,10 @@ local bot_check_time = 0
 --- @return number b
 --- @return number a
 function M.hex_to_rgba( hex )
-	local r, g, b, a = string.match( hex, "^#?(%x%x)(%x%x)(%x%x)(%x?%x?)$" )
+	local rr, gg, bb, aa = string.match( hex, "^#?(%x%x)(%x%x)(%x%x)(%x?%x?)$" )
 
-	r, g, b = tonumber( r, 16 ) / 255, tonumber( g, 16 ) / 255, tonumber( b, 16 ) / 255
-	a = a ~= "" and tonumber( a, 16 ) / 255 or 1
+	local r, g, b = tonumber( rr, 16 ) / 255, tonumber( gg, 16 ) / 255, tonumber( bb, 16 ) / 255
+	local a = aa ~= "" and tonumber( aa, 16 ) / 255 or 1
 	return r, g, b, a
 end
 

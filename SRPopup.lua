@@ -635,9 +635,9 @@ function M.new()
 			is_deleting = false
 			m.msg.request_sr( m.db.events[ event_id ].srId )
 			if not m.debug_enabled or m.db.events[ event_id ].leaderId == m.db.user_settings.discord_id then
-				m.info("start refresh button timer")
+				m.debug("start refresh button timer")
 				m.ace_timer.ScheduleTimer( M, function()
-					m.info("enable refresh button")
+					m.debug("enable refresh button")
 					frame.btn_refresh:Enable()
 				end, 7 )
 			end

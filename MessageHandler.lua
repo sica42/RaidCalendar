@@ -270,7 +270,8 @@ function M.new()
 	---@param data table?
 	local function broadcast( command, data )
 		m.debug( string.format( "Broadcasting %s", command ) )
-		local channel = m.db.user_settings.bot_name and "GUILD" or "RAID"
+		--local channel = m.db.user_settings.bot_name and "GUILD" or "RAID"
+		local channel = "GUILD"
 		local _data = data and m.flatten( data ) or ""
 		ace_comm:SendCommMessage( m.prefix, command .. "::" .. _data, channel, nil, "NORMAL" )
 	end
@@ -397,7 +398,7 @@ function M.new()
 			-- Discord ID response
 			--
 			if data.player == m.player then
-				m.welcome_popup.discord_response( data.success, data.userId )
+				m.welcome_popup.discord_response( data.success, data.userId, sender )
 			end
 		elseif command == MessageCommand.ChannelCheckResult then
 			--

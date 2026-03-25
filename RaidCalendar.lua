@@ -42,7 +42,6 @@ function RaidCalendar.events:ADDON_LOADED()
 
 	m.player = UnitName( "player" )
 	m.player_class = UnitClass( "player" )
-	m.player_guild = GetGuildInfo( "player" )
 	m.bot_online = false
 
 	RaidCalendarDB = RaidCalendarDB or {}
@@ -82,6 +81,7 @@ function RaidCalendar.events:ADDON_LOADED()
 	m.minimap_icon = m.MinimapIcon.new()
 
 	if m.db.user_settings.sr_admins == nil then
+		m.debug("Get bot status")
 		m.msg.bot_status()
 	end
 
@@ -137,6 +137,23 @@ function RaidCalendar.events:ADDON_LOADED()
 			return
 		end
 
+		if args == "reset" then
+			m.info( "All settings have been reset" )
+			m.info( "Run \"/rc welcome\" to set up your bot again" )
+			m.db.events = {}
+			m.db.user_settings = {}
+			m.db.user_settings.show_welcome_popup = true
+			m.db.user_settings.time_format = "24"
+			m.db.user_settings.channel_access = {}
+			m.db.bots = m.db.bots or {}
+			m.db.popup_sr = m.db.popup_sr or {}
+			m.db.popup_event = m.db.popup_event or {}
+			m.db.popup_calendar = m.db.popup_calendar or {}
+			m.db.minimap_icon = m.db.minimap_icon or {}
+			m.msg.bot_status()
+			return
+		end
+
 		if args == "welcome" then
 			m.welcome_popup.show()
 			return
@@ -167,10 +184,24 @@ function RaidCalendar.events:ADDON_LOADED()
 			m.get_events()
 		end
 	elseif m.db.user_settings.show_welcome_popup == true then
-		m.welcome_popup.show()
+		local delay = 4
+		m.debug( "Showing welcome popup in " .. delay .. " seconds..." )
+		self.frame:SetScript( "OnUpdate", function()
+			delay = delay - arg1
+			if delay > 0 then return end
+
+			m.welcome_popup.show()
+			self.frame:SetScript( "OnUpdate", nil )
+		end )
 	end
 
 	self.check_new_version()
+end
+
+function RaidCalendar.events:PLAYER_GUILD_UPDATE()
+	if not m.player_guild then
+		m.player_guild = GetGuildInfo( "player" )
+	end
 end
 
 function RaidCalendar.events.CHAT_MSG_CHANNEL()
@@ -223,9 +254,11 @@ end
 
 function RaidCalendar.get_events()
 	if m.db.user_settings.bot_name and m.db.user_settings.bot_name ~= "" then
+		m.debug( "Requesting events from guild bot: " .. m.db.user_settings.bot_name )
 		m.msg.request_events()
 	end
 	if m.table_size( m.db.bots ) > 0 then
+		m.debug( "Requesting events from channel bots" )
 		m.msg_channel.request_events( m.db.bots )
 	end
 end

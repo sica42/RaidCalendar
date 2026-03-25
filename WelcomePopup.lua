@@ -78,6 +78,7 @@ function M.new()
 		popup.input_discord:EnableMouse( false )
 
 		if bot_list[ selected ].in_guild then
+			m.debug( "Guild checking discord id: " .. discord_id )
 			m.msg.find_discord_id( discord_id )
 		else
 			m.msg_channel.find_discord_id( discord_id, bot_list[ selected ].bot_name )
@@ -386,15 +387,19 @@ function M.new()
 	end
 
 	local function add_bot( bot_name, guild_name )
-		if popup:IsVisible() then
+		if popup and popup:IsVisible() then
 			if not m.find( bot_name, bot_list, "bot_name" ) then
 				local data = {
 					bot_name = bot_name,
 					guild_name = guild_name,
 				}
+				m.debug( "Found bot: " .. bot_name .. " for guild: " .. guild_name )
+				m.debug( "Player guild: " .. m.player_guild )
 				if guild_name == m.player_guild then
 					data.in_guild = true
+
 					data.authorized = m.db.user_settings.discord_id and true or false
+					m.msg.bot_status()
 				else
 					local bot = m.db.bots[ bot_name ]
 					data.authorized = bot and bot.discord_id and true or false
