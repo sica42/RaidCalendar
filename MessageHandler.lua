@@ -657,7 +657,7 @@ function M.new()
 					local cmd = string.match( chunk_data, cmd_pat )
 					chunk_data = string.gsub( chunk_data, cmd_pat, "" )
 
-					local lua_data = loadstring( "return " .. chunk_data )()
+					local lua_data = chunk_data and loadstring( "return " .. chunk_data )() or {}
 					on_command( cmd, lua_data, sender )
 				end
 			else

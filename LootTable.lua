@@ -26,23 +26,27 @@ M.loot_table = {
 		}, {
 			[ "id" ] = 566,
 			[ "name" ] = "Ebonroc",
-			[ "position" ] = 4
+			[ "position" ] = 5
 		}, {
 			[ "id" ] = 567,
 			[ "name" ] = "Flamegor",
-			[ "position" ] = 5
+			[ "position" ] = 6
 		}, {
 			[ "id" ] = 568,
 			[ "name" ] = "Chromaggus",
-			[ "position" ] = 6
+			[ "position" ] = 7
 		}, {
 			[ "id" ] = 569,
 			[ "name" ] = "Nefarian",
-			[ "position" ] = 7
+			[ "position" ] = 8
 		}, {
 			[ "id" ] = 570,
 			[ "name" ] = "Trash mobs",
-			[ "position" ] = 8
+			[ "position" ] = 9
+		}, {
+			[ "id" ] = 710,
+			[ "name" ] = "Ezzel Darkbrewer",
+			[ "position" ] = 4
 		} },
 		[ "raidItems" ] = { {
 			[ "id" ] = 5703,
@@ -1087,6 +1091,84 @@ M.loot_table = {
 			[ "quality" ] = 4,
 			[ "itemId" ] = 70213,
 			[ "raidBosses" ] = { 570 }
+		}, {
+			[ "id" ] = 7849,
+			[ "icon" ] = "inv_misc_questionmark",
+			[ "name" ] = "Apron of Fuming Protection",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 33077,
+			[ "raidBosses" ] = { 710 }
+		}, {
+			[ "id" ] = 7850,
+			[ "classes" ] = { "Druid" },
+			[ "icon" ] = "inv_stone_05",
+			[ "name" ] = "Idol of Acidity",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 33097,
+			[ "raidBosses" ] = { 710 }
+		}, {
+			[ "id" ] = 7851,
+			[ "icon" ] = "inv_misc_questionmark",
+			[ "name" ] = "Over-Tinkered Lens",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 33085,
+			[ "raidBosses" ] = { 710 }
+		}, {
+			[ "id" ] = 7854,
+			[ "icon" ] = "inv_misc_questionmark",
+			[ "name" ] = "Philosopher's Barrier",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 33073,
+			[ "raidBosses" ] = { 710 }
+		}, {
+			[ "id" ] = 7855,
+			[ "icon" ] = "inv_misc_questionmark",
+			[ "name" ] = "Ichorus",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 33076,
+			[ "raidBosses" ] = { 710 }
+		}, {
+			[ "id" ] = 7856,
+			[ "icon" ] = "inv_misc_questionmark",
+			[ "name" ] = "Taut Dragonhide Boots",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 33074,
+			[ "raidBosses" ] = { 710 }
+		}, {
+			[ "id" ] = 7857,
+			[ "icon" ] = "inv_misc_questionmark",
+			[ "name" ] = "Staff of Cleansing Vapors",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 33075,
+			[ "raidBosses" ] = { 710 }
+		}, {
+			[ "id" ] = 7858,
+			[ "icon" ] = "inv_misc_questionmark",
+			[ "name" ] = "Vials of Volatile Acid",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 33078,
+			[ "raidBosses" ] = { 710 }
+		}, {
+			[ "id" ] = 7859,
+			[ "icon" ] = "inv_misc_orb_03",
+			[ "name" ] = "Philosopher's Stone Replica",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 33079,
+			[ "raidBosses" ] = { 710 }
+		}, {
+			[ "id" ] = 7860,
+			[ "icon" ] = "inv_bracer_18",
+			[ "name" ] = "Wingbone Vambraces",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 33080,
+			[ "raidBosses" ] = { 710 }
+		}, {
+			[ "id" ] = 7861,
+			[ "icon" ] = "inv_misc_questionmark",
+			[ "name" ] = "Flask of Petrified Gold",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 33081,
+			[ "raidBosses" ] = { 710 }
 		} }
 	},
 	[ 95 ] = {
@@ -3750,6 +3832,13 @@ M.loot_table = {
 			[ "quality" ] = 2,
 			[ "itemId" ] = 37012,
 			[ "raidBosses" ] = { 588 }
+		}, {
+			[ "id" ] = 7852,
+			[ "icon" ] = "inv_misc_monsterspidercarapace_01",
+			[ "name" ] = "Crypt Lord's Beckoning",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 42167,
+			[ "raidBosses" ] = { 586 }
 		} }
 	},
 	[ 97 ] = {
@@ -3759,6 +3848,10 @@ M.loot_table = {
 			[ "id" ] = 598,
 			[ "name" ] = "Onyxia",
 			[ "position" ] = 0
+		}, {
+			[ "id" ] = 711,
+			[ "name" ] = "Broodcommander Axelus",
+			[ "position" ] = 1
 		} },
 		[ "raidItems" ] = { {
 			[ "id" ] = 6165,
@@ -3922,7 +4015,7 @@ M.loot_table = {
 			[ "icon" ] = "inv_misc_stonetablet_03",
 			[ "name" ] = "Draconic for Dummies",
 			[ "quality" ] = 1,
-			[ "itemId" ] = 21110,
+			[ "itemId" ] = 21108,
 			[ "raidBosses" ] = { 598 }
 		}, {
 			[ "id" ] = 6825,
@@ -3945,6 +4038,69 @@ M.loot_table = {
 			[ "quality" ] = 4,
 			[ "itemId" ] = 30017,
 			[ "raidBosses" ] = { 598 }
+		}, {
+			[ "id" ] = 7862,
+			[ "icon" ] = "inv_misc_questionmark",
+			[ "name" ] = "Battle Standard of the Broodcommander",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 33149,
+			[ "raidBosses" ] = { 711 }
+		}, {
+			[ "id" ] = 7863,
+			[ "icon" ] = "inv_misc_questionmark",
+			[ "name" ] = "Yoxtez, Black Breath of the Dragonflight",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 33150,
+			[ "raidBosses" ] = { 711 }
+		}, {
+			[ "id" ] = 7864,
+			[ "icon" ] = "inv_misc_questionmark",
+			[ "name" ] = "Onyxian Brood Egg",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 33151,
+			[ "raidBosses" ] = { 711 }
+		}, {
+			[ "id" ] = 7865,
+			[ "icon" ] = "inv_misc_questionmark",
+			[ "name" ] = "Prestor's Rod of Command",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 33152,
+			[ "raidBosses" ] = { 711 }
+		}, {
+			[ "id" ] = 7866,
+			[ "icon" ] = "inv_misc_questionmark",
+			[ "name" ] = "Ignited Obsidian Scale",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 33153,
+			[ "raidBosses" ] = { 711 }
+		}, {
+			[ "id" ] = 7867,
+			[ "icon" ] = "inv_misc_questionmark",
+			[ "name" ] = "Ring of Burning Talons",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 33154,
+			[ "raidBosses" ] = { 711 }
+		}, {
+			[ "id" ] = 7868,
+			[ "icon" ] = "inv_shield_23",
+			[ "name" ] = "Scaleshield of the Obsidian Flight",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 33155,
+			[ "raidBosses" ] = { 711 }
+		}, {
+			[ "id" ] = 7869,
+			[ "icon" ] = "inv_spear_08",
+			[ "name" ] = "Dragonhunter Javelin",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 33156,
+			[ "raidBosses" ] = { 711 }
+		}, {
+			[ "id" ] = 7870,
+			[ "icon" ] = "inv_sword_01",
+			[ "name" ] = "Broodwarden's Bulwarkblade",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 33157,
+			[ "raidBosses" ] = { 711 }
 		} }
 	},
 	[ 98 ] = {
@@ -4647,7 +4803,7 @@ M.loot_table = {
 			[ "id" ] = 6299,
 			[ "classes" ] = { "Rogue" },
 			[ "icon" ] = "inv_misc_book_10",
-			[ "name" ] = "Handbook of Deadly Poison V",
+			[ "name" ] = "Handbook of Lethal Poisons",
 			[ "quality" ] = 3,
 			[ "itemId" ] = 21302,
 			[ "raidBosses" ] = { 608 }
@@ -7362,7 +7518,7 @@ M.loot_table = {
 			[ "icon" ] = "inv_weapon_shortblade_23",
 			[ "name" ] = "The Scythe of Elune",
 			[ "quality" ] = 5,
-			[ "itemId" ] = 61759,
+			[ "itemId" ] = 61184,
 			[ "raidBosses" ] = { 642 }
 		}, {
 			[ "id" ] = 6677,
@@ -7611,6 +7767,13 @@ M.loot_table = {
 			[ "quality" ] = 4,
 			[ "itemId" ] = 58401,
 			[ "raidBosses" ] = { 639, 640, 641, 642, 643, 644 }
+		}, {
+			[ "id" ] = 7853,
+			[ "icon" ] = "ability_hunter_beastcall",
+			[ "name" ] = "Lord Blackwald II's Riding Whistle",
+			[ "quality" ] = 4,
+			[ "itemId" ] = 42166,
+			[ "raidBosses" ] = { 642 }
 		} }
 	},
 	[ 102 ] = {
@@ -7624,10 +7787,6 @@ M.loot_table = {
 			[ "id" ] = 647,
 			[ "name" ] = "Solnius",
 			[ "position" ] = 1
-		}, {
-			[ "id" ] = 648,
-			[ "name" ] = "Solnius 2 (DEPRECATED)",
-			[ "position" ] = 2
 		}, {
 			[ "id" ] = 649,
 			[ "name" ] = "Hard-mode",
@@ -7660,7 +7819,7 @@ M.loot_table = {
 			[ "raidBosses" ] = { 646, 649, 650 }
 		}, {
 			[ "id" ] = 6710,
-			[ "icon" ] = "inv_misc_monsterscales_11",
+			[ "icon" ] = "inv_misc_questionmark",
 			[ "name" ] = "Dreamscale",
 			[ "quality" ] = 2,
 			[ "itemId" ] = 20381,
@@ -7741,7 +7900,7 @@ M.loot_table = {
 			[ "name" ] = "Mantle of the Wakener",
 			[ "quality" ] = 4,
 			[ "itemId" ] = 61214,
-			[ "raidBosses" ] = { 646, 647, 648, 649, 650 }
+			[ "raidBosses" ] = { 646, 647, 649, 650 }
 		}, {
 			[ "id" ] = 6722,
 			[ "icon" ] = "inv_helmet_02",
@@ -8037,6 +8196,10 @@ M.loot_table = {
 			[ "id" ] = 665,
 			[ "name" ] = "General Drakkisath",
 			[ "position" ] = 9
+		}, {
+			[ "id" ] = 666,
+			[ "name" ] = "Trash Mobs",
+			[ "position" ] = 10
 		} },
 		[ "raidItems" ] = { {
 			[ "id" ] = 6948,
@@ -8834,29 +8997,21 @@ M.loot_table = {
 		[ "name" ] = "Tower of Karazhan",
 		[ "reference" ] = "TK",
 		[ "raidBosses" ] = { {
-			[ "id" ] = 669,
-			[ "name" ] = "Unknown boss",
-			[ "position" ] = 0
-		}, {
 			[ "id" ] = 671,
 			[ "name" ] = "Anomalus",
-			[ "position" ] = 1
+			[ "position" ] = 2
 		}, {
 			[ "id" ] = 672,
 			[ "name" ] = "Keeper Gnarlmoon",
-			[ "position" ] = 2
-		}, {
-			[ "id" ] = 673,
-			[ "name" ] = "Ima'ghaol",
-			[ "position" ] = 3
+			[ "position" ] = 0
 		}, {
 			[ "id" ] = 674,
 			[ "name" ] = "Incantagos",
-			[ "position" ] = 5
+			[ "position" ] = 1
 		}, {
 			[ "id" ] = 675,
 			[ "name" ] = "Echo of Medivh",
-			[ "position" ] = 10
+			[ "position" ] = 4
 		}, {
 			[ "id" ] = 676,
 			[ "name" ] = "Sanv Tas'dal",
@@ -8868,19 +9023,19 @@ M.loot_table = {
 		}, {
 			[ "id" ] = 678,
 			[ "name" ] = "Mephistroth",
-			[ "position" ] = 8
+			[ "position" ] = 9
 		}, {
 			[ "id" ] = 679,
 			[ "name" ] = "Kruul",
-			[ "position" ] = 9
+			[ "position" ] = 8
 		}, {
 			[ "id" ] = 680,
 			[ "name" ] = "King's Council",
-			[ "position" ] = 4
+			[ "position" ] = 5
 		}, {
 			[ "id" ] = 681,
 			[ "name" ] = "Trash mobs",
-			[ "position" ] = 11
+			[ "position" ] = 10
 		} },
 		[ "raidItems" ] = { {
 			[ "id" ] = 7079,
@@ -8888,7 +9043,7 @@ M.loot_table = {
 			[ "name" ] = "Broken Lock",
 			[ "quality" ] = 1,
 			[ "itemId" ] = 16747,
-			[ "raidBosses" ] = { 669 }
+			[ "raidBosses" ] = { 681 }
 		}, {
 			[ "id" ] = 7215,
 			[ "icon" ] = "inv_enchant_dustsoul",
@@ -9260,11 +9415,11 @@ M.loot_table = {
 			[ "raidBosses" ] = { 677 }
 		}, {
 			[ "id" ] = 7274,
-			[ "icon" ] = "inv_stone_10",
+			[ "icon" ] = "inv_misc_questionmark",
 			[ "name" ] = "Fragments of Aldrach",
 			[ "quality" ] = 4,
 			[ "itemId" ] = 55510,
-			[ "raidBosses" ] = { 677 }
+			[ "raidBosses" ] = { 679 }
 		}, {
 			[ "id" ] = 7275,
 			[ "icon" ] = "inv_gauntlets_05",
@@ -9368,7 +9523,7 @@ M.loot_table = {
 			[ "raidBosses" ] = { 675 }
 		}, {
 			[ "id" ] = 7289,
-			[ "icon" ] = "spell_shadow_soulgem",
+			[ "icon" ] = "inv_misc_questionmark",
 			[ "name" ] = "Eye of Dormant Corruption",
 			[ "quality" ] = 4,
 			[ "itemId" ] = 55111,
@@ -9480,21 +9635,21 @@ M.loot_table = {
 			[ "name" ] = "Boots of the Grand Crusader",
 			[ "quality" ] = 4,
 			[ "itemId" ] = 55282,
-			[ "raidBosses" ] = { 681 }
+			[ "raidBosses" ] = { 673, 681 }
 		}, {
 			[ "id" ] = 7307,
 			[ "icon" ] = "inv_jewelry_necklace_27",
 			[ "name" ] = "Brand of Karazhan",
 			[ "quality" ] = 4,
 			[ "itemId" ] = 55508,
-			[ "raidBosses" ] = { 681 }
+			[ "raidBosses" ] = { 673, 681 }
 		}, {
 			[ "id" ] = 7308,
 			[ "icon" ] = "inv_belt_08",
 			[ "name" ] = "Dragunovi's Sash of Domination",
 			[ "quality" ] = 4,
 			[ "itemId" ] = 55284,
-			[ "raidBosses" ] = { 681 }
+			[ "raidBosses" ] = { 673, 681 }
 		}, {
 			[ "id" ] = 7309,
 			[ "classes" ] = { "Shaman" },
@@ -9502,7 +9657,7 @@ M.loot_table = {
 			[ "name" ] = "Gauntlets of Elemental Fury",
 			[ "quality" ] = 4,
 			[ "itemId" ] = 55281,
-			[ "raidBosses" ] = { 681 }
+			[ "raidBosses" ] = { 673, 681 }
 		}, {
 			[ "id" ] = 7310,
 			[ "classes" ] = { "Paladin" },
@@ -9524,14 +9679,14 @@ M.loot_table = {
 			[ "name" ] = "Ques' Gauntlets of Precision",
 			[ "quality" ] = 4,
 			[ "itemId" ] = 55278,
-			[ "raidBosses" ] = { 681 }
+			[ "raidBosses" ] = { 673, 681 }
 		}, {
 			[ "id" ] = 7314,
 			[ "icon" ] = "inv_jewelry_ring_33",
 			[ "name" ] = "Ring of Holy Light",
 			[ "quality" ] = 4,
 			[ "itemId" ] = 55286,
-			[ "raidBosses" ] = { 681 }
+			[ "raidBosses" ] = { 673, 681 }
 		}, {
 			[ "id" ] = 7315,
 			[ "classes" ] = { "Mage" },
@@ -9553,14 +9708,14 @@ M.loot_table = {
 			[ "name" ] = "Slivers of Nullification",
 			[ "quality" ] = 4,
 			[ "itemId" ] = 55275,
-			[ "raidBosses" ] = { 681 }
+			[ "raidBosses" ] = { 673, 681 }
 		}, {
 			[ "id" ] = 7318,
 			[ "icon" ] = "inv_theend",
 			[ "name" ] = "The End of All Ambitions",
 			[ "quality" ] = 4,
 			[ "itemId" ] = 55277,
-			[ "raidBosses" ] = { 681 }
+			[ "raidBosses" ] = { 673, 681 }
 		}, {
 			[ "id" ] = 7320,
 			[ "classes" ] = { "Druid" },
@@ -9617,14 +9772,14 @@ M.loot_table = {
 			[ "name" ] = "Pristine Ley Crystal",
 			[ "quality" ] = 4,
 			[ "itemId" ] = 41485,
-			[ "raidBosses" ] = { 671, 674, 675, 677, 678, 679, 680, 681 }
+			[ "raidBosses" ] = { 671, 674, 675, 676, 677, 678, 679, 680, 681 }
 		}, {
 			[ "id" ] = 7676,
 			[ "icon" ] = "inv_jewelry_necklace_29",
 			[ "name" ] = "Ephemeral Pendant",
 			[ "quality" ] = 4,
 			[ "itemId" ] = 55482,
-			[ "raidBosses" ] = { 677, 678, 679, 680 }
+			[ "raidBosses" ] = { 676, 677, 678, 679, 680 }
 		}, {
 			[ "id" ] = 7679,
 			[ "icon" ] = "inv_helmet_57",
@@ -9674,6 +9829,13 @@ M.loot_table = {
 			[ "quality" ] = 4,
 			[ "itemId" ] = 92082,
 			[ "raidBosses" ] = { 678 }
+		}, {
+			[ "id" ] = 7848,
+			[ "icon" ] = "inv_weapon_shortblade_16",
+			[ "name" ] = "Tiny Warp Stalker",
+			[ "quality" ] = 3,
+			[ "itemId" ] = 69001,
+			[ "raidBosses" ] = { 676 }
 		} }
 	},
 	[ 110 ] = {
